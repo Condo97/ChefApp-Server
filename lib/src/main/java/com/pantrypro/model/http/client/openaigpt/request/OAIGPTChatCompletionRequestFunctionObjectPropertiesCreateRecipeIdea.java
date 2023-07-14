@@ -6,20 +6,20 @@ import com.oaigptconnector.model.request.chat.completion.function.objects.OAIGPT
 public class OAIGPTChatCompletionRequestFunctionObjectPropertiesCreateRecipeIdea {
 
     private OAIGPTChatCompletionRequestFunctionObjectArray ingredients;
-    private OAIGPTChatCompletionRequestFunctionObjectArray equipment;
+//    private OAIGPTChatCompletionRequestFunctionObjectArray equipment;
     private OAIGPTChatCompletionRequestFunctionObjectString name;
-    private OAIGPTChatCompletionRequestFunctionObjectString summary;
+    private OAIGPTChatCompletionRequestFunctionObjectString short10To40WordEngagingInterestingSummary;
     private OAIGPTChatCompletionRequestFunctionObjectString cuisineType;
 
     public OAIGPTChatCompletionRequestFunctionObjectPropertiesCreateRecipeIdea() {
 
     }
 
-    public OAIGPTChatCompletionRequestFunctionObjectPropertiesCreateRecipeIdea(OAIGPTChatCompletionRequestFunctionObjectArray ingredients, OAIGPTChatCompletionRequestFunctionObjectArray equipment, OAIGPTChatCompletionRequestFunctionObjectString name, OAIGPTChatCompletionRequestFunctionObjectString summary, OAIGPTChatCompletionRequestFunctionObjectString cuisineType) {
+    public OAIGPTChatCompletionRequestFunctionObjectPropertiesCreateRecipeIdea(OAIGPTChatCompletionRequestFunctionObjectArray ingredients, OAIGPTChatCompletionRequestFunctionObjectString name, OAIGPTChatCompletionRequestFunctionObjectString short10To40WordEngagingInterestingSummary, OAIGPTChatCompletionRequestFunctionObjectString cuisineType) {
         this.ingredients = ingredients;
-        this.equipment = equipment;
+//        this.equipment = equipment;
         this.name = name;
-        this.summary = summary;
+        this.short10To40WordEngagingInterestingSummary = short10To40WordEngagingInterestingSummary;
         this.cuisineType = cuisineType;
     }
 
@@ -27,16 +27,16 @@ public class OAIGPTChatCompletionRequestFunctionObjectPropertiesCreateRecipeIdea
         return ingredients;
     }
 
-    public OAIGPTChatCompletionRequestFunctionObjectArray getEquipment() {
-        return equipment;
-    }
+//    public OAIGPTChatCompletionRequestFunctionObjectArray getEquipment() {
+//        return equipment;
+//    }
 
     public OAIGPTChatCompletionRequestFunctionObjectString getName() {
         return name;
     }
 
-    public OAIGPTChatCompletionRequestFunctionObjectString getSummary() {
-        return summary;
+    public OAIGPTChatCompletionRequestFunctionObjectString getShort10To40WordEngagingInterestingSummary() {
+        return short10To40WordEngagingInterestingSummary;
     }
 
     public OAIGPTChatCompletionRequestFunctionObjectString getCuisineType() {

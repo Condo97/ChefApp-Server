@@ -6,6 +6,7 @@ import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
 import com.pantrypro.core.Server;
 import com.pantrypro.keys.Keys;
+import com.pantrypro.model.exceptions.ResponseStatusException;
 import com.pantrypro.model.http.server.ResponseStatus;
 import com.pantrypro.model.http.server.response.BodyResponse;
 import com.pantrypro.model.http.server.response.GetIAPStuffResponse;
@@ -22,7 +23,7 @@ public class Main {
     private static final int MIN_THREADS = 1;
     private static final int TIMEOUT_MS = -1; //30000;
 
-    private static final int DEFAULT_PORT = 443;
+    private static final int DEFAULT_PORT = 800;
 
     public static void main(String... args) throws SQLException {
         // Set up MySQL Driver
@@ -58,25 +59,30 @@ public class Main {
         configureHttpEndpoints();
 
         // Exception Handling
+        exception(ResponseStatusException.class, (e, req, res) -> {
+            // If it is a ResponseStatusException, then send the response status to the client
+            res.body(Server.getSimpleExceptionHandlerResponseStatusJSON(e.getResponseStatus(), e.getMessage()));
+        });
+
         exception(JsonMappingException.class, (error, req, res) -> {
             System.out.println("The request: " + req.body());
             error.printStackTrace();
 
-            res.body(Server.getSimpleExceptionHandlerResponseStatusJSON(ResponseStatus.JSON_ERROR));
+            res.body(Server.getSimpleExceptionHandlerResponseStatusJSON(ResponseStatus.JSON_ERROR, "JSON Format Issue"));
         });
 
         exception(OpenAIGPTException.class, (error, req, res) -> {
             System.out.println("The request: " + req.body());
             error.printStackTrace();
 
-            res.body(Server.getSimpleExceptionHandlerResponseStatusJSON(ResponseStatus.OAIGPT_ERROR));
+            res.body(Server.getSimpleExceptionHandlerResponseStatusJSON(ResponseStatus.OAIGPT_ERROR, "Issue with our GPT provider."));
         });
 
         exception(IllegalArgumentException.class, (error, req, res) -> {
             System.out.println("The request: " + req.body());
             error.printStackTrace();
 
-            res.body(Server.getSimpleExceptionHandlerResponseStatusJSON(ResponseStatus.ILLEGAL_ARGUMENT));
+            res.body(Server.getSimpleExceptionHandlerResponseStatusJSON(ResponseStatus.ILLEGAL_ARGUMENT, "Illegal argument"));
         });
 
         exception(Exception.class, (error, req, res) -> {
@@ -84,7 +90,7 @@ public class Main {
             System.out.println("The request: " + req.body());
             error.printStackTrace();
 
-            res.body(Server.getSimpleExceptionHandlerResponseStatusJSON(ResponseStatus.UNHANDLED_ERROR));
+            res.body(Server.getSimpleExceptionHandlerResponseStatusJSON(ResponseStatus.UNHANDLED_ERROR, "Unhandled error! :O"));
         });
 
         // Handle not found (404)
@@ -114,12 +120,17 @@ public class Main {
 
     private static void configureHttpEndpoints(boolean dev) {
         // POST Functions
-        post(Constants.URIs.Function.CREATE_RECIPE_IDEA, Server.Func::createRecipeIdea);
+        post(Constants.URIs.CATEGORIZE_INGREDIENTS, Server.Func::categorizeIngredients);
+        post(Constants.URIs.CREATE_RECIPE_IDEA, Server.Func::createRecipeIdea);
+        post(Constants.URIs.MAKE_RECIPE, Server.Func::makeRecipe);
+        post(Constants.URIs.TAG_RECIPE_IDEA, Server.Func::tagRecipeIdea);
 
+        post(Constants.URIs.GET_ALL_TAGS_URI, Server::getAllTags);
         post(Constants.URIs.GET_IS_PREMIUM_URI, Server::getIsPremium);
-//        post(Constants.URIs.GET_REMAINING_URI, Server::getRemainingChats);
-        post(Constants.URIs.REGISTER_USER_URI, Server::registerUser);
+        post(Constants.URIs.GET_REMAINING_URI, Server::getRemainingIdeaRecipes);
         post(Constants.URIs.REGISTER_TRANSACTION_URI, Server::registerTransaction);
+        post(Constants.URIs.REGISTER_USER_URI, Server::registerUser);
+        post(Constants.URIs.VALIDATE_AUTH_TOKEN_URI, Server::validateAuthToken);
 
         // Get Constants
         post(Constants.URIs.GET_IMPORTANT_CONSTANTS_URI, (req, res) -> new ObjectMapper().writeValueAsString(new BodyResponse(ResponseStatus.SUCCESS, new GetImportantConstantsResponse())));

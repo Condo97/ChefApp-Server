@@ -28,11 +28,11 @@ public class User_AuthTokenDBManager extends DBManager {
 
         // If there are no u_aTs, throw an exception
         if (u_aTs.size() == 0)
-            throw new DBObjectNotFoundFromQueryException("No most recent user_authToken found!");
+            throw new DBObjectNotFoundFromQueryException("No user_authToken found!");
 
         // If there is more than one u_aTs, it shouldn't be a functionality issue at this moment but print to console to see how widespread this is
         if (u_aTs.size() > 1)
-            System.out.println("More than one user_authToken found when getting most recent User_AuthToken, even though there is a limit of one transaction.. This should never be seen!");
+            System.out.println("More than one user_authToken found when getting User_AuthToken.. This should never be seen!");
 
         // Return first u_aT
         return u_aTs.get(0);

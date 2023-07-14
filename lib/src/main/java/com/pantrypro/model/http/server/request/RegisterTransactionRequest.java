@@ -1,8 +1,7 @@
 package com.pantrypro.model.http.server.request;
 
-public class RegisterTransactionRequest {
+public class RegisterTransactionRequest extends AuthRequest {
 
-    private String authToken;
     private Long transactionId;
 
     // LEGACY
@@ -13,13 +12,9 @@ public class RegisterTransactionRequest {
     }
 
     public RegisterTransactionRequest(String authToken, Long transactionId, String receiptString) {
-        this.authToken = authToken;
+        super(authToken);
         this.transactionId = transactionId;
         this.receiptString = receiptString;
-    }
-
-    public String getAuthToken() {
-        return authToken;
     }
 
     public Long getTransactionId() {

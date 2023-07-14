@@ -17,7 +17,11 @@ public class RecipeInstruction {
     private String text;
 
     public RecipeInstruction() {
-        // This object should only be created from DBDeserializer (or DBSerializer if thats the right one lol), and if a new one is to be created, it needs to be inserted with an insertion "builder" method BEFORE it's created here
+
+    }
+
+    public RecipeInstruction(String text) {
+        this.text = text;
     }
 
     public Integer getId() {
@@ -26,6 +30,10 @@ public class RecipeInstruction {
 
     public Integer getRecipeID() {
         return recipeID;
+    }
+
+    public void setRecipeID(Integer recipeID) {
+        this.recipeID = recipeID;
     }
 
     public String getText() {

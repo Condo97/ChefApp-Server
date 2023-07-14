@@ -17,11 +17,19 @@ public class IdeaRecipeEquipment {
     private String name;
 
     public IdeaRecipeEquipment() {
-        // This object should only be created from DBDeserializer (or DBSerializer if thats the right one lol), and if a new one is to be created, it needs to be inserted with an insertion "builder" method BEFORE it's created here
+
+    }
+
+    public IdeaRecipeEquipment(String name) {
+        this.name = name;
     }
 
     public Integer getId() {
         return id;
+    }
+
+    public void setIdeaID(Integer ideaID) {
+        this.ideaID = ideaID;
     }
 
     public Integer getIdeaId() {

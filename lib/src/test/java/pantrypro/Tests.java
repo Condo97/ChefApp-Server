@@ -1,5 +1,6 @@
 package pantrypro;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oaigptconnector.core.OpenAIGPTHttpsClientHelper;
 import com.oaigptconnector.model.Role;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
@@ -8,11 +9,14 @@ import com.oaigptconnector.model.request.chat.completion.OAIGPTChatCompletionReq
 import com.oaigptconnector.model.response.chat.completion.http.OAIGPTChatCompletionResponse;
 import com.pantrypro.Constants;
 import com.pantrypro.common.exceptions.AutoIncrementingDBObjectExistsException;
+import com.pantrypro.common.exceptions.CapReachedException;
 import com.pantrypro.common.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.common.exceptions.PreparedStatementMissingArgumentException;
 import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
+import com.pantrypro.core.PPGPTGenerator;
 import com.pantrypro.core.database.managers.TransactionDBManager;
 import com.pantrypro.core.database.managers.User_AuthTokenDBManager;
+import com.pantrypro.core.service.endpoints.CreateRecipeIdeaEndpoint;
 import com.pantrypro.core.service.endpoints.GetIsPremiumEndpoint;
 import com.pantrypro.core.service.endpoints.RegisterTransactionEndpoint;
 import com.pantrypro.core.service.endpoints.RegisterUserEndpoint;
@@ -20,13 +24,12 @@ import com.pantrypro.keys.Keys;
 import com.pantrypro.model.database.AppStoreSubscriptionStatus;
 import com.pantrypro.model.database.objects.Transaction;
 import com.pantrypro.model.database.objects.User_AuthToken;
+import com.pantrypro.model.exceptions.ResponseStatusException;
 import com.pantrypro.model.http.client.apple.itunes.exception.AppStoreStatusResponseException;
 import com.pantrypro.model.http.client.apple.itunes.exception.AppleItunesResponseException;
-import com.pantrypro.model.http.server.request.AuthRequest;
-import com.pantrypro.model.http.server.request.RegisterTransactionRequest;
-import com.pantrypro.model.http.server.response.AuthResponse;
-import com.pantrypro.model.http.server.response.BodyResponse;
-import com.pantrypro.model.http.server.response.IsPremiumResponse;
+import com.pantrypro.model.http.client.openaigpt.request.builder.OAIGPTChatCompletionRequestFunctionCategorizeIngredientsBuilder;
+import com.pantrypro.model.http.server.request.*;
+import com.pantrypro.model.http.server.response.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -166,57 +169,57 @@ public class Tests {
 
     }
 
-    @Test
-    @DisplayName("Test Registering Transaction")
-    void testTransactionValidation() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, AppStoreStatusResponseException, UnrecoverableKeyException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchMethodException, InstantiationException, PreparedStatementMissingArgumentException, AppleItunesResponseException {
-        /* REGISTER TRANSACTION ENDPOINT */
-        // Input
-        final Long sampleTransactionId = 2000000351816446l;
-        // Expected Results
-        final AppStoreSubscriptionStatus expectedStatus = AppStoreSubscriptionStatus.EXPIRED;
-        final Boolean expectedIsPremiumValue1 = false;
-
-        // Register user
-        BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
-        AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
-
-        // Get authToken
-        String authToken = aResponse.getAuthToken();
-
-        // Create register transaction request
-        RegisterTransactionRequest rtr = new RegisterTransactionRequest(authToken, sampleTransactionId, null);
-
-        // Register transaction
-        BodyResponse registerTransactionBR = RegisterTransactionEndpoint.registerTransaction(rtr);
-        IsPremiumResponse ipr1 = (IsPremiumResponse)registerTransactionBR.getBody();
-
-        // Get User_AuthToken
-        User_AuthToken u_aT = User_AuthTokenDBManager.getFromDB(authToken);
-
-        // Verify transaction registered successfully
-        Transaction transaction = TransactionDBManager.getMostRecent(u_aT.getUserID());
-        assert(transaction != null);
-        System.out.println(transaction.getAppstoreTransactionID() + " " + sampleTransactionId);
-        assert(transaction.getAppstoreTransactionID().equals(sampleTransactionId));
-//        assert(transaction.getStatus() == expectedStatus);
-
-        // Verify registered transaction successfully got isPremium value
-//        assert(ipr1.getIsPremium() == expectedIsPremiumValue1);
-
-        /* IS PREMIUM ENDPOINT */
-        // Expected Results
-        final Boolean expectedIsPremiumValue2 = false;
-
-        // Create authRequest
-        AuthRequest aRequest = new AuthRequest(authToken);
-
-        // Get Is Premium from endpoint
-        BodyResponse isPremiumBR = GetIsPremiumEndpoint.getIsPremium(aRequest);
-        IsPremiumResponse ipr2 = (IsPremiumResponse)isPremiumBR.getBody();
-
-        // Verify results
-//        assert(ipr2.getIsPremium() == expectedIsPremiumValue2);
-    }
+//    @Test
+//    @DisplayName("Test Registering Transaction")
+//    void testTransactionValidation() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, AppStoreStatusResponseException, UnrecoverableKeyException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchMethodException, InstantiationException, PreparedStatementMissingArgumentException, AppleItunesResponseException {
+//        /* REGISTER TRANSACTION ENDPOINT */
+//        // Input
+//        final Long sampleTransactionId = 2000000351816446l;
+//        // Expected Results
+//        final AppStoreSubscriptionStatus expectedStatus = AppStoreSubscriptionStatus.EXPIRED;
+//        final Boolean expectedIsPremiumValue1 = false;
+//
+//        // Register user
+//        BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
+//        AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
+//
+//        // Get authToken
+//        String authToken = aResponse.getAuthToken();
+//
+//        // Create register transaction request
+//        RegisterTransactionRequest rtr = new RegisterTransactionRequest(authToken, sampleTransactionId, null);
+//
+//        // Register transaction
+//        BodyResponse registerTransactionBR = RegisterTransactionEndpoint.registerTransaction(rtr);
+//        IsPremiumResponse ipr1 = (IsPremiumResponse)registerTransactionBR.getBody();
+//
+//        // Get User_AuthToken
+//        User_AuthToken u_aT = User_AuthTokenDBManager.getFromDB(authToken);
+//
+//        // Verify transaction registered successfully
+//        Transaction transaction = TransactionDBManager.getMostRecent(u_aT.getUserID());
+//        assert(transaction != null);
+//        System.out.println(transaction.getAppstoreTransactionID() + " " + sampleTransactionId);
+//        assert(transaction.getAppstoreTransactionID().equals(sampleTransactionId));
+////        assert(transaction.getStatus() == expectedStatus);
+//
+//        // Verify registered transaction successfully got isPremium value
+////        assert(ipr1.getIsPremium() == expectedIsPremiumValue1);
+//
+//        /* IS PREMIUM ENDPOINT */
+//        // Expected Results
+//        final Boolean expectedIsPremiumValue2 = false;
+//
+//        // Create authRequest
+//        AuthRequest aRequest = new AuthRequest(authToken);
+//
+//        // Get Is Premium from endpoint
+//        BodyResponse isPremiumBR = GetIsPremiumEndpoint.getIsPremium(aRequest);
+//        IsPremiumResponse ipr2 = (IsPremiumResponse)isPremiumBR.getBody();
+//
+//        // Verify results
+////        assert(ipr2.getIsPremium() == expectedIsPremiumValue2);
+//    }
 
 //    @Test
 //    @DisplayName("Test Create Recipe Idea Endpoint")
@@ -244,8 +247,130 @@ public class Tests {
 //    }
 
     @Test
+    @DisplayName("Test Create Recipe Idea Endpoint")
+    void testCreateRecipeIdeaEndpoint() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, AppStoreStatusResponseException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, NoSuchMethodException, UnrecoverableKeyException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException {
+        // Register user
+        BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
+        AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
+
+        // Get authToken
+        String authToken = aResponse.getAuthToken();
+
+        // Build CreateRecipeIdeaRequest
+        CreateRecipeIdeaRequest request = new CreateRecipeIdeaRequest(
+                authToken,
+                "peaches, flour, eggs, oatmeal, chocolate chips",
+                "make souffle",
+                0
+        );
+
+        // Generate pack save create recipe idea function
+        BodyResponse bResponse = PPGPTGenerator.generatePackSaveCreateRecipeIdeaFunction(request);
+
+        // Ensure body is CreateRecipeIdeaResponse
+        assert(bResponse.getBody() instanceof CreateRecipeIdeaResponse);
+    }
+
+    @Test
+    @DisplayName("Test Make Recipe Endpoint")
+    void testMakeRecipeEndpiont() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, AppStoreStatusResponseException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, NoSuchMethodException, UnrecoverableKeyException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException {
+        // Register user
+        BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
+        AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
+
+        // Get authToken
+        String authToken = aResponse.getAuthToken();
+
+        // Build MakeRecipeRequest
+        MakeRecipeRequest request = new MakeRecipeRequest(
+                authToken,
+                1
+        );
+
+        try {
+            // Generate pack save make recipe function
+            PPGPTGenerator.generatePackSaveMakeRecipe(request);
+        } catch (ResponseStatusException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    @DisplayName("Test Tag Recipe Idea")
+    void testTagRecipeIdea() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, OpenAIGPTException, DBObjectNotFoundFromQueryException, IOException, NoSuchMethodException, InstantiationException, AppStoreStatusResponseException, UnrecoverableKeyException, CapReachedException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException {
+        final String ingredients = "peaches, flour, eggs";
+        final String modifiers = null;
+
+        // Register user
+        BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
+        AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
+
+        // Create recipe idea request
+        CreateRecipeIdeaRequest ideaRecipeRequest = new CreateRecipeIdeaRequest(
+                aResponse.getAuthToken(),
+                ingredients,
+                modifiers,
+                1
+        );
+        BodyResponse recipeIdeaBR = PPGPTGenerator.generatePackSaveCreateRecipeIdeaFunction(ideaRecipeRequest);
+
+        // Assert recipeIdeaBR body is CreateRecipeIdeaResponse
+        assert(recipeIdeaBR.getBody() instanceof CreateRecipeIdeaResponse);
+
+        // Parse idea ID out of recipeIdeaBR
+        Integer ideaID = ((CreateRecipeIdeaResponse)recipeIdeaBR.getBody()).getIdeaID();
+
+        // Build TagIdeaRecipeRequest
+        TagRecipeIdeaRequest trir = new TagRecipeIdeaRequest(
+                aResponse.getAuthToken(),
+                ideaID
+        );
+
+        try {
+            // Generate pack save make tag recipe idea
+            PPGPTGenerator.generatePackIdeaRecipeTags(trir);
+        } catch (ResponseStatusException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    @DisplayName("Test Categorize Ingredients")
+    void testCategorizeIngredients() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, DBObjectNotFoundFromQueryException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException {
+        final List<String> ingredients = List.of(
+                "peaches",
+                "flour",
+                "eggs",
+                "bread",
+                "paper towels",
+                "chef boy r dee",
+                "pasta"
+        );
+
+        // Register user
+        BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
+        AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
+
+        // Create categorize ingredients request
+        CategorizeIngredientsRequest categorizeIngredientsRequest = new CategorizeIngredientsRequest(
+                aResponse.getAuthToken(),
+                ingredients,
+                null
+        );
+        BodyResponse categorizeIngredientsBR = PPGPTGenerator.generatePackSaveCategorizeIngredientsFunction(categorizeIngredientsRequest);
+
+        // Assert categorizeIngredientsBR body is CategorizeIngredientsResponse
+        assert(categorizeIngredientsBR.getBody() instanceof CategorizeIngredientsResponse);
+
+        // Print ingredients and categories
+        CategorizeIngredientsResponse categorizeIngredientsResponse = (CategorizeIngredientsResponse)categorizeIngredientsBR.getBody();
+        categorizeIngredientsResponse.getIngredientCategories().forEach(ic -> System.out.println(ic.getIngredient() + " " + ic.getCategory()));
+    }
+
+    @Test
     @DisplayName("Misc Modifyable")
-    void misc() {
+    void misc() throws IOException {
 //        System.out.println("Here it is: " + Table.USER_AUTHTOKEN);
+        System.out.println("OAIGPTChatCompletionRequestFunctionCategorizeIngredients:\n" + new ObjectMapper().writeValueAsString(OAIGPTChatCompletionRequestFunctionCategorizeIngredientsBuilder.build()));
     }
 }

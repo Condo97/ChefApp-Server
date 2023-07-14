@@ -7,10 +7,13 @@ public class DBRegistry {
         public class IdeaRecipe {
             public static final String TABLE_NAME = "IdeaRecipe";
             public static final String idea_id = "idea_id";
+            public static final String user_id = "user_id";
             public static final String input = "input";
             public static final String name = "name";
             public static final String summary = "summary";
             public static final String cuisine_type = "cuisine_type";
+            public static final String expand_ingredients_magnitude = "expand_ingredients_magnitude";
+            public static final String date = "date";
         }
 
         public class IdeaRecipeEquipment {
@@ -25,13 +28,21 @@ public class DBRegistry {
             public static final String ingredient_id = "ingredient_id";
             public static final String idea_id = "idea_id";
             public static final String name = "name";
-            public static final String amount = "amount";
+        }
+
+        public class IdeaRecipeTag {
+            public static final String TABLE_NAME = "IdeaRecipeTag";
+            public static final String tag_id = "tag_id";
+            public static final String idea_id = "idea_id";
+            public static final String tag = "tag";
         }
 
         public class Recipe {
             public static final String TABLE_NAME = "Recipe";
             public static final String recipe_id = "recipe_id";
             public static final String idea_id = "idea_id";
+            public static final String estimated_total_minutes = "estimated_total_minutes";
+            public static final String date = "date";
         }
 
         public class RecipeEquipment {
@@ -41,12 +52,11 @@ public class DBRegistry {
             public static final String name = "name";
         }
 
-        public class RecipeIngredient {
-            public static final String TABLE_NAME = "RecipeIngredient";
+        public class RecipeMeasuredIngredient {
+            public static final String TABLE_NAME = "RecipeMeasuredIngredient";
             public static final String ingredient_id = "ingredient_id";
             public static final String recipe_id = "recipe_id";
-            public static final String name = "name";
-            public static final String amount = "amount";
+            public static final String string = "string";
         }
 
         public class RecipeInstruction {

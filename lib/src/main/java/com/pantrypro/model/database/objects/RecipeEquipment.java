@@ -17,7 +17,12 @@ public class RecipeEquipment {
     private String name;
 
     public RecipeEquipment() {
-        // This object should only be created from DBDeserializer (or DBSerializer if thats the right one lol), and if a new one is to be created, it needs to be inserted with an insertion "builder" method BEFORE it's created here
+
+    }
+
+    public RecipeEquipment(Integer recipeID, String name) {
+        this.recipeID = recipeID;
+        this.name = name;
     }
 
     public Integer getId() {
