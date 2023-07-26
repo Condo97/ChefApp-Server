@@ -33,4 +33,9 @@ public enum AppStoreSubscriptionStatus {
         return value;
     }
 
+
+    @Override
+    public String toString() {
+        return "" + value;
+    }
 }

@@ -9,22 +9,17 @@ import com.oaigptconnector.model.request.chat.completion.OAIGPTChatCompletionReq
 import com.oaigptconnector.model.response.chat.completion.http.OAIGPTChatCompletionResponse;
 import com.pantrypro.Constants;
 import com.pantrypro.common.exceptions.AutoIncrementingDBObjectExistsException;
-import com.pantrypro.common.exceptions.CapReachedException;
+import com.pantrypro.core.service.endpoints.CreateRecipeIdeaEndpoint;
+import com.pantrypro.core.service.endpoints.MakeRecipeEndpoint;
+import com.pantrypro.core.service.endpoints.RegenerateRecipeDirectionsAndIdeaRecipeIngredientsEndpoint;
+import com.pantrypro.keys.EncryptionManager;
+import com.pantrypro.model.exceptions.*;
 import com.pantrypro.common.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.common.exceptions.PreparedStatementMissingArgumentException;
 import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
 import com.pantrypro.core.PPGPTGenerator;
-import com.pantrypro.core.database.managers.TransactionDBManager;
-import com.pantrypro.core.database.managers.User_AuthTokenDBManager;
-import com.pantrypro.core.service.endpoints.CreateRecipeIdeaEndpoint;
-import com.pantrypro.core.service.endpoints.GetIsPremiumEndpoint;
-import com.pantrypro.core.service.endpoints.RegisterTransactionEndpoint;
 import com.pantrypro.core.service.endpoints.RegisterUserEndpoint;
 import com.pantrypro.keys.Keys;
-import com.pantrypro.model.database.AppStoreSubscriptionStatus;
-import com.pantrypro.model.database.objects.Transaction;
-import com.pantrypro.model.database.objects.User_AuthToken;
-import com.pantrypro.model.exceptions.ResponseStatusException;
 import com.pantrypro.model.http.client.apple.itunes.exception.AppStoreStatusResponseException;
 import com.pantrypro.model.http.client.apple.itunes.exception.AppleItunesResponseException;
 import com.pantrypro.model.http.client.openaigpt.request.builder.OAIGPTChatCompletionRequestFunctionCategorizeIngredientsBuilder;
@@ -59,7 +54,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -365,6 +359,88 @@ public class Tests {
         // Print ingredients and categories
         CategorizeIngredientsResponse categorizeIngredientsResponse = (CategorizeIngredientsResponse)categorizeIngredientsBR.getBody();
         categorizeIngredientsResponse.getIngredientCategories().forEach(ic -> System.out.println(ic.getIngredient() + " " + ic.getCategory()));
+    }
+
+    @Test
+    @DisplayName("Test Regenerate Recipe Directions And Idea Recipe Ingredients")
+    void testRegenerateRecipeDirectionsAndIdeaRecipeIngredients() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, AppStoreStatusResponseException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, NoSuchMethodException, UnrecoverableKeyException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, InvalidAssociatedIdentifierException, InvalidRequestJSONException, GenerationException {
+        /* Create Idea Recipe and Recipe */
+        // Register user
+        BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
+        AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
+
+        // Get authToken
+        String authToken = aResponse.getAuthToken();
+
+        // Build CreateRecipeIdeaRequest
+        CreateRecipeIdeaRequest criRequest = new CreateRecipeIdeaRequest(
+                authToken,
+                "peaches, flour, eggs, oatmeal, chocolate chips",
+                "make souffle",
+                0
+        );
+
+        // Generate pack save create recipe idea function
+        BodyResponse criBResponse = CreateRecipeIdeaEndpoint.createRecipeIdea(criRequest);
+
+        // Get ideaID, name, and summary from bResponse
+        Integer ideaID = ((CreateRecipeIdeaResponse)criBResponse.getBody()).getIdeaID();
+        String name = ((CreateRecipeIdeaResponse)criBResponse.getBody()).getName();
+        String summary = ((CreateRecipeIdeaResponse)criBResponse.getBody()).getSummary();
+
+        // Build MakeRecipeRequest
+        MakeRecipeRequest mrRequest = new MakeRecipeRequest(
+                authToken,
+                ideaID
+        );
+
+        // Generate pack save make recipe as body response
+        BodyResponse mrBResponse = MakeRecipeEndpoint.makeRecipe(mrRequest);
+
+        // Get measuredIngredients from mrBResponse
+        List<String> measuredIngredients = ((MakeRecipeResponse)mrBResponse.getBody()).getAllIngredientsAndMeasurements();
+
+        /* Regenerate Recipe Directions and Idea Recipe Ingredients */
+        // Create new name, summary, and measuredIngredients
+        String newName = "chicken alfredo";
+        String newSummary = "a delicious chicken alfredo dish that uses a lot of cream";
+        List<String> newMeasuredIngredientStrings = List.of(
+                "1 lb chicken",
+                "2 oz heavy cream",
+                "1 lb pasta",
+                "8 oz butter"
+        );
+
+        // Build RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest
+        RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest rrdairiRequest = new RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest(
+                authToken,
+                ideaID,
+                newName,
+                newSummary,
+                newMeasuredIngredientStrings
+        );
+
+        // Generate pack save regenerate recipe directions and idea recipe ingredients as body response
+        BodyResponse rrdairiBResponse = RegenerateRecipeDirectionsAndIdeaRecipeIngredientsEndpoint.regenerateRecipeDirectionsAndIdeaRecipeIngredients(rrdairiRequest);
+
+        // Get recipeDirections and ideaRecipeIngredients from rrdairiBResponse
+        List<String> recipeDirections = ((RegenerateRecipeDirectionsAndIdeaRecipeIngredientsResponse)rrdairiBResponse.getBody()).getRecipeDirections();
+        List<String> ideaRecipeIngredients = ((RegenerateRecipeDirectionsAndIdeaRecipeIngredientsResponse)rrdairiBResponse.getBody()).getIdeaRecipeIngredients();
+
+        // Assert neither are null or empty, and print their values
+        assert(recipeDirections != null && !recipeDirections.isEmpty());
+        assert(ideaRecipeIngredients != null && !ideaRecipeIngredients.isEmpty());
+
+        System.out.println(recipeDirections);
+        System.out.println(ideaRecipeIngredients);
+    }
+
+    @Test
+    @DisplayName("Test Get Encrypted Bing API Key")
+    void testGetEncryptedBingAPIKey() {
+        String encryptedBingAPIKey = EncryptionManager.getEncryptedBingAPIKey();
+
+        assert(encryptedBingAPIKey != null);
     }
 
     @Test

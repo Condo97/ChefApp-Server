@@ -21,6 +21,10 @@ public class Recipe {
     @DBColumn(name = DBRegistry.Table.Recipe.date)
     private LocalDateTime date;
 
+    @DBColumn(name = DBRegistry.Table.Recipe.feasibility)
+    private Integer feasibility;
+
+
     public Recipe() {
 
     }
@@ -46,6 +50,10 @@ public class Recipe {
 
     public LocalDateTime getDate() {
         return date;
+    }
+
+    public Integer getFeasibility() {
+        return feasibility;
     }
 
 }

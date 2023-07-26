@@ -1,7 +1,7 @@
 package com.pantrypro.core.service.endpoints;
 
 import com.oaigptconnector.model.exception.OpenAIGPTException;
-import com.pantrypro.common.exceptions.CapReachedException;
+import com.pantrypro.model.exceptions.CapReachedException;
 import com.pantrypro.common.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.common.exceptions.PreparedStatementMissingArgumentException;
 import com.pantrypro.core.PPGPTGenerator;

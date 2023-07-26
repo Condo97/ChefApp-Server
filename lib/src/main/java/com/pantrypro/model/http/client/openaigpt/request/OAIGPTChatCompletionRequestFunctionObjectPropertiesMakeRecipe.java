@@ -8,15 +8,17 @@ public class OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe {
     private OAIGPTChatCompletionRequestFunctionObjectArray instructions;
     private OAIGPTChatCompletionRequestFunctionObjectArray allIngredientsAndMeasurements;
     private OAIGPTChatCompletionRequestFunctionObjectInteger estimatedTotalMinutes;
+    private OAIGPTChatCompletionRequestFunctionObjectInteger feasibility;
 
     public OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe() {
 
     }
 
-    public OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe(OAIGPTChatCompletionRequestFunctionObjectArray instructions, OAIGPTChatCompletionRequestFunctionObjectArray allIngredientsAndMeasurements, OAIGPTChatCompletionRequestFunctionObjectInteger estimatedTotalMinutes) {
+    public OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe(OAIGPTChatCompletionRequestFunctionObjectArray instructions, OAIGPTChatCompletionRequestFunctionObjectArray allIngredientsAndMeasurements, OAIGPTChatCompletionRequestFunctionObjectInteger estimatedTotalMinutes, OAIGPTChatCompletionRequestFunctionObjectInteger feasibility) {
         this.instructions = instructions;
         this.allIngredientsAndMeasurements = allIngredientsAndMeasurements;
         this.estimatedTotalMinutes = estimatedTotalMinutes;
+        this.feasibility = feasibility;
     }
 
     public OAIGPTChatCompletionRequestFunctionObjectArray getInstructions() {
@@ -29,6 +31,10 @@ public class OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe {
 
     public OAIGPTChatCompletionRequestFunctionObjectInteger getEstimatedTotalMinutes() {
         return estimatedTotalMinutes;
+    }
+
+    public OAIGPTChatCompletionRequestFunctionObjectInteger getFeasibility() {
+        return feasibility;
     }
 
 }

@@ -15,15 +15,16 @@ public class OAIGPTChatCompletionRequestFunctionMakeRecipeBuilder {
     private static final String defaultInstructionsDescription = "The instructions to make the recipe";
     private static final String defaultAllIngredientsAndMeasurementsDescription = "All of the ingredients with measurements needed to make this recipe";
     private static final String defaultEstimatedTotalMinutesDescription = "The total estimated time in minutes needed to make the recipe";
+    private static final String defaultFeasibilityDescription = "On a scale of 1-10, how feasible the recipe is to make in reality";
 
     public static OAIGPTChatCompletionRequestFunction build() {
-        return build(defaultFunctionDescription, defaultInstructionsDescription, defaultAllIngredientsAndMeasurementsDescription, defaultEstimatedTotalMinutesDescription);
+        return build(defaultFunctionDescription, defaultInstructionsDescription, defaultAllIngredientsAndMeasurementsDescription, defaultEstimatedTotalMinutesDescription, defaultFeasibilityDescription);
     }
 
-    public static OAIGPTChatCompletionRequestFunction build(String functionDescription, String instructionsDescription, String allIngredientsAndMeasurementsDescription, String estimatedTotalMinutesDescription) {
+    public static OAIGPTChatCompletionRequestFunction build(String functionDescription, String instructionsDescription, String allIngredientsAndMeasurementsDescription, String estimatedTotalMinutesDescription, String feasibilityDescription) {
         // Create the OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe
         OAIGPTChatCompletionRequestFunctionObjectArray instructions, allIngredientsAndMeasurements;
-        OAIGPTChatCompletionRequestFunctionObjectInteger estimatedTotalMinutes;
+        OAIGPTChatCompletionRequestFunctionObjectInteger estimatedTotalMinutes, feasibility;
 
         instructions = new OAIGPTChatCompletionRequestFunctionObjectArray(
                 instructionsDescription,
@@ -39,18 +40,24 @@ public class OAIGPTChatCompletionRequestFunctionMakeRecipeBuilder {
                 estimatedTotalMinutesDescription
         );
 
+        feasibility = new OAIGPTChatCompletionRequestFunctionObjectInteger(
+                feasibilityDescription
+        );
+
         // Create object properties
         OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe r = new OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe(
                 instructions,
                 allIngredientsAndMeasurements,
-                estimatedTotalMinutes
+                estimatedTotalMinutes,
+                feasibility
         );
 
         // Create container for object properties TODO: The strings are the required functions, make these stored somewhere better.. These have to be the same as OAIGPTFunctionCallResponseMakeRecipe
         OAIGPTChatCompletionRequestFunctionObjectObject rContainer = new OAIGPTChatCompletionRequestFunctionObjectObject(r, null, List.of(
                 "instructions",
                 "allIngredientsAndMeasurements",
-                "estimatedTotalMinutes"
+                "estimatedTotalMinutes",
+                "feasibility"
         ));
 
         // Create function from container

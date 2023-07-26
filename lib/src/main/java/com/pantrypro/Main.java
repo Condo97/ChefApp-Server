@@ -61,7 +61,7 @@ public class Main {
         // Exception Handling
         exception(ResponseStatusException.class, (e, req, res) -> {
             // If it is a ResponseStatusException, then send the response status to the client
-            res.body(Server.getSimpleExceptionHandlerResponseStatusJSON(e.getResponseStatus(), e.getMessage()));
+            res.body(Server.getSimpleExceptionHandlerResponseStatusJSON(e.getResponseStatus(), e.getResponseMessage()));
         });
 
         exception(JsonMappingException.class, (error, req, res) -> {
@@ -123,6 +123,7 @@ public class Main {
         post(Constants.URIs.CATEGORIZE_INGREDIENTS, Server.Func::categorizeIngredients);
         post(Constants.URIs.CREATE_RECIPE_IDEA, Server.Func::createRecipeIdea);
         post(Constants.URIs.MAKE_RECIPE, Server.Func::makeRecipe);
+        post(Constants.URIs.REGENERATE_RECIPE_DIRECTIONS_AND_IDEA_RECIPE_INGREDIENTS, Server.Func::regenerateRecipeDirectionsAndIdeaRecipeIngredients);
         post(Constants.URIs.TAG_RECIPE_IDEA, Server.Func::tagRecipeIdea);
 
         post(Constants.URIs.GET_ALL_TAGS_URI, Server::getAllTags);

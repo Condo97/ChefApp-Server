@@ -24,6 +24,11 @@ public class RecipeInstruction {
         this.text = text;
     }
 
+    public RecipeInstruction(Integer recipeID, String text) {
+        this.recipeID = recipeID;
+        this.text = text;
+    }
+
     public Integer getId() {
         return id;
     }

@@ -95,7 +95,21 @@ public class Transaction {
         this.status = status;
     }
 
-//    /* Functionality */
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id=" + id +
+                ", userID=" + userID +
+                ", appstoreTransactionID=" + appstoreTransactionID +
+                ", transactionDate=" + transactionDate +
+                ", recordDate=" + recordDate +
+                ", checkDate=" + checkDate +
+                ", status=" + status +
+                '}';
+    }
+
+    //    /* Functionality */
 //
 //    public static Transaction getMostRecent(Integer userID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
 //        try {

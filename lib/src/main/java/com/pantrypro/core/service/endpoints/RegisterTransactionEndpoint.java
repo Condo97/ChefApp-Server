@@ -34,7 +34,7 @@ public class RegisterTransactionEndpoint {
 
         // Create transaction with now record date
         Transaction transaction = Transaction.withNowRecordDate(u_aT.getUserID(), registerTransactionRequest.getTransactionId());
-
+        
         // Update transaction with Apple status
         TransactionPersistentAppleUpdater.updateAndSaveAppleTransactionStatus(transaction);
 

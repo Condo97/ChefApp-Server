@@ -76,8 +76,6 @@ public class AppleHttpsClientHelper extends HttpsClientHelper {
         String token = generateJWT();
         String authorizationToken = "Bearer " + token;
 
-//        System.out.println("Token: " + token);
-
         // Do the get request
         JsonNode response = sendGET(AppleHttpClient.getClient(), getStatusURI, builder -> {
             builder.header("Authorization", authorizationToken);
@@ -111,8 +109,6 @@ public class AppleHttpsClientHelper extends HttpsClientHelper {
         String p8KeyStringRemovedHeaderFooterText = removeBeginEndPrivateKeyText(new String(p8Key));
         byte[] p8KeyRemovedHeaderFooterText = p8KeyStringRemovedHeaderFooterText.getBytes();
 
-//        System.out.println(p8KeyStringRemovedHeaderFooterText);
-
         PKCS8EncodedKeySpec p8EncodedKeySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(p8KeyRemovedHeaderFooterText));
 
 //        keyStore.load(new FileInputStream(Constants.Apple_SubscriptionKey_JWS_Path), null);
@@ -128,7 +124,7 @@ public class AppleHttpsClientHelper extends HttpsClientHelper {
                         "iat", System.currentTimeMillis() / 1000l,
                         "exp", System.currentTimeMillis() / 1000l + 80,
                         "aud", "appstoreconnect-v1",
-                        "bid", "com.acapplications.ChitChat"
+                        "bid", Constants.Apple_Bundle_ID
                 ))
                 .withHeader(Map.of(
                         "alg", "ES256",

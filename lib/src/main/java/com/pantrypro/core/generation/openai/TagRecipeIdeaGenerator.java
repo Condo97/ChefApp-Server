@@ -8,6 +8,7 @@ import com.oaigptconnector.model.request.chat.completion.OAIGPTChatCompletionReq
 import com.oaigptconnector.model.request.chat.completion.function.OAIGPTChatCompletionRequestFunction;
 import com.oaigptconnector.model.response.chat.completion.http.OAIGPTChatCompletionResponse;
 import com.pantrypro.Constants;
+import com.pantrypro.core.generation.OpenAIGPTChatCompletionRequestFactory;
 import com.pantrypro.keys.Keys;
 import com.pantrypro.model.http.client.openaigpt.request.builder.OAIGPTChatCompletionRequestFunctionTagRecipeIdeaBuilder;
 import com.pantrypro.model.http.client.openaigpt.response.functioncall.OAIGPTFunctionCallResponseTagRecipeIdea;

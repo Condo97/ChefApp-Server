@@ -7,6 +7,7 @@ import sqlcomponentizer.dbserializer.DBSerializer;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 import sqlcomponentizer.preparedstatement.ComponentizedPreparedStatement;
+import sqlcomponentizer.preparedstatement.ComponentizedPreparedStatementBuilder;
 import sqlcomponentizer.preparedstatement.SQLTokens;
 import sqlcomponentizer.preparedstatement.component.OrderByComponent;
 import sqlcomponentizer.preparedstatement.component.PSComponent;
@@ -14,6 +15,7 @@ import sqlcomponentizer.preparedstatement.component.columns.As;
 import sqlcomponentizer.preparedstatement.component.columns.aggregate.Count;
 import sqlcomponentizer.preparedstatement.component.condition.SQLOperatorCondition;
 import sqlcomponentizer.preparedstatement.component.condition.SQLOperators;
+import sqlcomponentizer.preparedstatement.statement.DeleteComponentizedPreparedStatementBuilder;
 import sqlcomponentizer.preparedstatement.statement.InsertIntoComponentizedPreparedStatementBuilder;
 import sqlcomponentizer.preparedstatement.statement.SelectComponentizedPreparedStatementBuilder;
 import sqlcomponentizer.preparedstatement.statement.UpdateComponentizedPreparedStatementBuilder;
@@ -31,7 +33,7 @@ public class DBManager {
 
     /* Insert and Deep Insert */
 
-    public static void insert(Object object) throws DBSerializerException, IllegalAccessException, SQLException, InterruptedException, DBSerializerPrimaryKeyMissingException, InvocationTargetException {
+    protected static void insert(Object object) throws DBSerializerException, IllegalAccessException, SQLException, InterruptedException, DBSerializerPrimaryKeyMissingException, InvocationTargetException {
         // Get table name and table map
         String tableName = DBSerializer.getTableName(object.getClass());
         Map<String, Object> tableMap = DBSerializer.getTableMap(object);
@@ -83,7 +85,7 @@ public class DBManager {
 
     }
 
-    public static Object deepInsert(Object object, boolean setWithDeepestSubObjectID) throws DBSerializerException, IllegalAccessException, DBSerializerPrimaryKeyMissingException, SQLException, InterruptedException, InvocationTargetException {
+    protected static Object deepInsert(Object object, boolean setWithDeepestSubObjectID) throws DBSerializerException, IllegalAccessException, DBSerializerPrimaryKeyMissingException, SQLException, InterruptedException, InvocationTargetException {
         // Create ID to be given by subobject
         Object id = null;
 
@@ -109,24 +111,72 @@ public class DBManager {
         return id;
     }
 
-    public static void deepInsert(Object object) throws DBSerializerException, IllegalAccessException, DBSerializerPrimaryKeyMissingException, SQLException, InterruptedException, InvocationTargetException {
+    protected static void deepInsert(Object object) throws DBSerializerException, IllegalAccessException, DBSerializerPrimaryKeyMissingException, SQLException, InterruptedException, InvocationTargetException {
         // Deep insert recursive with shouldGetID as false
         deepInsert(object, false);
     }
 
+    /* Delete Objects Where */
+
+    protected static void deleteWhere(Class dbClass, String whereCol, SQLOperators operator, Object whereVal) throws DBSerializerException, SQLException, InterruptedException {
+        deleteWhere(
+                dbClass,
+                Map.of(
+                        whereCol, whereVal
+                ),
+                operator
+        );
+    }
+
+    protected static void deleteWhere(Class dbClass, Map<String, Object> whereColMap, SQLOperators commonOperator) throws DBSerializerException, SQLException, InterruptedException {
+        List<PSComponent> sqlConditions = new ArrayList<>();
+
+        whereColMap.forEach((k,v) -> sqlConditions.add(new SQLOperatorCondition(k, commonOperator, v)));
+
+        deleteWhere(dbClass, sqlConditions);
+    }
+
+    protected static void deleteWhere(Class dbClass, List<PSComponent> sqlConditions) throws DBSerializerException, SQLException, InterruptedException {
+        // Get tableName
+        String tableName = DBSerializer.getTableName(dbClass);
+
+        // Create CPS
+        ComponentizedPreparedStatement cps = DeleteComponentizedPreparedStatementBuilder
+                .forTable(tableName)
+                .where(sqlConditions)
+                .build();
+
+        delete(cps);
+    }
+
+    protected static void delete(ComponentizedPreparedStatement cps) throws InterruptedException, SQLException {
+        // Get connection
+        Connection conn = SQLConnectionPoolInstance.getConnection();
+
+        // Do update
+        try {
+            DBClient.update(conn, cps);
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            // Release connection instance
+            SQLConnectionPoolInstance.releaseConnection(conn);
+        }
+    }
+
     /* Get All Objects Where */
 
-    public static <T> List<T> selectAllByPrimaryKey(Class<T> dbClass, Object primaryKey) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, IllegalAccessException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException {
+    protected static <T> List<T> selectAllByPrimaryKey(Class<T> dbClass, Object primaryKey) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, IllegalAccessException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException {
         String primaryKeyName = DBSerializer.getPrimaryKeyName(dbClass);
 
         return selectAllWhere(dbClass, primaryKeyName, SQLOperators.EQUAL, primaryKey);
     }
 
-    public static <T> List<T> selectAllWhere(Class<T> dbClass, String whereCol, SQLOperators operator, Object whereVal) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    protected static <T> List<T> selectAllWhere(Class<T> dbClass, String whereCol, SQLOperators operator, Object whereVal) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         return selectAllWhere(dbClass, Map.of(whereCol, whereVal), operator);
     }
 
-    public static <T> List<T> selectAllWhere(Class<T> dbClass, Map<String, Object> colValMap, SQLOperators commonOperator) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    protected static <T> List<T> selectAllWhere(Class<T> dbClass, Map<String, Object> colValMap, SQLOperators commonOperator) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         // Create PS Component List
         List<PSComponent> sqlConditions = new ArrayList<>();
 
@@ -136,7 +186,7 @@ public class DBManager {
         return selectAllWhere(dbClass, sqlConditions);
     }
 
-    public static <T> List<T> selectAllWhere(Class<T> dbClass, List<PSComponent> sqlConditions) throws DBSerializerException, InterruptedException, SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    protected static <T> List<T> selectAllWhere(Class<T> dbClass, List<PSComponent> sqlConditions) throws DBSerializerException, InterruptedException, SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         // Get tableName
         String tableName = DBSerializer.getTableName(dbClass);
 
@@ -149,11 +199,11 @@ public class DBManager {
         return select(dbClass, cps);
     }
 
-    public static <T> List<T> selectAllWhereOrderByLimit(Class<T> dbClass, String whereCol, SQLOperators operator, Object whereVal, List<String> orderByColumns, OrderByComponent.Direction direction, Integer limit) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    protected static <T> List<T> selectAllWhereOrderByLimit(Class<T> dbClass, String whereCol, SQLOperators operator, Object whereVal, List<String> orderByColumns, OrderByComponent.Direction direction, Integer limit) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         return selectAllWhereOrderByLimit(dbClass, Map.of(whereCol, whereVal), operator, orderByColumns, direction, limit);
     }
 
-    public static <T> List<T> selectAllWhereOrderByLimit(Class<T> dbClass, Map<String, Object> whereColValMap, SQLOperators commonOperator, List<String> orderByColumns, OrderByComponent.Direction direction, Integer limit) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    protected static <T> List<T> selectAllWhereOrderByLimit(Class<T> dbClass, Map<String, Object> whereColValMap, SQLOperators commonOperator, List<String> orderByColumns, OrderByComponent.Direction direction, Integer limit) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         // Create PS Component List
         List<PSComponent> sqlConditions = new ArrayList<>();
 
@@ -163,7 +213,7 @@ public class DBManager {
         return selectAllWhereOrderByLimit(dbClass, sqlConditions, orderByColumns, direction, limit);
     }
 
-    public static <T> List<T> selectAllWhereOrderByLimit(Class<T> dbClass, List<PSComponent> sqlConditions, List<String> orderBoColumns, OrderByComponent.Direction direction, Integer limit) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    protected static <T> List<T> selectAllWhereOrderByLimit(Class<T> dbClass, List<PSComponent> sqlConditions, List<String> orderBoColumns, OrderByComponent.Direction direction, Integer limit) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         // Get tableName
         String tableName = DBSerializer.getTableName(dbClass);
 
@@ -203,17 +253,17 @@ public class DBManager {
         }
     }
 
-    public static <T> T asdf() {
+    protected static <T> T asdf() {
         return (T)"asdf";
     }
 
     /* Count Object Where */
 
-    public static Long countObjectWhere(Class dbClass, String whereCol, SQLOperators operator, Object whereVal) throws DBSerializerException, SQLException, InterruptedException {
+    protected static Long countObjectWhere(Class dbClass, String whereCol, SQLOperators operator, Object whereVal) throws DBSerializerException, SQLException, InterruptedException {
         return countObjectWhere(dbClass, Map.of(whereCol, whereVal), operator);
     }
 
-    public static Long countObjectWhere(Class dbClass, Map<String, Object> whereColValMap, SQLOperators commonOperator) throws DBSerializerException, SQLException, InterruptedException {
+    protected static Long countObjectWhere(Class dbClass, Map<String, Object> whereColValMap, SQLOperators commonOperator) throws DBSerializerException, SQLException, InterruptedException {
         // Create SQL condition list
         List<PSComponent> sqlConditions = new ArrayList<>();
 
@@ -223,7 +273,7 @@ public class DBManager {
         return countObjectWhere(dbClass, sqlConditions);
     }
 
-    public static Long countObjectWhere(Class dbClass, List<PSComponent> sqlConditions) throws DBSerializerException, InterruptedException, SQLException {
+    protected static Long countObjectWhere(Class dbClass, List<PSComponent> sqlConditions) throws DBSerializerException, InterruptedException, SQLException {
         // Get tableName
         String tableName = DBSerializer.getTableName(dbClass);
 
@@ -239,11 +289,11 @@ public class DBManager {
 
     /* Count Object Where Inner Join */
 
-    public static Long countObjectWhereInnerJoin(Class dbClass, String whereCol, SQLOperators operator, Object whereVal, Class joinClass, String... joinColumns) throws DBSerializerException, InterruptedException, SQLException {
+    protected static Long countObjectWhereInnerJoin(Class dbClass, String whereCol, SQLOperators operator, Object whereVal, Class joinClass, String... joinColumns) throws DBSerializerException, InterruptedException, SQLException {
         return countObjectWhereInnerJoin(dbClass, Map.of(whereCol, whereVal), operator, joinClass, joinColumns);
     }
 
-    public static Long countObjectWhereInnerJoin(Class dbClass, Map<String, Object> whereColValMap, SQLOperators commonOperator, Class joinClass, String... joinColumns) throws DBSerializerException, InterruptedException, SQLException {
+    protected static Long countObjectWhereInnerJoin(Class dbClass, Map<String, Object> whereColValMap, SQLOperators commonOperator, Class joinClass, String... joinColumns) throws DBSerializerException, InterruptedException, SQLException {
         // Create SQL condition list
         List<PSComponent> sqlConditions = new ArrayList<>();
 
@@ -253,11 +303,11 @@ public class DBManager {
         return countObjectWhereInnerJoin(dbClass, sqlConditions, joinClass, joinColumns);
     }
 
-    public static Long countObjectWhereInnerJoin(Class dbClass, List<PSComponent> sqlConditions, Class joinClass, String... joinColumns) throws DBSerializerException, InterruptedException, SQLException {
+    protected static Long countObjectWhereInnerJoin(Class dbClass, List<PSComponent> sqlConditions, Class joinClass, String... joinColumns) throws DBSerializerException, InterruptedException, SQLException {
         return countObjectWhereInnerJoin(dbClass, sqlConditions, joinClass, Arrays.asList(joinColumns));
     }
 
-    public static Long countObjectWhereInnerJoin(Class dbClass, List<PSComponent> sqlConditions, Class joinClass, List<String> joinColumns) throws DBSerializerException, InterruptedException, SQLException {
+    protected static Long countObjectWhereInnerJoin(Class dbClass, List<PSComponent> sqlConditions, Class joinClass, List<String> joinColumns) throws DBSerializerException, InterruptedException, SQLException {
         // Get tableName
         String tableName = DBSerializer.getTableName(dbClass);
         String joinTableName = DBSerializer.getTableName(joinClass);
@@ -302,17 +352,17 @@ public class DBManager {
 
     /* Count Object By Column Where */
 
-    public static Integer countObjectByColumnWhere(Class dbClass, String byColumn, String whereCol, SQLOperators operator, Object whereVal) throws DBSerializerException, SQLException, InterruptedException {
+    protected static Integer countObjectByColumnWhere(Class dbClass, String byColumn, String whereCol, SQLOperators operator, Object whereVal) throws DBSerializerException, SQLException, InterruptedException {
         return countObjectByColumnWhere(dbClass, byColumn, Map.of(whereCol, whereVal), operator);
     }
 
-    public static Integer countObjectByColumnWhere(Class dbClass, String byColumn, Map<String, Object> whereColValMap, SQLOperators commonOperator) throws DBSerializerException, SQLException, InterruptedException {
+    protected static Integer countObjectByColumnWhere(Class dbClass, String byColumn, Map<String, Object> whereColValMap, SQLOperators commonOperator) throws DBSerializerException, SQLException, InterruptedException {
         List<PSComponent> sqlConditions = new ArrayList<>();
         whereColValMap.forEach((k, v) -> sqlConditions.add(new SQLOperatorCondition(k, commonOperator, v)));
         return countObjectByColumnWhere(dbClass, byColumn, sqlConditions);
     }
 
-    public static Integer countObjectByColumnWhere(Class dbClass, String byColumn, List<PSComponent> sqlConditions) throws DBSerializerException, SQLException, InterruptedException {
+    protected static Integer countObjectByColumnWhere(Class dbClass, String byColumn, List<PSComponent> sqlConditions) throws DBSerializerException, SQLException, InterruptedException {
         // Table, row=v
         String tableName = DBSerializer.getTableName(dbClass);
 
@@ -334,7 +384,7 @@ public class DBManager {
 
     /* Update Where */
 
-    public static void updateWhere(Class dbClass, String toUpdateCol, Object newVal, String whereCol, SQLOperators operator, Object whereVal) throws DBSerializerException, SQLException, InterruptedException {
+    protected static void updateWhere(Class dbClass, String toUpdateCol, Object newVal, String whereCol, SQLOperators operator, Object whereVal) throws DBSerializerException, SQLException, InterruptedException {
         updateWhere(
                 dbClass,
                 Map.of(
@@ -347,7 +397,7 @@ public class DBManager {
         );
     }
 
-    public static void updateWhere(Class dbClass, Map<String, Object> toUpdateColValMap, Map<String, Object> whereColValMap, SQLOperators commonOperator) throws InterruptedException, DBSerializerException, SQLException {
+    protected static void updateWhere(Class dbClass, Map<String, Object> toUpdateColValMap, Map<String, Object> whereColValMap, SQLOperators commonOperator) throws InterruptedException, DBSerializerException, SQLException {
         String tableName = DBSerializer.getTableName(dbClass);
 
         ComponentizedPreparedStatement cps = UpdateComponentizedPreparedStatementBuilder.forTable(tableName)

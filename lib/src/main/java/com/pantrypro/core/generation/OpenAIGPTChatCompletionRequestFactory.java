@@ -1,4 +1,4 @@
-package com.pantrypro.core.generation.openai;
+package com.pantrypro.core.generation;
 
 import com.oaigptconnector.model.Role;
 import com.oaigptconnector.model.generation.OpenAIGPTModels;

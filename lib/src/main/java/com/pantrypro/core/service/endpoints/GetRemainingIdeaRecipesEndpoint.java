@@ -35,7 +35,7 @@ public class GetRemainingIdeaRecipesEndpoint {
         boolean isPremium = PPPremiumValidator.getIsPremium(u_aT.getUserID());
 
         // Get remaining
-        Long remaining = CreateRecipeIdeaRemainingCalculator.calculateRemaining(u_aT.getUserID(), isPremium);
+        Long remaining = new CreateRecipeIdeaRemainingCalculator().calculateRemaining(u_aT.getUserID(), isPremium);
 
         // Build getRemainingResponse
         GetRemainingResponse getRemainingResponse = new GetRemainingResponse(remaining);

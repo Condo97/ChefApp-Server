@@ -2,38 +2,29 @@ package com.pantrypro.core;
 
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.Constants;
-import com.pantrypro.common.exceptions.CapReachedException;
+import com.pantrypro.core.database.adapters.*;
+import com.pantrypro.core.generation.openai.*;
+import com.pantrypro.model.exceptions.CapReachedException;
 import com.pantrypro.common.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.common.exceptions.PreparedStatementMissingArgumentException;
-import com.pantrypro.core.database.adapters.IdeaRecipeFromOpenAIAdapter;
-import com.pantrypro.core.database.adapters.IdeaRecipeTagFromOpenAIAdapter;
-import com.pantrypro.core.database.adapters.RecipeFromOpenAIAdapter;
 import com.pantrypro.core.database.managers.IdeaRecipeDBManager;
 import com.pantrypro.core.database.managers.RecipeDBManager;
 import com.pantrypro.core.database.managers.User_AuthTokenDBManager;
 import com.pantrypro.core.generation.calculators.CreateRecipeIdeaRemainingCalculator;
-import com.pantrypro.core.generation.openai.CategorizeIngredientsGenerator;
-import com.pantrypro.core.generation.openai.CreateRecipeIdeaGenerator;
-import com.pantrypro.core.generation.openai.MakeRecipeGenerator;
-import com.pantrypro.core.generation.openai.TagRecipeIdeaGenerator;
 import com.pantrypro.core.generation.tagging.TagFilterer;
 import com.pantrypro.core.service.BodyResponseFactory;
 import com.pantrypro.core.service.PPPremiumValidator;
 import com.pantrypro.core.service.adapters.ResponseFromDBObjectAdapter;
 import com.pantrypro.core.service.adapters.ResponseFromOpenAIResponseAdapter;
 import com.pantrypro.model.database.objects.*;
+import com.pantrypro.model.exceptions.GenerationException;
 import com.pantrypro.model.exceptions.InvalidAssociatedIdentifierException;
+import com.pantrypro.model.exceptions.InvalidRequestJSONException;
 import com.pantrypro.model.generation.IdeaRecipeExpandIngredients;
-import com.pantrypro.model.http.client.openaigpt.response.functioncall.OAIGPTFunctionCallResponseCategorizeIngredients;
-import com.pantrypro.model.http.client.openaigpt.response.functioncall.OAIGPTFunctionCallResponseCreateRecipeIdea;
-import com.pantrypro.model.http.client.openaigpt.response.functioncall.OAIGPTFunctionCallResponseMakeRecipe;
+import com.pantrypro.model.http.client.openaigpt.response.functioncall.*;
 import com.pantrypro.model.http.client.apple.itunes.exception.AppStoreStatusResponseException;
 import com.pantrypro.model.http.client.apple.itunes.exception.AppleItunesResponseException;
-import com.pantrypro.model.http.client.openaigpt.response.functioncall.OAIGPTFunctionCallResponseTagRecipeIdea;
-import com.pantrypro.model.http.server.request.CategorizeIngredientsRequest;
-import com.pantrypro.model.http.server.request.CreateRecipeIdeaRequest;
-import com.pantrypro.model.http.server.request.MakeRecipeRequest;
-import com.pantrypro.model.http.server.request.TagRecipeIdeaRequest;
+import com.pantrypro.model.http.server.request.*;
 import com.pantrypro.model.http.server.response.*;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
@@ -47,6 +38,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -81,7 +73,7 @@ public class PPGPTGenerator {
         boolean isPremium = PPPremiumValidator.getIsPremium(u_aT.getUserID());
 
         // Get remaining
-        Long remaining = CreateRecipeIdeaRemainingCalculator.calculateRemaining(u_aT.getUserID(), isPremium);
+        Long remaining = new CreateRecipeIdeaRemainingCalculator().calculateRemaining(u_aT.getUserID(), isPremium);
 
         // If remaining is not null (infinite) and less than 0, throw CapReachedException
         if (remaining != null && remaining <= 0) throw new CapReachedException("Cap reached for user when generating recipe ideas");
@@ -105,11 +97,114 @@ public class PPGPTGenerator {
                 ideaRecipe,
                 ideaRecipeIngredients,
 //                ideaRecipeEquipment,
-                remaining - 1
+                remaining == null ? null : remaining - 1
         );
 
         return BodyResponseFactory.createSuccessBodyResponse(ideaResponse);
 
+    }
+
+    public static BodyResponse generatePackSaveRegenerateRecipeDirectionsAndIdeaRecipeIngredients(RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest request) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, CapReachedException, InvalidRequestJSONException, OpenAIGPTException, GenerationException {
+        // Require ideaID and at least one of newName with text, newSummary with text, or measuredIngredients with at least one
+        if (request.getIdeaID() == null || ((request.getNewName() == null || request.getNewName().isEmpty()) && (request.getNewSummary() == null || request.getNewSummary().isEmpty()) && (request.getMeasuredIngredients() == null || request.getMeasuredIngredients().size() == 0)))
+            throw new InvalidRequestJSONException("Missing required object - Please ensure your JSON contains authToken, ideaID, and optionally with at least one required newTitle, newSummary, and/or measuredIngredients.");
+
+        // Get u_aT
+        User_AuthToken u_aT = User_AuthTokenDBManager.getFromDB(request.getAuthToken());
+
+        // Get isPremium
+        boolean isPremium = PPPremiumValidator.getIsPremium(u_aT.getUserID());
+
+        // Calculate remaining TODO:
+//        Long remaining = new RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRemainingCalculator().calculateRemaining(u_aT.getUserID(), isPremium);
+
+        // If remaining is not null (infinite) and less than 0, throw CapReachedException
+//        if (remaining != null && remaining <= 0) throw new CapReachedException("Cap reached for user when regenerating recipe directions and idea recipe ingredients");
+
+        // If newTitle is not null, update in DB
+        if (request.getNewName() != null)
+            IdeaRecipeDBManager.updateName(request.getIdeaID(), request.getNewName());
+
+        // If newSummary is not null, update in DB
+        if (request.getNewSummary() != null)
+            IdeaRecipeDBManager.updateSummary(request.getIdeaID(), request.getNewSummary());
+
+        // Get recipe ID
+        final Integer recipeID = RecipeDBManager.getFromIdeaID(request.getIdeaID()).getId();
+
+        // If recipe is null, throw GenerationException
+        if (recipeID == null)
+            throw new GenerationException("Could not find Recipe. Please make sure it's generated before trying to update!");
+
+        // Create a variable for idea recipe ingredients set as null which will be assigned in the getMeasuredIngredients not null or empty conditional, so it can be added to the response if it is not null
+        List<IdeaRecipeIngredient> ideaRecipeIngredients = null;
+
+        // If measuredIngredients is not null, update in DB and get ingredients without measurements
+        if (request.getMeasuredIngredients() != null && !request.getMeasuredIngredients().isEmpty()) {
+            // Delete all measured ingredients for recipe
+            RecipeDBManager.deleteAllMeasuredIngredients(recipeID);
+
+            // Create recipe measured ingredients from request
+            List<RecipeMeasuredIngredient> recipeMeasuredIngredients = new ArrayList<>();
+            request.getMeasuredIngredients().forEach(ingredientString -> {
+                recipeMeasuredIngredients.add(new RecipeMeasuredIngredient(recipeID, ingredientString));
+            });
+
+            // Insert all measured ingredients for recipe
+            RecipeDBManager.insertRecipeMeasuredIngredients(recipeMeasuredIngredients);
+
+            // Generate new idea recipe ingredients from get ingredients without measurements
+            OAIGPTFunctionCallResponseParseIngredientNames parseIngredientNamesResponse = ParseIngredientNamesGenerator.getParsedIngredientNames(
+                    request.getMeasuredIngredients(),
+                    Constants.Context_Character_Limit_Get_Ingredients_Without_Measurements,
+                    Constants.Response_Token_Limit_Get_Ingredients_Without_Measurements
+            );
+
+            // Get ideaRecipeIngredients with IdeaRecipeIngredientFromOpenAIAdapter
+            ideaRecipeIngredients = IdeaRecipeIngredientFromOpenAIAdapter.getIdeaRecipeIngredients(request.getIdeaID(), parseIngredientNamesResponse);
+
+            // Delete all ingredients from idea recipe
+            IdeaRecipeDBManager.deleteAllIngredients(request.getIdeaID());
+
+            // Insert all ingredients for idea recipe
+            IdeaRecipeDBManager.insertIdeaRecipeIngredients(ideaRecipeIngredients);
+        }
+
+        // Get updated ideaRecipe and recipeMeasuredIngredients TODO: Optimize this!
+        IdeaRecipe ideaRecipe = IdeaRecipeDBManager.get(request.getIdeaID());
+        List<RecipeMeasuredIngredient> recipeMeasuredIngredients = RecipeDBManager.getMeasuredIngredients(recipeID);
+
+        // Convert recipeMeasuredIngredients into a string array using their strings
+        List<String> recipeMeasuredIngredientsStrings = new ArrayList<>();
+        recipeMeasuredIngredients.forEach(measuredIngredient -> {
+            recipeMeasuredIngredientsStrings.add(measuredIngredient.getString());
+        });
+
+        // Generate new directions
+        OAIGPTFunctionCallResponseGenerateDirections generateDirectionsResponse = GenerateDirectionsGenerator.generateDirections(
+                ideaRecipe.getName(),
+                ideaRecipe.getSummary(),
+                recipeMeasuredIngredientsStrings,
+                Constants.Context_Character_Limit_Generate_Directions,
+                Constants.Response_Token_Limit_Generate_Directions
+        );
+
+        // Get recipeInstructions from RecipeInstructionFromOpenAIAdapter TODO: Rename to recipeDiretions when I rename the DB object and everything else ree lol
+        List<RecipeInstruction> recipeInstructions = RecipeInstructionFromOpenAIAdapter.getRecipeInstructions(recipeID, generateDirectionsResponse);
+
+        // Delete all recipe directions
+        RecipeDBManager.deleteAllInstructions(recipeID);
+
+        // Insert generated directions
+        RecipeDBManager.insertRecipeInstructions(recipeInstructions);
+
+        // Get feasibility and update in DB
+        Integer feasibility = generateDirectionsResponse.getFeasibility();
+
+        // Adapt to RegenerateRecipeDirectionAndIdeaRecipeIngredientsResponse
+        RegenerateRecipeDirectionsAndIdeaRecipeIngredientsResponse response = ResponseFromDBObjectAdapter.from(recipeInstructions, ideaRecipeIngredients, feasibility);
+
+        return BodyResponseFactory.createSuccessBodyResponse(response);
     }
 
     public static BodyResponse generatePackSaveMakeRecipe(MakeRecipeRequest request) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, DBSerializerPrimaryKeyMissingException, AppStoreStatusResponseException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, CapReachedException, InvalidAssociatedIdentifierException {
@@ -140,7 +235,7 @@ public class PPGPTGenerator {
         OAIGPTFunctionCallResponseMakeRecipe makeRecipeFunctionCallResponse = MakeRecipeGenerator.generateMakeRecipeFunctionCall(input, Constants.Context_Character_Limit_Make_Recipe, Constants.Response_Token_Limit_Make_Recipe);
 
         // Adapt to IdeaRecipe, IdeaRecipeIngredients, and IdeaRecipeEquipment
-        Recipe recipe = RecipeFromOpenAIAdapter.getRecipe(u_aT.getUserID(), makeRecipeFunctionCallResponse);
+        Recipe recipe = RecipeFromOpenAIAdapter.getRecipe(request.getIdeaID(), makeRecipeFunctionCallResponse);
         List<RecipeInstruction> recipeInstructions = RecipeFromOpenAIAdapter.getRecipeInstructions(makeRecipeFunctionCallResponse);
         List<RecipeMeasuredIngredient> recipeMeasuredIngredients = RecipeFromOpenAIAdapter.getRecipeMeasuredIngredients(makeRecipeFunctionCallResponse);
 

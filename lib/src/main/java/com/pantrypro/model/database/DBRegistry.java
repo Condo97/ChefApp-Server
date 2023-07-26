@@ -43,6 +43,7 @@ public class DBRegistry {
             public static final String idea_id = "idea_id";
             public static final String estimated_total_minutes = "estimated_total_minutes";
             public static final String date = "date";
+            public static final String feasibility = "feasibility";
         }
 
         public class RecipeEquipment {

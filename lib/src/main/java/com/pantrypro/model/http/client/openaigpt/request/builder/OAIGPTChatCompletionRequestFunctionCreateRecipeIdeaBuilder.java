@@ -10,15 +10,15 @@ import java.util.List;
 
 public class OAIGPTChatCompletionRequestFunctionCreateRecipeIdeaBuilder {
 
-    private static final String defaultFunctionDescription = "Creates a recipe idea from ingredients, adding as necessary";
+//    private static final String defaultFunctionDescription = "Creates a recipe idea from ingredients, adding as necessary";
     private static final String defaultIngredientsDescription = "All of the ingredients needed, no measurements, adding as necessary";
 //    private static final String defaultEquipmentDescription = "The equipment needed to make the recipe";
     private static final String defaultNameDescription = "An interesting and fitting name for the recipe";
     private static final String defaultSummaryDescription = "A short 10 word engaging summary for the recipe";
     private static final String defaultCuisineTypeDescription = "A 1-5 word cuisine type for the recipe";
 
-    public static OAIGPTChatCompletionRequestFunction build() {
-        return build(defaultFunctionDescription, defaultIngredientsDescription, defaultNameDescription, defaultSummaryDescription, defaultCuisineTypeDescription);
+    public static OAIGPTChatCompletionRequestFunction build(String functionDescription) {
+        return build(functionDescription, defaultIngredientsDescription, defaultNameDescription, defaultSummaryDescription, defaultCuisineTypeDescription);
     }
 
     public static OAIGPTChatCompletionRequestFunction build(String functionDescription, String ingredientsDescription, String nameDescription, String summaryDescription, String cuisineTypeDescription) {
@@ -40,6 +40,7 @@ public class OAIGPTChatCompletionRequestFunctionCreateRecipeIdeaBuilder {
         short10To40WordEngagingInterestingSummary = new OAIGPTChatCompletionRequestFunctionObjectString(summaryDescription);
         cuisineType = new OAIGPTChatCompletionRequestFunctionObjectString(cuisineTypeDescription);
 
+        // Create OAIGPTChatCompletionRequestFunctionObjectPropertiesCreateRecipeIdea
         OAIGPTChatCompletionRequestFunctionObjectPropertiesCreateRecipeIdea r = new OAIGPTChatCompletionRequestFunctionObjectPropertiesCreateRecipeIdea(
                 ingredients,
                 name,
@@ -47,7 +48,7 @@ public class OAIGPTChatCompletionRequestFunctionCreateRecipeIdeaBuilder {
                 cuisineType
         );
 
-        // Create the OAIGPTChatCompletionRequestFunctionObjectObject
+        // Create the OAIGPTChatCompletionRequestFunctionObjectObject as container with required functions
         OAIGPTChatCompletionRequestFunctionObjectObject rContainer = new OAIGPTChatCompletionRequestFunctionObjectObject(r, null, List.of(
                 "ingredients",
 //                "equipment",

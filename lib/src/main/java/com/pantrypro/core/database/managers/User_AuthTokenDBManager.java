@@ -14,12 +14,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
-import static com.pantrypro.core.database.DBManager.deepInsert;
-
 public class User_AuthTokenDBManager extends DBManager {
 
     public static User_AuthToken getFromDB(String authToken) throws DBSerializerException, SQLException, IllegalAccessException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException {
-        List<User_AuthToken> u_aTs = DBManager.selectAllWhere(
+        List<User_AuthToken> u_aTs = selectAllWhere(
                 User_AuthToken.class,
                 DBRegistry.Table.User_AuthToken.auth_token,
                 SQLOperators.EQUAL,

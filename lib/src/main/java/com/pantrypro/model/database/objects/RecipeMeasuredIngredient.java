@@ -24,6 +24,11 @@ public class RecipeMeasuredIngredient {
         this.string = string;
     }
 
+    public RecipeMeasuredIngredient(Integer recipeID, String string) {
+        this.recipeID = recipeID;
+        this.string = string;
+    }
+
     public Integer getId() {
         return id;
     }

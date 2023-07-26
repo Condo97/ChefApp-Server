@@ -24,6 +24,11 @@ public class IdeaRecipeIngredient {
         this.name = name;
     }
 
+    public IdeaRecipeIngredient(Integer ideaID, String name) {
+        this.ideaID = ideaID;
+        this.name = name;
+    }
+
     public Integer getId() {
         return id;
     }

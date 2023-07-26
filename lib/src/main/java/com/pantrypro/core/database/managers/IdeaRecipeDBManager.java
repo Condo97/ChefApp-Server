@@ -35,6 +35,11 @@ public class IdeaRecipeDBManager extends DBManager {
 //        }
     }
 
+    public static void insertIdeaRecipeIngredients(List<IdeaRecipeIngredient> ingredients) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
+        for (IdeaRecipeIngredient ingredient: ingredients)
+            insert(ingredient);
+    }
+
     public static void insertIdeaRecipeTags(List<IdeaRecipeTag> tags) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
         for (IdeaRecipeTag tag: tags) {
             insert(tag);
@@ -68,6 +73,15 @@ public class IdeaRecipeDBManager extends DBManager {
         );
     }
 
+    public static void deleteAllIngredients(Integer ideaID) throws DBSerializerException, SQLException, InterruptedException {
+        deleteWhere(
+                IdeaRecipeIngredient.class,
+                DBRegistry.Table.IdeaRecipeIngredient.idea_id,
+                SQLOperators.EQUAL,
+                ideaID
+        );
+    }
+
     public static IdeaRecipe get(Integer ideaID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
         // Get all recipe ideas for idea ID
         List<IdeaRecipe> allRecipesForID = selectAllByPrimaryKey(IdeaRecipe.class, ideaID);
@@ -92,6 +106,26 @@ public class IdeaRecipeDBManager extends DBManager {
         return allIngredientsForID;
     }
 
+    public static void updateName(Integer ideaID, String name) throws DBSerializerException, SQLException, InterruptedException {
+        updateWhere(
+                IdeaRecipe.class,
+                DBRegistry.Table.IdeaRecipe.name,
+                name,
+                DBRegistry.Table.IdeaRecipe.idea_id,
+                SQLOperators.EQUAL,
+                ideaID
+        );
+    }
 
+    public static void updateSummary(Integer ideaID, String summary) throws DBSerializerException, SQLException, InterruptedException {
+        updateWhere(
+                IdeaRecipe.class,
+                DBRegistry.Table.IdeaRecipe.summary,
+                summary,
+                DBRegistry.Table.IdeaRecipe.idea_id,
+                SQLOperators.EQUAL,
+                ideaID
+        );
+    }
 
 }

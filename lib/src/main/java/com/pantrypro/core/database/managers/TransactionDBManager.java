@@ -21,7 +21,7 @@ public class TransactionDBManager extends DBManager {
         // If most recent transaction is not null and parameter transaction ID matches most recent transaction ID, update, otherwise insert
         if (mostRecentTransaction != null && mostRecentTransaction.getAppstoreTransactionID().equals(transaction.getAppstoreTransactionID())) {
             // Update
-            updateCheckedStatus(transaction);
+            updateCheckedStatus(mostRecentTransaction);
         } else {
             // Insert
             insert(transaction);
@@ -59,6 +59,7 @@ public class TransactionDBManager extends DBManager {
 
     public static void updateCheckedStatus(Transaction transaction) throws DBSerializerException, SQLException, InterruptedException {
         System.out.println("AppStore Transaction ID: " + transaction.getAppstoreTransactionID());
+
         DBManager.updateWhere( // TODO: Should this be all that is updated? I think so..
                 Transaction.class,
                 Map.of(

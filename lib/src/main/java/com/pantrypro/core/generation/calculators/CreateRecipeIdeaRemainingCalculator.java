@@ -7,16 +7,20 @@ import sqlcomponentizer.dbserializer.DBSerializerException;
 
 import java.sql.SQLException;
 
-public class CreateRecipeIdeaRemainingCalculator {
+public class CreateRecipeIdeaRemainingCalculator extends RemainingCalculator {
 
-    public static IntegerFromBoolean getCapFromPremium = t -> t ? Constants.Create_Recipe_Idea_Cap_Daily_Paid : Constants.Create_Recipe_Idea_Cap_Daily_Free;
+    @Override
+    protected Integer getCapFromPremium(boolean isPremium) {
+        return isPremium ? Constants.Create_Recipe_Idea_Cap_Daily_Paid : Constants.Create_Recipe_Idea_Cap_Daily_Free;
+    }
 
-    public static Long calculateRemaining(Integer userID, boolean isPremium) throws DBSerializerException, SQLException, InterruptedException {
+    @Override
+    public Long calculateRemaining(Integer userID, boolean isPremium) throws DBSerializerException, SQLException, InterruptedException {
         // Get count of today's ideaRecipe
         Long count = IdeaRecipeDBManager.countForToday(userID);
 
-        // Get cap
-        Integer cap = getCapFromPremium.getInt(isPremium);
+        // Get cap TODO: Creating a new object here just to access this value, is this okay?
+        Integer cap = getCapFromPremium(isPremium);
 
         // Return null if cap is null
         if (cap == null)
@@ -24,5 +28,4 @@ public class CreateRecipeIdeaRemainingCalculator {
 
         return cap - count;
     }
-
 }

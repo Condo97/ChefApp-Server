@@ -7,7 +7,10 @@ import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.common.exceptions.*;
 import com.pantrypro.core.service.BodyResponseFactory;
 import com.pantrypro.core.service.endpoints.*;
+import com.pantrypro.model.exceptions.CapReachedException;
+import com.pantrypro.model.exceptions.GenerationException;
 import com.pantrypro.model.exceptions.InvalidAssociatedIdentifierException;
+import com.pantrypro.model.exceptions.InvalidRequestJSONException;
 import com.pantrypro.model.http.client.apple.itunes.exception.AppStoreStatusResponseException;
 import com.pantrypro.model.http.client.apple.itunes.exception.AppleItunesResponseException;
 import com.pantrypro.model.http.server.ResponseStatus;
@@ -158,6 +161,48 @@ public class Server {
 
             } catch (JsonMappingException | JsonParseException e) {
                 System.out.println("Error when Making Recipe.. The request: " + request.body());
+                e.printStackTrace();
+                throw new MalformedJSONException("Malformed JSON - " + e.getMessage());
+            }
+        }
+
+        /***
+         * Regenerate Recipe Directions and Idea Recipe Ingredients
+         *
+         * Regenerates recipe directions and idea recipe ingredients given new name, summary, and/or measuredIngredients
+         *
+         * Request: {
+         *     authToken: String - Authentication token for the user
+         *     ideaID: Integer - The ideaID received from generating an idea recipe
+         *     ? newName: String - Optional new name to set for the idea recipe, to be used when generating recipe directions, replaces name in DB
+         *     ? newSummary: String - Optional new summary to set for the idea recipe, to be used when generating recipe directions, replaces summary in DB
+         *     ? measuredIngredients: String[] - Optional array of all measuredIngredients for the recipe, including new ones and existing ones, to be used when generating recipe directions, replaces measured ingredients for recipe in DB, removes measurement and saves to idea recipe ingredients in DB and sends these back in ideaRecipeIngredients in the response
+         * }
+         *
+         * Response: {
+         *     Body: {
+         *         recipeDirections: String[] - List of new recipe directions in order
+         *         ? ideaRecipeIngredients: String[] - Optional, included if the request included measuredIngredients that needed to be parsed to idea recipe ingredients by removing the measurement
+         *     }
+         *     Success: Integer - Integer denoting success, 1 if successful
+         * }
+         *
+         * @param request
+         * @param response
+         *
+         *
+         */
+        public static String regenerateRecipeDirectionsAndIdeaRecipeIngredients(Request request, Response response) throws IOException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, InvalidRequestJSONException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, MalformedJSONException, GenerationException {
+            // Try to parse RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest
+            RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest rrdairiRequest;
+
+            try {
+                rrdairiRequest = new ObjectMapper().readValue(request.body(), RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest.class);
+                BodyResponse br = RegenerateRecipeDirectionsAndIdeaRecipeIngredientsEndpoint.regenerateRecipeDirectionsAndIdeaRecipeIngredients(rrdairiRequest);
+
+                return new ObjectMapper().writeValueAsString(br);
+            } catch (JsonMappingException | JsonParseException e) {
+                System.out.println("Error when regenerating recipe directions and idea recipe ingredients.. The request: " + request.body());
                 e.printStackTrace();
                 throw new MalformedJSONException("Malformed JSON - " + e.getMessage());
             }

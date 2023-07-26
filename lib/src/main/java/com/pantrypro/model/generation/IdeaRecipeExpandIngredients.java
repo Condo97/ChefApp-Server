@@ -2,15 +2,16 @@ package com.pantrypro.model.generation;
 
 public enum IdeaRecipeExpandIngredients {
 
-    NONE("Do not expand on ingredients."),
-    MINIMUM("Try not to expand ingredients unless necessary to make a complete recipe."),
-    MODERATE("Take ingredients and modifiers, expand upon them, and create a delicious complete recipe."),
-    MAXIMUM("Take significant creative liberties in creating this recipe, and expand ingredients to make a complete recipe.");
+    NONE("Only use provided ingredients.", "Creates a recipe"),
+    DEFAULT("Try not to expand ingredients unless necessary to make a complete recipe.", "Creates a recipe from ingredients, adding as necessary"),
+    CREATIVE("Take ingredients and modifiers, expand upon them, and create a delicious complete recipe.", "Creates a recipe from ingredients, adding as necessary");
+//    MAXIMUM("Take significant creative liberties in creating this recipe, and expand ingredients to make a complete recipe.", "Creates a recipe from ingredients, adding to create a complete recipe");
 
-    private String systemMessage;
+    private String systemMessage, functionDescription;
 
-    IdeaRecipeExpandIngredients(String systemMessage) {
+    IdeaRecipeExpandIngredients(String systemMessage, String functionDescription) {
         this.systemMessage = systemMessage;
+        this.functionDescription = functionDescription;
     }
 
     public static IdeaRecipeExpandIngredients from(int magnitude) {
@@ -26,6 +27,10 @@ public enum IdeaRecipeExpandIngredients {
     public String getSystemMessageString() {
         // TODO: Should this just be toString?
         return systemMessage;
+    }
+
+    public String getFunctionDescription() {
+        return functionDescription;
     }
 
 }

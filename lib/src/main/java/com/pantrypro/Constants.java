@@ -21,11 +21,15 @@ public final class Constants {
     /* Tiered Limits */
     public static final int Response_Token_Limit_Categorize_Ingredients = 800;
     public static final int Response_Token_Limit_Create_Recipe_Idea = 800;
+    public static final int Response_Token_Limit_Generate_Directions = 800;
+    public static final int Response_Token_Limit_Get_Ingredients_Without_Measurements = 800;
     public static final int Response_Token_Limit_Make_Recipe = 800;
     public static final int Response_Token_Limit_Tag_Recipe_Idea = 800;
 
     public static final int Context_Character_Limit_Categorize_Ingredients = 800;
     public static final int Context_Character_Limit_Create_Recipe_Idea = 800;
+    public static final int Context_Character_Limit_Generate_Directions = 800;
+    public static final int Context_Character_Limit_Get_Ingredients_Without_Measurements = 800;
     public static final int Context_Character_Limit_Make_Recipe = 800;
     public static final int Context_Character_Limit_Tag_Recipe_Idea = 800;
 
@@ -38,6 +42,8 @@ public final class Constants {
     public static final Integer Create_Recipe_Idea_Cap_Daily_Paid = null;
 //    public static final Integer Make_Recipe_Cap_Daily_Free = 10;
 //    public static final Integer Make_Recipe_Cap_Daily_Paid = null;
+    public static final Integer Regenerate_Recipe_Directions_And_Idea_Recipe_Ingredients_Cap_Daily_Free = 1;
+    public static final Integer Regenerate_Recipe_Directions_And_Idea_Recipe_Ingredients_Cap_Daily_Paid = null;
     public static final int Cap_Chat_Daily_Paid_Legacy = -1; //-1 is unlimited
 
     /* URIs for HTTPSServer */
@@ -45,6 +51,7 @@ public final class Constants {
         public static final String CATEGORIZE_INGREDIENTS = "/categorizeIngredients";
         public static final String CREATE_RECIPE_IDEA = "/createRecipeIdea";
         public static final String MAKE_RECIPE = "/makeRecipeFromIdea";
+        public static final String REGENERATE_RECIPE_DIRECTIONS_AND_IDEA_RECIPE_INGREDIENTS = "/regenerateRecipeDirectionsAndIdeaRecipeIngredients";
         public static final String TAG_RECIPE_IDEA = "/tagRecipeIdea";
         public static final String GET_ALL_TAGS_URI = "/getAllTags";
         public static final String GET_IAP_STUFF_URI = "/getIAPStuff";
@@ -67,9 +74,10 @@ public final class Constants {
     /* Policy Retrieval Constants */
 
     /* MySQL Constants */
-    public static final String MYSQL_URL = "jdbc:mysql://localhost:3306/pantrypro_schema";
+    public static final String MYSQL_URL = "jdbc:mysql://localhost:3306/pantrypro_schema?autoReconnect=true";
 
     /* Apple Server Constants */
+    public static final String Apple_Bundle_ID = "com.acapplications.PantryPal";
     public static final String Apple_Sandbox_Storekit_Base_URL = "https://api.storekit-sandbox.itunes.apple.com";
     public static final String Apple_Storekit_Base_URL = "https://api.storekit.itunes.apple.com";
     public static final String Apple_In_Apps_URL_Path = "/inApps";

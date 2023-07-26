@@ -2,17 +2,24 @@ package com.pantrypro.model.http.server.response;
 
 
 import com.pantrypro.Constants;
+import com.pantrypro.keys.EncryptionManager;
 
 public class GetImportantConstantsResponse {
+
+    private final String bingAPIKey = EncryptionManager.getEncryptedBingAPIKey();
     private final String weeklyDisplayPrice = Constants.WEEKLY_PRICE;
     private final String monthlyDisplayPrice = Constants.MONTHLY_PRICE;
     private final String annualDisplayPrice = Constants.YEARLY_PRICE;
-
     private final String shareURL = Constants.SHARE_URL;
-    private final int freeEssayCap = Constants.Cap_Free_Total_Essays;
+
 
     public GetImportantConstantsResponse() {
 
+    }
+
+
+    public String getBingAPIKey() {
+        return bingAPIKey;
     }
 
     public String getWeeklyDisplayPrice() {
@@ -31,7 +38,4 @@ public class GetImportantConstantsResponse {
         return shareURL;
     }
 
-    public int getFreeEssayCap() {
-        return freeEssayCap;
-    }
 }

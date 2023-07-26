@@ -8,19 +8,16 @@ import com.oaigptconnector.model.request.chat.completion.OAIGPTChatCompletionReq
 import com.oaigptconnector.model.request.chat.completion.function.OAIGPTChatCompletionRequestFunction;
 import com.oaigptconnector.model.response.chat.completion.http.OAIGPTChatCompletionResponse;
 import com.pantrypro.Constants;
+import com.pantrypro.core.generation.OpenAIGPTChatCompletionRequestFactory;
 import com.pantrypro.keys.Keys;
 import com.pantrypro.model.generation.IdeaRecipeExpandIngredients;
 import com.pantrypro.model.http.client.openaigpt.response.functioncall.OAIGPTFunctionCallResponseCreateRecipeIdea;
 import com.pantrypro.model.http.client.openaigpt.request.builder.OAIGPTChatCompletionRequestFunctionCreateRecipeIdeaBuilder;
-import com.sun.jdi.StringReference;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 
-import java.awt.*;
 import java.io.IOException;
-import java.lang.ref.Reference;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class CreateRecipeIdeaGenerator {
@@ -29,7 +26,7 @@ public class CreateRecipeIdeaGenerator {
 
     public static OAIGPTFunctionCallResponseCreateRecipeIdea generateCreateRecipeIdeaFunctionCall(String ingredientsString, String modifiersString, Integer expandIngredientsMagnitude, int characterLimit, int responseTokenLimit, AtomicReference<String> outInput) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException {
         // Create request function
-        OAIGPTChatCompletionRequestFunction requestFunction = OAIGPTChatCompletionRequestFunctionCreateRecipeIdeaBuilder.build();
+        OAIGPTChatCompletionRequestFunction requestFunction = OAIGPTChatCompletionRequestFunctionCreateRecipeIdeaBuilder.build(IdeaRecipeExpandIngredients.from(expandIngredientsMagnitude).getFunctionDescription());
 
         // Create system input
         String systemInput = parseSystemInput(expandIngredientsMagnitude);
@@ -54,7 +51,7 @@ public class CreateRecipeIdeaGenerator {
         // Get response from Open AI
         OAIGPTChatCompletionResponse response = OpenAIGPTHttpsClientHelper.postChatCompletion(request, Keys.openAiAPI);
 
-        // Parse response's choice message function call arguments to OAIGPTFunctionCallResponseCreateRecipeIdea TODO: Make this better
+        // Parse response's choice message function call arguments to OAIGPTFunctionCallResponseCreateRecipeIdea and return TODO: Make this better
         OAIGPTFunctionCallResponseCreateRecipeIdea functionCallResponse = parseCreateRecipeIdeaResponse(response.getChoices()[0].getMessage().getFunction_call().getArguments());
 
         return functionCallResponse;
