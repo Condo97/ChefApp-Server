@@ -1,12 +1,12 @@
 package com.pantrypro.core.service.endpoints;
 
+import appletransactionclient.exception.AppStoreStatusResponseException;
 import com.pantrypro.common.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.common.exceptions.PreparedStatementMissingArgumentException;
 import com.pantrypro.core.database.managers.User_AuthTokenDBManager;
 import com.pantrypro.core.service.BodyResponseFactory;
-import com.pantrypro.core.service.PPPremiumValidator;
+import com.pantrypro.core.PPRemainingCalculator;
 import com.pantrypro.model.database.objects.User_AuthToken;
-import com.pantrypro.model.http.client.apple.itunes.exception.AppStoreStatusResponseException;
 import com.pantrypro.model.http.client.apple.itunes.exception.AppleItunesResponseException;
 import com.pantrypro.model.http.server.request.AuthRequest;
 import com.pantrypro.model.http.server.response.BodyResponse;
@@ -31,7 +31,7 @@ public class GetIsPremiumEndpoint {
         User_AuthToken u_aT = User_AuthTokenDBManager.getFromDB(request.getAuthToken());
 
         // Get isPremium
-        boolean isPremium = PPPremiumValidator.getIsPremium(u_aT.getUserID());
+        boolean isPremium = PPRemainingCalculator.getIsPremium(u_aT.getUserID());
 
         // Build isPremiumResponse
         IsPremiumResponse isPremiumResponse = new IsPremiumResponse(isPremium);

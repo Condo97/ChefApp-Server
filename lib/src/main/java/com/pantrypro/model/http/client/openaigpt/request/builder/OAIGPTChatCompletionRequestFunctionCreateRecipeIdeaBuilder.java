@@ -14,7 +14,7 @@ public class OAIGPTChatCompletionRequestFunctionCreateRecipeIdeaBuilder {
     private static final String defaultIngredientsDescription = "All of the ingredients needed, no measurements, adding as necessary";
 //    private static final String defaultEquipmentDescription = "The equipment needed to make the recipe";
     private static final String defaultNameDescription = "An interesting and fitting name for the recipe";
-    private static final String defaultSummaryDescription = "A short 10 word engaging summary for the recipe";
+    private static final String defaultSummaryDescription = "A short 10-24 word engaging summary for the recipe";
     private static final String defaultCuisineTypeDescription = "A 1-5 word cuisine type for the recipe";
 
     public static OAIGPTChatCompletionRequestFunction build(String functionDescription) {

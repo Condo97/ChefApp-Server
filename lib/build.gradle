@@ -64,6 +64,16 @@ dependencies {
 
     // java-jwt for JWT
     implementation 'com.auth0:java-jwt:4.4.0'
+
+    // Httpson for HTTPS handling with Jackson and JsonNode
+    implementation 'com.github.condo97:Httpson:1.0.0'
+
+    // AppleTransactionClient for handling Apple transactions
+    implementation 'com.github.condo97:AppleTransactionClient:1.0.0'
+
+    // MySQLDBClient for handling MySQL database interaction
+    implementation 'com.github.condo97:MySQLDBClient:1.0.0'
+
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

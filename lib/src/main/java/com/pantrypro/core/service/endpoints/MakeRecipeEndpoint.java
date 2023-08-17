@@ -1,12 +1,12 @@
 package com.pantrypro.core.service.endpoints;
 
+import appletransactionclient.exception.AppStoreStatusResponseException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.model.exceptions.CapReachedException;
 import com.pantrypro.common.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.common.exceptions.PreparedStatementMissingArgumentException;
-import com.pantrypro.core.PPGPTGenerator;
+import com.pantrypro.core.PantryPro;
 import com.pantrypro.model.exceptions.InvalidAssociatedIdentifierException;
-import com.pantrypro.model.http.client.apple.itunes.exception.AppStoreStatusResponseException;
 import com.pantrypro.model.http.client.apple.itunes.exception.AppleItunesResponseException;
 import com.pantrypro.model.http.server.request.MakeRecipeRequest;
 import com.pantrypro.model.http.server.response.BodyResponse;
@@ -27,7 +27,7 @@ public class MakeRecipeEndpoint {
 
     public static BodyResponse makeRecipe(MakeRecipeRequest makeRecipeRequest) throws AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, InvalidAssociatedIdentifierException {
         // Generate from request
-        return PPGPTGenerator.generatePackSaveMakeRecipe(makeRecipeRequest);
+        return PantryPro.generatePackSaveMakeRecipe(makeRecipeRequest);
     }
 
 }

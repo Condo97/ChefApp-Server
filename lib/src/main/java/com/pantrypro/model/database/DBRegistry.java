@@ -41,7 +41,9 @@ public class DBRegistry {
             public static final String TABLE_NAME = "Recipe";
             public static final String recipe_id = "recipe_id";
             public static final String idea_id = "idea_id";
+            public static final String estimated_total_calories = "estimated_total_calories";
             public static final String estimated_total_minutes = "estimated_total_minutes";
+            public static final String estimated_servings = "estimated_servings";
             public static final String date = "date";
             public static final String feasibility = "feasibility";
         }

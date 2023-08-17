@@ -39,12 +39,12 @@ public class Main {
         // Set up SQLConnectionPoolInstance
         SQLConnectionPoolInstance.create(Constants.MYSQL_URL, Keys.MYSQL_USER, Keys.MYSQL_PASS, MAX_THREADS * 4);
 
-        // Set up Policy static file location
-        staticFiles.location("/policies");
-
         // Set up Spark thread pool and port
 //        threadPool(MAX_THREADS, MIN_THREADS, TIMEOUT_MS);
         port(DEFAULT_PORT);
+
+        // Set up Policy static file location
+        staticFiles.location("/policies");
 
         // Set up SSL
         secure("chitchatserver.com.jks", Keys.sslPassword, null, null);
@@ -132,6 +132,11 @@ public class Main {
         post(Constants.URIs.REGISTER_TRANSACTION_URI, Server::registerTransaction);
         post(Constants.URIs.REGISTER_USER_URI, Server::registerUser);
         post(Constants.URIs.VALIDATE_AUTH_TOKEN_URI, Server::validateAuthToken);
+
+        post("/printDidTapWeeklyPrice", (req, res) -> {
+            System.out.println("Did tap weekly price");
+            return "";
+        });
 
         // Get Constants
         post(Constants.URIs.GET_IMPORTANT_CONSTANTS_URI, (req, res) -> new ObjectMapper().writeValueAsString(new BodyResponse(ResponseStatus.SUCCESS, new GetImportantConstantsResponse())));

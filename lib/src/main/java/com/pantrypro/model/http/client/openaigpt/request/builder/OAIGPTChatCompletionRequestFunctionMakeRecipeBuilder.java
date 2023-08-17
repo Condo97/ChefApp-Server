@@ -14,17 +14,19 @@ public class OAIGPTChatCompletionRequestFunctionMakeRecipeBuilder {
     private static final String defaultFunctionDescription = "Creates a recipe from the given summary and ingredients";
     private static final String defaultInstructionsDescription = "The instructions to make the recipe";
     private static final String defaultAllIngredientsAndMeasurementsDescription = "All of the ingredients with measurements needed to make this recipe";
+    private static final String defaultEstimatedTotalCaloriesDescription = "Estimated number of total calories for the recipe";
     private static final String defaultEstimatedTotalMinutesDescription = "The total estimated time in minutes needed to make the recipe";
+    private static final String defaultEstimatedServingsDescription = "Estimated number of servings the recipe makes";
     private static final String defaultFeasibilityDescription = "On a scale of 1-10, how feasible the recipe is to make in reality";
 
     public static OAIGPTChatCompletionRequestFunction build() {
-        return build(defaultFunctionDescription, defaultInstructionsDescription, defaultAllIngredientsAndMeasurementsDescription, defaultEstimatedTotalMinutesDescription, defaultFeasibilityDescription);
+        return build(defaultFunctionDescription, defaultInstructionsDescription, defaultAllIngredientsAndMeasurementsDescription, defaultEstimatedTotalCaloriesDescription, defaultEstimatedTotalMinutesDescription, defaultEstimatedServingsDescription, defaultFeasibilityDescription);
     }
 
-    public static OAIGPTChatCompletionRequestFunction build(String functionDescription, String instructionsDescription, String allIngredientsAndMeasurementsDescription, String estimatedTotalMinutesDescription, String feasibilityDescription) {
+    public static OAIGPTChatCompletionRequestFunction build(String functionDescription, String instructionsDescription, String allIngredientsAndMeasurementsDescription, String estimatedTotalCaloriesDescription, String estimatedTotalMinutesDescription, String estimatedServingsDescription, String feasibilityDescription) {
         // Create the OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe
         OAIGPTChatCompletionRequestFunctionObjectArray instructions, allIngredientsAndMeasurements;
-        OAIGPTChatCompletionRequestFunctionObjectInteger estimatedTotalMinutes, feasibility;
+        OAIGPTChatCompletionRequestFunctionObjectInteger estimatedTotalCalories, estimatedTotalMinutes, estimatedServings, feasibility;
 
         instructions = new OAIGPTChatCompletionRequestFunctionObjectArray(
                 instructionsDescription,
@@ -36,8 +38,16 @@ public class OAIGPTChatCompletionRequestFunctionMakeRecipeBuilder {
                 new OAIGPTChatCompletionRequestFunctionObjectString()
         );
 
+        estimatedTotalCalories = new OAIGPTChatCompletionRequestFunctionObjectInteger(
+                estimatedTotalCaloriesDescription
+        );
+
         estimatedTotalMinutes = new OAIGPTChatCompletionRequestFunctionObjectInteger(
                 estimatedTotalMinutesDescription
+        );
+
+        estimatedServings = new OAIGPTChatCompletionRequestFunctionObjectInteger(
+                estimatedServingsDescription
         );
 
         feasibility = new OAIGPTChatCompletionRequestFunctionObjectInteger(
@@ -48,7 +58,9 @@ public class OAIGPTChatCompletionRequestFunctionMakeRecipeBuilder {
         OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe r = new OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe(
                 instructions,
                 allIngredientsAndMeasurements,
+                estimatedTotalCalories,
                 estimatedTotalMinutes,
+                estimatedServings,
                 feasibility
         );
 
@@ -57,6 +69,8 @@ public class OAIGPTChatCompletionRequestFunctionMakeRecipeBuilder {
                 "instructions",
                 "allIngredientsAndMeasurements",
                 "estimatedTotalMinutes",
+                "estimatedServings",
+                "estimatedCalories",
                 "feasibility"
         ));
 

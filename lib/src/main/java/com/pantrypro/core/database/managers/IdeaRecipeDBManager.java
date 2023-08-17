@@ -1,12 +1,11 @@
 package com.pantrypro.core.database.managers;
 
-import com.pantrypro.core.database.DBManager;
+import com.dbclient.DBManager;
 import com.pantrypro.model.database.DBRegistry;
 import com.pantrypro.model.database.objects.IdeaRecipe;
-import com.pantrypro.model.database.objects.IdeaRecipeEquipment;
 import com.pantrypro.model.database.objects.IdeaRecipeIngredient;
 import com.pantrypro.model.database.objects.IdeaRecipeTag;
-import sqlcomponentizer.DBClient;
+import com.pantrypro.model.database.objects.RecipeMeasuredIngredient;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 import sqlcomponentizer.preparedstatement.component.PSComponent;
@@ -14,19 +13,20 @@ import sqlcomponentizer.preparedstatement.component.condition.SQLOperatorConditi
 import sqlcomponentizer.preparedstatement.component.condition.SQLOperators;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class IdeaRecipeDBManager extends DBManager {
+public class IdeaRecipeDBManager {
 
-    public static void insertIdeaRecipe(IdeaRecipe ideaRecipe, List<IdeaRecipeIngredient> ingredients) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
-        insert(ideaRecipe);
+    public static void insertIdeaRecipe(Connection conn, IdeaRecipe ideaRecipe, List<IdeaRecipeIngredient> ingredients) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
+        DBManager.insert(conn, ideaRecipe);
 
         for (IdeaRecipeIngredient ingredient: ingredients) {
             ingredient.setIdeaID(ideaRecipe.getId());
-            insert(ingredient);
+            DBManager.insert(conn, ingredient);
         }
 
 //        for (IdeaRecipeEquipment equipmentObject: equipment) {
@@ -35,18 +35,18 @@ public class IdeaRecipeDBManager extends DBManager {
 //        }
     }
 
-    public static void insertIdeaRecipeIngredients(List<IdeaRecipeIngredient> ingredients) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
+    public static void insertIdeaRecipeIngredients(Connection conn, List<IdeaRecipeIngredient> ingredients) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
         for (IdeaRecipeIngredient ingredient: ingredients)
-            insert(ingredient);
+            DBManager.insert(conn, ingredient);
     }
 
-    public static void insertIdeaRecipeTags(List<IdeaRecipeTag> tags) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
+    public static void insertIdeaRecipeTags(Connection conn, List<IdeaRecipeTag> tags) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
         for (IdeaRecipeTag tag: tags) {
-            insert(tag);
+            DBManager.insert(conn, tag);
         }
     }
 
-    public static Long countForToday(Integer userID) throws DBSerializerException, SQLException, InterruptedException {
+    public static Long countForToday(Connection conn, Integer userID) throws DBSerializerException, SQLException, InterruptedException {
         // Get from date as yesterday's date to count all ideaRecipes after it
         LocalDateTime fromDate = LocalDateTime.now().minus(Duration.ofDays(1));
 
@@ -67,24 +67,16 @@ public class IdeaRecipeDBManager extends DBManager {
         );
 
         // Count where userID
-        return countObjectWhere(
+        return DBManager.countObjectWhere(
+                conn,
                 IdeaRecipe.class,
                 sqlConditions
         );
     }
 
-    public static void deleteAllIngredients(Integer ideaID) throws DBSerializerException, SQLException, InterruptedException {
-        deleteWhere(
-                IdeaRecipeIngredient.class,
-                DBRegistry.Table.IdeaRecipeIngredient.idea_id,
-                SQLOperators.EQUAL,
-                ideaID
-        );
-    }
-
-    public static IdeaRecipe get(Integer ideaID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+    public static IdeaRecipe get(Connection conn, Integer ideaID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
         // Get all recipe ideas for idea ID
-        List<IdeaRecipe> allRecipesForID = selectAllByPrimaryKey(IdeaRecipe.class, ideaID);
+        List<IdeaRecipe> allRecipesForID = DBManager.selectAllByPrimaryKey(conn, IdeaRecipe.class, ideaID);
 
         // if there is at least one object, return the first
         if (allRecipesForID.size() > 0)
@@ -94,9 +86,10 @@ public class IdeaRecipeDBManager extends DBManager {
         return null;
     }
 
-    public static List<IdeaRecipeIngredient> getIngredients(Integer ideaID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+    public static List<IdeaRecipeIngredient> getIngredients(Connection conn, Integer ideaID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
         // Get all recipe idea ingredients for idea ID
-        List<IdeaRecipeIngredient> allIngredientsForID = selectAllWhere(
+        List<IdeaRecipeIngredient> allIngredientsForID = DBManager.selectAllWhere(
+                conn,
                 IdeaRecipeIngredient.class,
                 DBRegistry.Table.IdeaRecipeIngredient.idea_id,
                 SQLOperators.EQUAL,
@@ -106,8 +99,9 @@ public class IdeaRecipeDBManager extends DBManager {
         return allIngredientsForID;
     }
 
-    public static void updateName(Integer ideaID, String name) throws DBSerializerException, SQLException, InterruptedException {
-        updateWhere(
+    public static void updateName(Connection conn, Integer ideaID, String name) throws DBSerializerException, SQLException, InterruptedException {
+        DBManager.updateWhere(
+                conn,
                 IdeaRecipe.class,
                 DBRegistry.Table.IdeaRecipe.name,
                 name,
@@ -117,12 +111,35 @@ public class IdeaRecipeDBManager extends DBManager {
         );
     }
 
-    public static void updateSummary(Integer ideaID, String summary) throws DBSerializerException, SQLException, InterruptedException {
-        updateWhere(
+    public static void updateSummary(Connection conn, Integer ideaID, String summary) throws DBSerializerException, SQLException, InterruptedException {
+        DBManager.updateWhere(
+                conn,
                 IdeaRecipe.class,
                 DBRegistry.Table.IdeaRecipe.summary,
                 summary,
                 DBRegistry.Table.IdeaRecipe.idea_id,
+                SQLOperators.EQUAL,
+                ideaID
+        );
+    }
+
+    public static void updateIngredients(Connection conn, Integer ideaID, List<IdeaRecipeIngredient> ingredients) throws DBSerializerException, SQLException, InterruptedException, DBSerializerPrimaryKeyMissingException, InvocationTargetException, IllegalAccessException {
+        // Delete all ingredients for ideaID
+        deleteAllIngredients(conn, ideaID);
+
+        // Insert new ingredients for ideaID
+        for (IdeaRecipeIngredient ingredient: ingredients) {
+            // Set ideaID since we want all ingredients here to be associated with the given ideaID, and in the use case when the ingredients are generated they do not adapt with ideaIDs TODO: Is this a good place to set this?
+            ingredient.setIdeaID(ideaID);
+            DBManager.insert(conn, ingredient);
+        }
+    }
+
+    private static void deleteAllIngredients(Connection conn, Integer ideaID) throws DBSerializerException, SQLException, InterruptedException {
+        DBManager.deleteWhere(
+                conn,
+                IdeaRecipeIngredient.class,
+                DBRegistry.Table.IdeaRecipeIngredient.idea_id,
                 SQLOperators.EQUAL,
                 ideaID
         );

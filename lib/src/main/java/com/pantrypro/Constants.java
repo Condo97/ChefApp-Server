@@ -11,9 +11,9 @@ public final class Constants {
 
     /* In-App Purchases Pricing */
     public static final int DEFAULT_PRICE_INDEX = 0;
-    public static final String WEEKLY_PRICE = "3.95";
+    public static final String WEEKLY_PRICE = "3.99";
     public static final String WEEKLY_NAME = "pantryproultraweekly";
-    public static final String MONTHLY_PRICE = "12.95";
+    public static final String MONTHLY_PRICE = "12.99";
     public static final String MONTHLY_NAME = "pantryproultramonthly";
     public static final String YEARLY_PRICE = "49.99";
     public static final String YEARLY_NAME = "pantryproultrayearly";
@@ -38,7 +38,7 @@ public final class Constants {
 
     /* Caps */
     public static final int Cap_Free_Total_Essays = 3; // This is just a constant sent to the device, which handles everything
-    public static final Integer Create_Recipe_Idea_Cap_Daily_Free = 4;
+    public static final Integer Create_Recipe_Idea_Cap_Daily_Free = 10;
     public static final Integer Create_Recipe_Idea_Cap_Daily_Paid = null;
 //    public static final Integer Make_Recipe_Cap_Daily_Free = 10;
 //    public static final Integer Make_Recipe_Cap_Daily_Paid = null;

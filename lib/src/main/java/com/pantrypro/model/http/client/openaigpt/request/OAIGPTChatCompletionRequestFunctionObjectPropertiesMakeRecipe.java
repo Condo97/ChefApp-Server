@@ -7,17 +7,21 @@ public class OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe {
 
     private OAIGPTChatCompletionRequestFunctionObjectArray instructions;
     private OAIGPTChatCompletionRequestFunctionObjectArray allIngredientsAndMeasurements;
+    private OAIGPTChatCompletionRequestFunctionObjectInteger estimatedTotalCalories;
     private OAIGPTChatCompletionRequestFunctionObjectInteger estimatedTotalMinutes;
+    private OAIGPTChatCompletionRequestFunctionObjectInteger estimatedServings;
     private OAIGPTChatCompletionRequestFunctionObjectInteger feasibility;
 
     public OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe() {
 
     }
 
-    public OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe(OAIGPTChatCompletionRequestFunctionObjectArray instructions, OAIGPTChatCompletionRequestFunctionObjectArray allIngredientsAndMeasurements, OAIGPTChatCompletionRequestFunctionObjectInteger estimatedTotalMinutes, OAIGPTChatCompletionRequestFunctionObjectInteger feasibility) {
+    public OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe(OAIGPTChatCompletionRequestFunctionObjectArray instructions, OAIGPTChatCompletionRequestFunctionObjectArray allIngredientsAndMeasurements, OAIGPTChatCompletionRequestFunctionObjectInteger estimatedTotalCalories, OAIGPTChatCompletionRequestFunctionObjectInteger estimatedTotalMinutes, OAIGPTChatCompletionRequestFunctionObjectInteger estimatedServings, OAIGPTChatCompletionRequestFunctionObjectInteger feasibility) {
         this.instructions = instructions;
         this.allIngredientsAndMeasurements = allIngredientsAndMeasurements;
+        this.estimatedTotalCalories = estimatedTotalCalories;
         this.estimatedTotalMinutes = estimatedTotalMinutes;
+        this.estimatedServings = estimatedServings;
         this.feasibility = feasibility;
     }
 
@@ -31,6 +35,14 @@ public class OAIGPTChatCompletionRequestFunctionObjectPropertiesMakeRecipe {
 
     public OAIGPTChatCompletionRequestFunctionObjectInteger getEstimatedTotalMinutes() {
         return estimatedTotalMinutes;
+    }
+
+    public OAIGPTChatCompletionRequestFunctionObjectInteger getEstimatedServings() {
+        return estimatedServings;
+    }
+
+    public OAIGPTChatCompletionRequestFunctionObjectInteger getEstimatedTotalCalories() {
+        return estimatedTotalCalories;
     }
 
     public OAIGPTChatCompletionRequestFunctionObjectInteger getFeasibility() {

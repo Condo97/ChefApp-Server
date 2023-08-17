@@ -1,13 +1,13 @@
 package com.pantrypro.core.service.endpoints;
 
+import appletransactionclient.exception.AppStoreStatusResponseException;
 import com.pantrypro.common.exceptions.DBObjectNotFoundFromQueryException;
-import com.pantrypro.core.apple.iapvalidation.TransactionPersistentAppleUpdater;
+import com.pantrypro.core.purchase.iapvalidation.TransactionPersistentAppleUpdater;
 import com.pantrypro.core.database.managers.User_AuthTokenDBManager;
 import com.pantrypro.core.service.BodyResponseFactory;
 import com.pantrypro.model.database.AppStoreSubscriptionStatusToIsPremiumAdapter;
 import com.pantrypro.model.database.objects.Transaction;
 import com.pantrypro.model.database.objects.User_AuthToken;
-import com.pantrypro.model.http.client.apple.itunes.exception.AppStoreStatusResponseException;
 import com.pantrypro.model.http.server.request.RegisterTransactionRequest;
 import com.pantrypro.model.http.server.response.BodyResponse;
 import com.pantrypro.model.http.server.response.IsPremiumResponse;

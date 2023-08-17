@@ -1,5 +1,7 @@
 package com.pantrypro.connectionpool;
 
+import com.pantrypro.util.Connectable;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -7,7 +9,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class SQLConnectionPool implements ISQLConncetionPool {
-    private String url, user, password;
+
     private Deque<Connection> poolConnections, usedConnections;
 
     public static SQLConnectionPool create(String url, String user, String password, int size) throws SQLException {

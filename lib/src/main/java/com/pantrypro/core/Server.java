@@ -1,5 +1,6 @@
 package com.pantrypro.core;
 
+import appletransactionclient.exception.AppStoreStatusResponseException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +12,6 @@ import com.pantrypro.model.exceptions.CapReachedException;
 import com.pantrypro.model.exceptions.GenerationException;
 import com.pantrypro.model.exceptions.InvalidAssociatedIdentifierException;
 import com.pantrypro.model.exceptions.InvalidRequestJSONException;
-import com.pantrypro.model.http.client.apple.itunes.exception.AppStoreStatusResponseException;
 import com.pantrypro.model.http.client.apple.itunes.exception.AppleItunesResponseException;
 import com.pantrypro.model.http.server.ResponseStatus;
 import com.pantrypro.model.http.server.request.*;
@@ -31,6 +31,8 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Server {
 
@@ -111,11 +113,13 @@ public class Server {
          */
         public static String createRecipeIdea(Request request, Response response) throws IOException, MalformedJSONException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException {
             // Try to parse GetRecipeIdeaRequest
-            CreateRecipeIdeaRequest criRequest;
+            CreateIdeaRecipeRequest criRequest;
 
             try {
-                criRequest = new ObjectMapper().readValue(request.body(), CreateRecipeIdeaRequest.class);
+                criRequest = new ObjectMapper().readValue(request.body(), CreateIdeaRecipeRequest.class);
                 BodyResponse br = CreateRecipeIdeaEndpoint.createRecipeIdea(criRequest);
+
+                printTimestamped("User with AuthToken " + criRequest.getAuthToken().substring(0, Math.min(criRequest.getAuthToken().length(), 7)) + " generated Recipe Idea for Ingredients - " + criRequest.getIngredients().substring(0, Math.min(criRequest.getIngredients().length(), 39)));
 
                 return new ObjectMapper().writeValueAsString(br);
 
@@ -341,6 +345,8 @@ public class Server {
     public static String registerUser(Request request, Response response) throws SQLException, SQLGeneratedKeyException, PreparedStatementMissingArgumentException, IOException, DBSerializerPrimaryKeyMissingException, DBSerializerException, AutoIncrementingDBObjectExistsException, IllegalAccessException, InterruptedException, InvocationTargetException {
         BodyResponse bodyResponse = RegisterUserEndpoint.registerUser();
 
+        printTimestamped("Registered new user!");
+
         return new ObjectMapper().writeValueAsString(bodyResponse);
     }
 
@@ -397,6 +403,16 @@ public class Server {
             return null;
         }
 //        return "{\"Success\":" + ResponseStatus.EXCEPTION_MAP_ERROR.Success + "}";
+    }
+
+    // -------------- //
+
+    public static void printTimestamped(String string) {
+        // TODO: Better logging
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date();
+
+        System.out.println(sdf.format(date) + " - " + string);
     }
 
 //    public static String getSimpleExceptionHandlerResponseStatusJSON(ResponseStatus status) {

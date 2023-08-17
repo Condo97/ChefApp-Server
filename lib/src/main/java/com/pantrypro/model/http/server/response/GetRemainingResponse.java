@@ -1,21 +1,21 @@
 package com.pantrypro.model.http.server.response;
 
 public class GetRemainingResponse {
-    private long remaining;
+    private Long remaining;
 
     public GetRemainingResponse() {
 
     }
 
-    public GetRemainingResponse(long remaining) {
+    public GetRemainingResponse(Long remaining) {
         this.remaining = remaining;
     }
 
-    public long getRemaining() {
+    public Long getRemaining() {
         return remaining;
     }
 
-    public void setRemaining(long remaining) {
+    public void setRemaining(Long remaining) {
         this.remaining = remaining;
     }
 }

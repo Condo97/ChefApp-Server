@@ -1,7 +1,8 @@
 package pantrypro;
 
+import appletransactionclient.exception.AppStoreStatusResponseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oaigptconnector.core.OpenAIGPTHttpsClientHelper;
+import com.oaigptconnector.core.OpenAIGPTHttpsHandler;
 import com.oaigptconnector.model.Role;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.oaigptconnector.model.request.chat.completion.OAIGPTChatCompletionRequest;
@@ -9,20 +10,23 @@ import com.oaigptconnector.model.request.chat.completion.OAIGPTChatCompletionReq
 import com.oaigptconnector.model.response.chat.completion.http.OAIGPTChatCompletionResponse;
 import com.pantrypro.Constants;
 import com.pantrypro.common.exceptions.AutoIncrementingDBObjectExistsException;
+import com.pantrypro.core.database.adapters.oai.RecipeFromOpenAIAdapter;
+import com.pantrypro.core.generation.openai.OAIRecipeGenerator;
 import com.pantrypro.core.service.endpoints.CreateRecipeIdeaEndpoint;
 import com.pantrypro.core.service.endpoints.MakeRecipeEndpoint;
 import com.pantrypro.core.service.endpoints.RegenerateRecipeDirectionsAndIdeaRecipeIngredientsEndpoint;
 import com.pantrypro.keys.EncryptionManager;
+import com.pantrypro.model.database.objects.Recipe;
 import com.pantrypro.model.exceptions.*;
 import com.pantrypro.common.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.common.exceptions.PreparedStatementMissingArgumentException;
 import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
-import com.pantrypro.core.PPGPTGenerator;
+import com.pantrypro.core.PantryPro;
 import com.pantrypro.core.service.endpoints.RegisterUserEndpoint;
 import com.pantrypro.keys.Keys;
-import com.pantrypro.model.http.client.apple.itunes.exception.AppStoreStatusResponseException;
 import com.pantrypro.model.http.client.apple.itunes.exception.AppleItunesResponseException;
 import com.pantrypro.model.http.client.openaigpt.request.builder.OAIGPTChatCompletionRequestFunctionCategorizeIngredientsBuilder;
+import com.pantrypro.model.http.client.openaigpt.response.functioncall.OAIGPTFunctionCallResponseMakeRecipe;
 import com.pantrypro.model.http.server.request.*;
 import com.pantrypro.model.http.server.response.*;
 import org.junit.jupiter.api.BeforeAll;
@@ -147,7 +151,7 @@ public class Tests {
             requestBuilder.setHeader("Authorization", "Bearer " + Keys.openAiAPI);
         };
 
-        OpenAIGPTHttpsClientHelper httpHelper = new OpenAIGPTHttpsClientHelper();
+        OpenAIGPTHttpsHandler httpHelper = new OpenAIGPTHttpsHandler();
 
         try {
             OAIGPTChatCompletionResponse response = httpHelper.postChatCompletion(promptRequest, Keys.openAiAPI);
@@ -251,7 +255,7 @@ public class Tests {
         String authToken = aResponse.getAuthToken();
 
         // Build CreateRecipeIdeaRequest
-        CreateRecipeIdeaRequest request = new CreateRecipeIdeaRequest(
+        CreateIdeaRecipeRequest request = new CreateIdeaRecipeRequest(
                 authToken,
                 "peaches, flour, eggs, oatmeal, chocolate chips",
                 "make souffle",
@@ -259,10 +263,10 @@ public class Tests {
         );
 
         // Generate pack save create recipe idea function
-        BodyResponse bResponse = PPGPTGenerator.generatePackSaveCreateRecipeIdeaFunction(request);
+        BodyResponse bResponse = PantryPro.generatePackSaveCreateRecipeIdeaFunction(request);
 
         // Ensure body is CreateRecipeIdeaResponse
-        assert(bResponse.getBody() instanceof CreateRecipeIdeaResponse);
+        assert(bResponse.getBody() instanceof CreateIdeaRecipeResponse);
     }
 
     @Test
@@ -278,12 +282,12 @@ public class Tests {
         // Build MakeRecipeRequest
         MakeRecipeRequest request = new MakeRecipeRequest(
                 authToken,
-                1
+                274
         );
 
         try {
             // Generate pack save make recipe function
-            PPGPTGenerator.generatePackSaveMakeRecipe(request);
+            PantryPro.generatePackSaveMakeRecipe(request);
         } catch (ResponseStatusException e) {
             e.printStackTrace();
         }
@@ -300,19 +304,19 @@ public class Tests {
         AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
 
         // Create recipe idea request
-        CreateRecipeIdeaRequest ideaRecipeRequest = new CreateRecipeIdeaRequest(
+        CreateIdeaRecipeRequest ideaRecipeRequest = new CreateIdeaRecipeRequest(
                 aResponse.getAuthToken(),
                 ingredients,
                 modifiers,
                 1
         );
-        BodyResponse recipeIdeaBR = PPGPTGenerator.generatePackSaveCreateRecipeIdeaFunction(ideaRecipeRequest);
+        BodyResponse recipeIdeaBR = PantryPro.generatePackSaveCreateRecipeIdeaFunction(ideaRecipeRequest);
 
         // Assert recipeIdeaBR body is CreateRecipeIdeaResponse
-        assert(recipeIdeaBR.getBody() instanceof CreateRecipeIdeaResponse);
+        assert(recipeIdeaBR.getBody() instanceof CreateIdeaRecipeResponse);
 
         // Parse idea ID out of recipeIdeaBR
-        Integer ideaID = ((CreateRecipeIdeaResponse)recipeIdeaBR.getBody()).getIdeaID();
+        Integer ideaID = ((CreateIdeaRecipeResponse)recipeIdeaBR.getBody()).getIdeaID();
 
         // Build TagIdeaRecipeRequest
         TagRecipeIdeaRequest trir = new TagRecipeIdeaRequest(
@@ -322,7 +326,7 @@ public class Tests {
 
         try {
             // Generate pack save make tag recipe idea
-            PPGPTGenerator.generatePackIdeaRecipeTags(trir);
+            PantryPro.generatePackSaveIdeaRecipeTags(trir);
         } catch (ResponseStatusException e) {
             e.printStackTrace();
         }
@@ -351,7 +355,7 @@ public class Tests {
                 ingredients,
                 null
         );
-        BodyResponse categorizeIngredientsBR = PPGPTGenerator.generatePackSaveCategorizeIngredientsFunction(categorizeIngredientsRequest);
+        BodyResponse categorizeIngredientsBR = PantryPro.generatePackSaveCategorizeIngredientsFunction(categorizeIngredientsRequest);
 
         // Assert categorizeIngredientsBR body is CategorizeIngredientsResponse
         assert(categorizeIngredientsBR.getBody() instanceof CategorizeIngredientsResponse);
@@ -373,7 +377,7 @@ public class Tests {
         String authToken = aResponse.getAuthToken();
 
         // Build CreateRecipeIdeaRequest
-        CreateRecipeIdeaRequest criRequest = new CreateRecipeIdeaRequest(
+        CreateIdeaRecipeRequest criRequest = new CreateIdeaRecipeRequest(
                 authToken,
                 "peaches, flour, eggs, oatmeal, chocolate chips",
                 "make souffle",
@@ -384,9 +388,9 @@ public class Tests {
         BodyResponse criBResponse = CreateRecipeIdeaEndpoint.createRecipeIdea(criRequest);
 
         // Get ideaID, name, and summary from bResponse
-        Integer ideaID = ((CreateRecipeIdeaResponse)criBResponse.getBody()).getIdeaID();
-        String name = ((CreateRecipeIdeaResponse)criBResponse.getBody()).getName();
-        String summary = ((CreateRecipeIdeaResponse)criBResponse.getBody()).getSummary();
+        Integer ideaID = ((CreateIdeaRecipeResponse)criBResponse.getBody()).getIdeaID();
+        String name = ((CreateIdeaRecipeResponse)criBResponse.getBody()).getName();
+        String summary = ((CreateIdeaRecipeResponse)criBResponse.getBody()).getSummary();
 
         // Build MakeRecipeRequest
         MakeRecipeRequest mrRequest = new MakeRecipeRequest(
@@ -445,8 +449,13 @@ public class Tests {
 
     @Test
     @DisplayName("Misc Modifyable")
-    void misc() throws IOException {
+    void misc() throws IOException, DBSerializerException, SQLException, OpenAIGPTException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
 //        System.out.println("Here it is: " + Table.USER_AUTHTOKEN);
         System.out.println("OAIGPTChatCompletionRequestFunctionCategorizeIngredients:\n" + new ObjectMapper().writeValueAsString(OAIGPTChatCompletionRequestFunctionCategorizeIngredientsBuilder.build()));
+
+        OAIGPTFunctionCallResponseMakeRecipe oaiResponse = OAIRecipeGenerator.generateMakeRecipeFunctionCall("chocolate, flour, milk", 800, 800);
+        Recipe r = RecipeFromOpenAIAdapter.getRecipe(123, oaiResponse);
+        System.out.println(r.getEstimated_total_minutes());
+        System.out.println(r.getFeasibility());
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 public class OAIGPTFunctionCallResponseMakeRecipe {
 
     private List<String> instructions, allIngredientsAndMeasurements;
-    private Integer estimatedTotalMinutes, feasibility;
+    private Integer estimatedTotalCalories, estimatedTotalMinutes, estimatedServings, feasibility;
 
     public OAIGPTFunctionCallResponseMakeRecipe() {
 
@@ -19,8 +19,16 @@ public class OAIGPTFunctionCallResponseMakeRecipe {
         return allIngredientsAndMeasurements;
     }
 
+    public Integer getEstimatedTotalCalories() {
+        return estimatedTotalCalories;
+    }
+
     public Integer getEstimatedTotalMinutes() {
         return estimatedTotalMinutes;
+    }
+
+    public Integer getEstimatedServings() {
+        return estimatedServings;
     }
 
     public Integer getFeasibility() {

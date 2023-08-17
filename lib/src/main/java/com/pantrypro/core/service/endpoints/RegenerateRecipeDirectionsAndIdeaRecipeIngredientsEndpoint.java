@@ -1,13 +1,13 @@
 package com.pantrypro.core.service.endpoints;
 
+import appletransactionclient.exception.AppStoreStatusResponseException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.common.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.common.exceptions.PreparedStatementMissingArgumentException;
-import com.pantrypro.core.PPGPTGenerator;
+import com.pantrypro.core.PantryPro;
 import com.pantrypro.model.exceptions.CapReachedException;
 import com.pantrypro.model.exceptions.GenerationException;
 import com.pantrypro.model.exceptions.InvalidRequestJSONException;
-import com.pantrypro.model.http.client.apple.itunes.exception.AppStoreStatusResponseException;
 import com.pantrypro.model.http.client.apple.itunes.exception.AppleItunesResponseException;
 import com.pantrypro.model.http.server.request.RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest;
 import com.pantrypro.model.http.server.response.BodyResponse;
@@ -27,7 +27,7 @@ import java.sql.SQLException;
 public class RegenerateRecipeDirectionsAndIdeaRecipeIngredientsEndpoint {
 
     public static BodyResponse regenerateRecipeDirectionsAndIdeaRecipeIngredients(RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest request) throws AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, InvalidRequestJSONException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, GenerationException {
-        return PPGPTGenerator.generatePackSaveRegenerateRecipeDirectionsAndIdeaRecipeIngredients(request);
+        return PantryPro.generatePackSaveRegenerateRecipeDirectionsAndIdeaRecipeIngredients(request);
     }
 
 }

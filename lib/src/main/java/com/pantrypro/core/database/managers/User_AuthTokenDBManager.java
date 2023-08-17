@@ -1,8 +1,8 @@
 package com.pantrypro.core.database.managers;
 
+import com.dbclient.DBManager;
 import com.pantrypro.common.exceptions.AutoIncrementingDBObjectExistsException;
 import com.pantrypro.common.exceptions.DBObjectNotFoundFromQueryException;
-import com.pantrypro.core.database.DBManager;
 import com.pantrypro.core.database.managers.helpers.AuthTokenGenerator;
 import com.pantrypro.model.database.DBRegistry;
 import com.pantrypro.model.database.objects.User_AuthToken;
@@ -11,13 +11,15 @@ import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 import sqlcomponentizer.preparedstatement.component.condition.SQLOperators;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-public class User_AuthTokenDBManager extends DBManager {
+public class User_AuthTokenDBManager {
 
-    public static User_AuthToken getFromDB(String authToken) throws DBSerializerException, SQLException, IllegalAccessException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException {
-        List<User_AuthToken> u_aTs = selectAllWhere(
+    public static User_AuthToken getFromDB(Connection conn, String authToken) throws DBSerializerException, SQLException, IllegalAccessException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException {
+        List<User_AuthToken> u_aTs = DBManager.selectAllWhere(
+                conn,
                 User_AuthToken.class,
                 DBRegistry.Table.User_AuthToken.auth_token,
                 SQLOperators.EQUAL,
@@ -36,11 +38,11 @@ public class User_AuthTokenDBManager extends DBManager {
         return u_aTs.get(0);
     }
 
-    public static User_AuthToken createInDB() throws AutoIncrementingDBObjectExistsException, DBSerializerException, DBSerializerPrimaryKeyMissingException, IllegalAccessException, SQLException, InterruptedException, InvocationTargetException {
+    public static User_AuthToken createInDB(Connection conn) throws AutoIncrementingDBObjectExistsException, DBSerializerException, DBSerializerPrimaryKeyMissingException, IllegalAccessException, SQLException, InterruptedException, InvocationTargetException {
         // Create u_aT and ensure no userID
         User_AuthToken u_aT = create();
 
-        deepInsert(u_aT);
+        DBManager.deepInsert(conn, u_aT);
 
         return u_aT;
     }

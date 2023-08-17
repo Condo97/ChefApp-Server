@@ -1,6 +1,6 @@
 package com.pantrypro.core.database.managers;
 
-import com.pantrypro.core.database.DBManager;
+import com.dbclient.DBManager;
 import com.pantrypro.model.database.DBRegistry;
 import com.pantrypro.model.database.objects.Transaction;
 import sqlcomponentizer.dbserializer.DBSerializerException;
@@ -9,28 +9,34 @@ import sqlcomponentizer.preparedstatement.component.OrderByComponent;
 import sqlcomponentizer.preparedstatement.component.condition.SQLOperators;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-public class TransactionDBManager extends DBManager {
+public class TransactionDBManager {
 
-    public static void insertOrUpdateByMostRecentTransactionID(Transaction transaction) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, DBSerializerPrimaryKeyMissingException {
-        Transaction mostRecentTransaction = getMostRecent(transaction.getUserID());
+    public static void insertOrUpdateByMostRecentTransactionID(Connection conn, Transaction transaction) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, DBSerializerPrimaryKeyMissingException {
+        Transaction mostRecentTransaction = getMostRecent(conn, transaction.getUserID());
 
         // If most recent transaction is not null and parameter transaction ID matches most recent transaction ID, update, otherwise insert
         if (mostRecentTransaction != null && mostRecentTransaction.getAppstoreTransactionID().equals(transaction.getAppstoreTransactionID())) {
-            // Update
-            updateCheckedStatus(mostRecentTransaction);
+            // Set mostRecentTransaction check date to today TODO: Should this be done here?
+            transaction.setCheckDate(LocalDateTime.now());
+
+            // Update checked status
+            updateCheckedStatus(conn, transaction);
         } else {
             // Insert
-            insert(transaction);
+            DBManager.insert(conn, transaction);
         }
     }
 
-    public static Transaction getMostRecent(Integer userID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+    public static Transaction getMostRecent(Connection conn, Integer userID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
         // Select most recent transaction as the only object in query list
-        List<Transaction> transactions = selectAllWhereOrderByLimit(
+        List<Transaction> transactions = DBManager.selectAllWhereOrderByLimit(
+                conn,
                 Transaction.class,
                 Map.of(
                         DBRegistry.Table.Transaction.user_id, userID
@@ -57,10 +63,11 @@ public class TransactionDBManager extends DBManager {
         return transactions.get(0);
     }
 
-    public static void updateCheckedStatus(Transaction transaction) throws DBSerializerException, SQLException, InterruptedException {
+    public static void updateCheckedStatus(Connection conn, Transaction transaction) throws DBSerializerException, SQLException, InterruptedException {
         System.out.println("AppStore Transaction ID: " + transaction.getAppstoreTransactionID());
 
         DBManager.updateWhere( // TODO: Should this be all that is updated? I think so..
+                conn,
                 Transaction.class,
                 Map.of(
                         DBRegistry.Table.Transaction.status, transaction.getStatus().getValue(),
