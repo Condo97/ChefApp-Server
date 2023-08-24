@@ -87,8 +87,8 @@ public class Server {
          *
          * Request: {
          *      authToken: String - Authentication token for the user
-         *      ingredients: String - String of ingredients to use
          *      expandIngredients: Integer - Value of 0-4 denoting how much to expand ingredients
+         *      ingredients: String - String of ingredients to use
          *      modifiers: String - Additional modifiers for the generation query
          * }
          *
@@ -96,10 +96,11 @@ public class Server {
          *      Body: {
          *          name: String - Name of the recipe idea
          *          summary: String - A summary of the recipe idea
-         *          cuisineType: String - A cuisine type for the recipe idea
+//         *          cuisineType: String - A cuisine type for the recipe idea
          *          ingredients: String[] - List of ingredients needed for the recipe idea
-         *          equipment: String[] - List of equipment needed for the recipe idea
-         *          ideaID: Integer - The ID of the idea
+//         *          equipment: String[] - List of equipment needed for the recipe idea
+         *          recipeID: Integer - The ID of the recipe
+         *          remaining: Integer - The amount of recipe generations the user has remaining for the current period and their tier
          *      }
          *      Success: Integer - Integer denoting success, 1 if successful
          * }
@@ -130,19 +131,28 @@ public class Server {
         }
 
         /***
-         * Make Recipe
+         * Finalize Recipe
          *
          * Generates a recipe from the given text, should be an idea
          *
          * Request: {
          *      authToken: String - Authentication token for the user
-         *      ideaID: Integer - The id for the idea to base the recipe on
+         *      recipeID: Integer - The id for the recipe to finalize
          * }
          *
          * Response: {
          *      Body: {
-         *          instructions: String[] - List of instructions for the recipe
-         *          allIngredientsAndMeasurements: String[] - Ingredients and measurements as strings for the recipe
+         *          estimatedTotalCalories: Integer - The total estimated calories for the recipe
+         *          estimatedTotalMinutes: Integer - The total estimated minutes to make the recipe
+         *          estimatedServings: Integer - The estimated amount of servings for the recipe
+         *          feasibility: Integer - On a scale of 1-10, how feasible the recipe is to make
+         *          ingredientsAndMeasurements: [
+         *              {
+         *                  ingredient: String - The ingredient
+         *                  measurement: String - The measurement or amount
+         *              }
+         *          ]
+         *          directions: [Integer: String] - Directions represented as String (value), index represented as Integer (key)
          *      }
          *      Success: Integer - Integer denoting success, 1 if successful
          * }
@@ -152,7 +162,7 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String makeRecipe(Request request, Response response) throws MalformedJSONException, IOException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, InvalidAssociatedIdentifierException, OAISerializerException, OAIDeserializerException {
+        public static String finalizeRecipe(Request request, Response response) throws MalformedJSONException, IOException, DBSerializerPrimaryKeyMissingException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, DBSerializerException, OpenAIGPTException, InstantiationException, InvalidAssociatedIdentifierException, OAISerializerException, OAIDeserializerException {
             // Try to parse MakeRecipeRequest
             MakeRecipeRequest mrRequest;
 
@@ -171,22 +181,27 @@ public class Server {
         }
 
         /***
-         * Regenerate Recipe Directions and Idea Recipe Ingredients
+         * Regenerate Recipe Directions and Update Measured Ingredients
          *
          * Regenerates recipe directions and idea recipe ingredients given new name, summary, and/or measuredIngredients
          *
          * Request: {
-         *     authToken: String - Authentication token for the user
-         *     ideaID: Integer - The ideaID received from generating an idea recipe
-         *     ? newName: String - Optional new name to set for the idea recipe, to be used when generating recipe directions, replaces name in DB
-         *     ? newSummary: String - Optional new summary to set for the idea recipe, to be used when generating recipe directions, replaces summary in DB
-         *     ? measuredIngredients: String[] - Optional array of all measuredIngredients for the recipe, including new ones and existing ones, to be used when generating recipe directions, replaces measured ingredients for recipe in DB, removes measurement and saves to idea recipe ingredients in DB and sends these back in ideaRecipeIngredients in the response
+         *      authToken: String - Authentication token for the user
+         *      ideaID: Integer - The ideaID received from generating an idea recipe
+         *      ? newName: String - Optional new name to set for the idea recipe, to be used when generating recipe directions, replaces name in DB
+         *      ? newSummary: String - Optional new summary to set for the idea recipe, to be used when generating recipe directions, replaces summary in DB
+         *      ? ingredientsAndMeasurements: [
+         *          {
+         *              ingredient: String - The ingredient
+         *              measurement: String - The measurement or amount
+         *          }
+         *      ] - Optional array of all measuredIngredients for the recipe, including new ones and existing ones, to be used when generating recipe directions, replaces measured ingredients for recipe in DB, removes measurement and saves to idea recipe ingredients in DB and sends these back in ideaRecipeIngredients in the response
          * }
          *
          * Response: {
          *     Body: {
          *         recipeDirections: String[] - List of new recipe directions in order
-         *         ? ideaRecipeIngredients: String[] - Optional, included if the request included measuredIngredients that needed to be parsed to idea recipe ingredients by removing the measurement
+         *         feasibility: Integer - On a scale of 1-10, how feasible the recipe is to make
          *     }
          *     Success: Integer - Integer denoting success, 1 if successful
          * }
@@ -196,13 +211,13 @@ public class Server {
          *
          *
          */
-        public static String regenerateRecipeDirectionsAndIdeaRecipeIngredients(Request request, Response response) throws IOException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, InvalidRequestJSONException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, MalformedJSONException, GenerationException, InvalidAssociatedIdentifierException, OAISerializerException, OAIDeserializerException {
+        public static String regenerateRecipeDirectionsAndUpdateMeasuredIngredients(Request request, Response response) throws IOException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, InvalidRequestJSONException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, MalformedJSONException, GenerationException, InvalidAssociatedIdentifierException, OAISerializerException, OAIDeserializerException {
             // Try to parse RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest
             RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest rrdairiRequest;
 
             try {
                 rrdairiRequest = new ObjectMapper().readValue(request.body(), RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest.class);
-                RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse rrdaumiResponse = RegenerateRecipeDirectionsAndIdeaRecipeIngredientsEndpoint.regenerateRecipeDirectionsAndUpdateMeasuredIngredients(rrdairiRequest);
+                RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse rrdaumiResponse = RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsEndpoint.regenerateRecipeDirectionsAndUpdateMeasuredIngredients(rrdairiRequest);
                 BodyResponse br = BodyResponseFactory.createSuccessBodyResponse(rrdaumiResponse);
 
                 return new ObjectMapper().writeValueAsString(br);
@@ -214,7 +229,7 @@ public class Server {
         }
 
         /***
-         * Tag Recipe Idea
+         * Tag Recipe
          *
          * Tags a recipe idea from the given ideaID
          *
@@ -308,10 +323,11 @@ public class Server {
         // Process the request
         AuthRequest authRequest = new ObjectMapper().readValue(request.body(), AuthRequest.class);
 
-        // Get get is premium response in body response and return as string
-        BodyResponse bodyResponse = GetIsPremiumEndpoint.getIsPremium(authRequest);
+        // Get IsPremiumResponse response, success body response, and return as string
+        IsPremiumResponse ipResponse = GetIsPremiumEndpoint.getIsPremium(authRequest);
+        BodyResponse br = BodyResponseFactory.createSuccessBodyResponse(ipResponse);
 
-        return new ObjectMapper().writeValueAsString(bodyResponse);
+        return new ObjectMapper().writeValueAsString(br);
     }
 
     public static Object registerTransaction(Request request, Response response) throws IOException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, AppStoreStatusResponseException, UnrecoverableKeyException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, DBSerializerPrimaryKeyMissingException {
@@ -417,22 +433,5 @@ public class Server {
 
         System.out.println(sdf.format(date) + " - " + string);
     }
-
-//    public static String getSimpleExceptionHandlerResponseStatusJSON(ResponseStatus status) {
-//
-//        //TODO: - This is the default implementation that goes along with the app... This needs to be put as legacy and a new way of handling errors needs to be developed!
-//        ObjectMapper mapper = new ObjectMapper();
-//        ObjectNode bodyNode = mapper.createObjectNode();
-//        bodyNode.put("output", "There was an issue getting your chat. Please try again..."); // Move this!
-//        bodyNode.put("remaining", -1);
-//        bodyNode.put("finishReason", "");
-//
-//        ObjectNode baseNode = mapper.createObjectNode();
-//        baseNode.put("Success", ResponseStatus.SUCCESS.Success);
-//        baseNode.put("Body", bodyNode);
-//
-//        return baseNode.toString();
-////        return "{\"Success\":" + ResponseStatus.EXCEPTION_MAP_ERROR.Success + "}";
-//    }
 
 }

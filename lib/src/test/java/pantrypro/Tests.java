@@ -49,76 +49,76 @@ public class Tests {
         SQLConnectionPoolInstance.create(Constants.MYSQL_URL, Keys.MYSQL_USER, Keys.MYSQL_PASS, 10);
     }
 
-    @Test
-    @DisplayName("Try creating a SELECT Prepared Statement")
-    void testSelectPreparedStatement() throws InterruptedException {
-        Connection conn = SQLConnectionPoolInstance.getConnection();
-
-        try {
-            // Try complete Select PS
-            ComponentizedPreparedStatement cps = SelectComponentizedPreparedStatementBuilder.forTable("Recipe").select("recipe_id").select("user_id").where("user_text", SQLOperators.EQUAL, 5).limit(5).orderBy(OrderByComponent.Direction.DESC, "date").build();
-
-            PreparedStatement cpsPS = cps.connect(conn);
-            System.out.println(cpsPS.toString());
-            cpsPS.close();
-
-            // Try minimal Select PS
-            ComponentizedPreparedStatement selectCPSMinimal = SelectComponentizedPreparedStatementBuilder.forTable("Recipe").build();
-
-            PreparedStatement selectCPSMinimalPS = selectCPSMinimal.connect(conn);
-            System.out.println(selectCPSMinimalPS.toString());
-            selectCPSMinimalPS.close();
-
-            // Try partial Select PS
-            ComponentizedPreparedStatement selectCPSPartial = SelectComponentizedPreparedStatementBuilder.forTable("IdeaRecipe").select("idea_id").where("user_id", SQLOperators.EQUAL, false).build();
-
-            PreparedStatement selectCPSPartialPS = selectCPSPartial.connect(conn);
-            System.out.println(selectCPSPartialPS.toString());
-            selectCPSPartialPS.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            SQLConnectionPoolInstance.releaseConnection(conn);
-        }
-    }
-
-    @Test
-    @DisplayName("Try creating an INSERT INTO Prepared Statement")
-    void testInsertIntoPreparedStatement() throws InterruptedException {
-        Connection conn = SQLConnectionPoolInstance.getConnection();
-
-        try {
-            // Build the insert componentized statement
-            ComponentizedPreparedStatement insertCPSComplete = InsertIntoComponentizedPreparedStatementBuilder.forTable("IdeaRecipe").addColAndVal("idea_id", Types.NULL).addColAndVal("user_id", 5).addColAndVal("date", LocalDateTime.now()).build(true);
-
-            System.out.println(insertCPSComplete);
-
-            // Do update and get generated keys
-            List<Map<String, Object>> generatedKeys = DBClient.updateReturnGeneratedKeys(conn, insertCPSComplete);
-
-            System.out.println(generatedKeys);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            SQLConnectionPoolInstance.releaseConnection(conn);
-        }
-    }
-
-    @Test
-    @DisplayName("Try creating an UPDATE Prepared Statement")
-    void testUpdatePreparedStatement() throws InterruptedException {
-        Connection conn = SQLConnectionPoolInstance.getConnection();
-
-        try {
-            ComponentizedPreparedStatement updatePSComplete = UpdateComponentizedPreparedStatementBuilder.forTable("IdeaRecipe").set("date", LocalDateTime.now()).where("user_id", SQLOperators.EQUAL, 5).build();
-
-            DBClient.update(conn, updatePSComplete);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            SQLConnectionPoolInstance.releaseConnection(conn);
-        }
-    }
+//    @Test
+//    @DisplayName("Try creating a SELECT Prepared Statement")
+//    void testSelectPreparedStatement() throws InterruptedException {
+//        Connection conn = SQLConnectionPoolInstance.getConnection();
+//
+//        try {
+//            // Try complete Select PS
+//            ComponentizedPreparedStatement cps = SelectComponentizedPreparedStatementBuilder.forTable("Recipe").select("recipe_id").select("user_id").where("user_text", SQLOperators.EQUAL, 5).limit(5).orderBy(OrderByComponent.Direction.DESC, "date").build();
+//
+//            PreparedStatement cpsPS = cps.connect(conn);
+//            System.out.println(cpsPS.toString());
+//            cpsPS.close();
+//
+//            // Try minimal Select PS
+//            ComponentizedPreparedStatement selectCPSMinimal = SelectComponentizedPreparedStatementBuilder.forTable("Recipe").build();
+//
+//            PreparedStatement selectCPSMinimalPS = selectCPSMinimal.connect(conn);
+//            System.out.println(selectCPSMinimalPS.toString());
+//            selectCPSMinimalPS.close();
+//
+//            // Try partial Select PS
+//            ComponentizedPreparedStatement selectCPSPartial = SelectComponentizedPreparedStatementBuilder.forTable("IdeaRecipe").select("idea_id").where("user_id", SQLOperators.EQUAL, false).build();
+//
+//            PreparedStatement selectCPSPartialPS = selectCPSPartial.connect(conn);
+//            System.out.println(selectCPSPartialPS.toString());
+//            selectCPSPartialPS.close();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        } finally {
+//            SQLConnectionPoolInstance.releaseConnection(conn);
+//        }
+//    }
+//
+//    @Test
+//    @DisplayName("Try creating an INSERT INTO Prepared Statement")
+//    void testInsertIntoPreparedStatement() throws InterruptedException {
+//        Connection conn = SQLConnectionPoolInstance.getConnection();
+//
+//        try {
+//            // Build the insert componentized statement
+//            ComponentizedPreparedStatement insertCPSComplete = InsertIntoComponentizedPreparedStatementBuilder.forTable("IdeaRecipe").addColAndVal("idea_id", Types.NULL).addColAndVal("user_id", 5).addColAndVal("date", LocalDateTime.now()).build(true);
+//
+//            System.out.println(insertCPSComplete);
+//
+//            // Do update and get generated keys
+//            List<Map<String, Object>> generatedKeys = DBClient.updateReturnGeneratedKeys(conn, insertCPSComplete);
+//
+//            System.out.println(generatedKeys);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        } finally {
+//            SQLConnectionPoolInstance.releaseConnection(conn);
+//        }
+//    }
+//
+//    @Test
+//    @DisplayName("Try creating an UPDATE Prepared Statement")
+//    void testUpdatePreparedStatement() throws InterruptedException {
+//        Connection conn = SQLConnectionPoolInstance.getConnection();
+//
+//        try {
+//            ComponentizedPreparedStatement updatePSComplete = UpdateComponentizedPreparedStatementBuilder.forTable("IdeaRecipe").set("date", LocalDateTime.now()).where("user_id", SQLOperators.EQUAL, 5).build();
+//
+//            DBClient.update(conn, updatePSComplete);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        } finally {
+//            SQLConnectionPoolInstance.releaseConnection(conn);
+//        }
+//    }
 
 //    @Test
 //    @DisplayName("HttpHelper Testing")
@@ -305,7 +305,7 @@ public class Tests {
         assert(mrResponse.getEstimatedServings() != null);
         assert(mrResponse.getFeasibility() != null);
         assert(mrResponse.getIngredientsAndMeasurements() != null && !mrResponse.getIngredientsAndMeasurements().isEmpty());
-        assert(mrResponse.getInstructions() != null && !mrResponse.getInstructions().isEmpty());
+        assert(mrResponse.getDirections() != null && !mrResponse.getDirections().isEmpty());
     }
 
     @Test
@@ -328,12 +328,12 @@ public class Tests {
         CreateIdeaRecipeResponse criResponse = CreateRecipeIdeaEndpoint.createRecipeIdea(criRequest);
 
         // Parse recipeID out of recipeIdeaBR
-        Integer ideaID = criResponse.getRecipeID();
+        Integer recipeID = criResponse.getRecipeID();
 
         // Build TagRecipeRequest
         TagRecipeRequest trRequest = new TagRecipeRequest(
                 aResponse.getAuthToken(),
-                ideaID
+                recipeID
         );
 
         // Test Tag Recipe Endpoint
@@ -395,10 +395,10 @@ public class Tests {
                 0
         );
 
-        // Generate pack save create recipe idea function
+        // Get Create Idea Recipe Response
         CreateIdeaRecipeResponse criResponse = CreateRecipeIdeaEndpoint.createRecipeIdea(criRequest);
 
-        // Get ideaID, name, and summary from bResponse
+        // Get ideaID, name, and summary from criResponse
         Integer ideaID = criResponse.getRecipeID();
         String name = criResponse.getName();
         String summary = criResponse.getSummary();
@@ -436,7 +436,7 @@ public class Tests {
         );
 
         // Generate pack save regenerate recipe directions and idea recipe ingredients as body response
-        RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse rrdaumiResponse = RegenerateRecipeDirectionsAndIdeaRecipeIngredientsEndpoint.regenerateRecipeDirectionsAndUpdateMeasuredIngredients(rrdaumiRequest);
+        RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse rrdaumiResponse = RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsEndpoint.regenerateRecipeDirectionsAndUpdateMeasuredIngredients(rrdaumiRequest);
 
         // Get recipeDirections and feasibility from rrdaumiResponse
         List<String> recipeDirections = rrdaumiResponse.getRecipeDirections();

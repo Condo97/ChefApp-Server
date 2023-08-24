@@ -122,8 +122,8 @@ public class Main {
         // POST Functions
         post(Constants.URIs.CATEGORIZE_INGREDIENTS, Server.Func::categorizeIngredients);
         post(Constants.URIs.CREATE_RECIPE_IDEA, Server.Func::createRecipeIdea);
-        post(Constants.URIs.MAKE_RECIPE, Server.Func::makeRecipe);
-        post(Constants.URIs.REGENERATE_RECIPE_DIRECTIONS_AND_IDEA_RECIPE_INGREDIENTS, Server.Func::regenerateRecipeDirectionsAndIdeaRecipeIngredients);
+        post(Constants.URIs.FINALIZE_RECIPE, Server.Func::finalizeRecipe);
+        post(Constants.URIs.REGENERATE_RECIPE_DIRECTIONS_AND_UPDATE_MEASURED_INGREDIENTS, Server.Func::regenerateRecipeDirectionsAndUpdateMeasuredIngredients);
         post(Constants.URIs.TAG_RECIPE_IDEA, Server.Func::tagRecipeIdea);
 
         post(Constants.URIs.GET_ALL_TAGS_URI, Server::getAllTags);

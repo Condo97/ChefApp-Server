@@ -49,8 +49,8 @@ public final class Constants {
     class URIs {
         public static final String CATEGORIZE_INGREDIENTS = "/categorizeIngredients";
         public static final String CREATE_RECIPE_IDEA = "/createRecipeIdea";
-        public static final String MAKE_RECIPE = "/makeRecipeFromIdea";
-        public static final String REGENERATE_RECIPE_DIRECTIONS_AND_IDEA_RECIPE_INGREDIENTS = "/regenerateRecipeDirectionsAndIdeaRecipeIngredients";
+        public static final String FINALIZE_RECIPE = "/finalizeRecipe";
+        public static final String REGENERATE_RECIPE_DIRECTIONS_AND_UPDATE_MEASURED_INGREDIENTS = "/regenerateRecipeDirectionsAndUpdateMeasuredIngredients";
         public static final String TAG_RECIPE_IDEA = "/tagRecipeIdea";
         public static final String GET_ALL_TAGS_URI = "/getAllTags";
         public static final String GET_IAP_STUFF_URI = "/getIAPStuff";

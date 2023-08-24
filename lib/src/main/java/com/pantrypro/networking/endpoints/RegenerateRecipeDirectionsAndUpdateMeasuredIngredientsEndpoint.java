@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RegenerateRecipeDirectionsAndIdeaRecipeIngredientsEndpoint {
+public class RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsEndpoint {
 
     public static RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse regenerateRecipeDirectionsAndUpdateMeasuredIngredients(RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest request) throws InvalidAssociatedIdentifierException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, DBSerializerPrimaryKeyMissingException, OAISerializerException, OpenAIGPTException, OAIDeserializerException, IOException {
         // Validate user recipe association

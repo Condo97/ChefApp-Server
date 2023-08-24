@@ -25,18 +25,17 @@ import java.sql.SQLException;
 
 public class GetIsPremiumEndpoint {
 
-    public static BodyResponse getIsPremium(AuthRequest request) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, AppStoreStatusResponseException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, DBSerializerException, DBSerializerPrimaryKeyMissingException {
+    public static IsPremiumResponse getIsPremium(AuthRequest request) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, AppStoreStatusResponseException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, DBSerializerException, DBSerializerPrimaryKeyMissingException {
         // Get userID from authRequest
         Integer userID = UserAuthenticator.getUserIDFromAuthToken(request.getAuthToken());
 
         // Get isPremium
         boolean isPremium = PPPremiumValidator.getIsPremium(userID);
 
-        // Build isPremiumResponse
+        // Build isPremiumResponse and return
         IsPremiumResponse isPremiumResponse = new IsPremiumResponse(isPremium);
 
-        // Build and return success body response with isPremiumResponse
-        return BodyResponseFactory.createSuccessBodyResponse(isPremiumResponse);
+        return isPremiumResponse;
     }
 
 }

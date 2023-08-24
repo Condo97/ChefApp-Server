@@ -29,7 +29,7 @@ public class MakeRecipeResponse {
 
     }
 
-    private Map<Integer, String> instructions;
+    private Map<Integer, String> directions;
 //    private List<String> allIngredientsAndMeasurements;
     private List<MakeRecipeResponseIngredientAndMeasurement> ingredientsAndMeasurements;
     private Integer estimatedTotalCalories, estimatedTotalMinutes, estimatedServings, feasibility;
@@ -38,8 +38,8 @@ public class MakeRecipeResponse {
 
     }
 
-    public MakeRecipeResponse(Map<Integer, String> instructions, List<MakeRecipeResponseIngredientAndMeasurement> ingredientsAndMeasurements, Integer estimatedTotalCalories, Integer estimatedTotalMinutes, Integer estimatedServings, Integer feasibility) {
-        this.instructions = instructions;
+    public MakeRecipeResponse(Map<Integer, String> directions, List<MakeRecipeResponseIngredientAndMeasurement> ingredientsAndMeasurements, Integer estimatedTotalCalories, Integer estimatedTotalMinutes, Integer estimatedServings, Integer feasibility) {
+        this.directions = directions;
         this.ingredientsAndMeasurements = ingredientsAndMeasurements;
         this.estimatedTotalCalories = estimatedTotalCalories;
         this.estimatedTotalMinutes = estimatedTotalMinutes;
@@ -47,8 +47,8 @@ public class MakeRecipeResponse {
         this.feasibility = feasibility;
     }
 
-    public Map<Integer, String> getInstructions() {
-        return instructions;
+    public Map<Integer, String> getDirections() {
+        return directions;
     }
 
     public List<MakeRecipeResponseIngredientAndMeasurement> getIngredientsAndMeasurements() {
