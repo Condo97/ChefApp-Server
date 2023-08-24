@@ -3,8 +3,8 @@ package com.pantrypro.core.purchase.iapvalidation;
 import appletransactionclient.exception.AppStoreStatusResponseException;
 import com.pantrypro.Constants;
 import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
-import com.pantrypro.core.database.managers.TransactionDBManager;
-import com.pantrypro.model.database.objects.Transaction;
+import com.pantrypro.database.dao.TransactionDBManager;
+import com.pantrypro.database.objects.transaction.Transaction;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 

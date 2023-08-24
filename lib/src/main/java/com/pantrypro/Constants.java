@@ -20,11 +20,10 @@ public final class Constants {
 
     /* Tiered Limits */
     public static final int Response_Token_Limit_Categorize_Ingredients = 800;
-    public static final int Response_Token_Limit_Create_Recipe_Idea = 800;
+    public static final int Response_Token_Limit_Create_Recipe = 800;
     public static final int Response_Token_Limit_Generate_Directions = 800;
-    public static final int Response_Token_Limit_Get_Ingredients_Without_Measurements = 800;
-    public static final int Response_Token_Limit_Make_Recipe = 800;
-    public static final int Response_Token_Limit_Tag_Recipe_Idea = 800;
+    public static final int Response_Token_Limit_Finalize_Recipe = 800;
+    public static final int Response_Token_Limit_Tag_Recipe = 800;
 
     public static final int Context_Character_Limit_Categorize_Ingredients = 800;
     public static final int Context_Character_Limit_Create_Recipe_Idea = 800;

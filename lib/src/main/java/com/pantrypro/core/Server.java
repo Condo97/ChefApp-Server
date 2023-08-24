@@ -4,19 +4,16 @@ import appletransactionclient.exception.AppStoreStatusResponseException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oaigptconnector.model.OAIDeserializerException;
+import com.oaigptconnector.model.OAISerializerException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
-import com.pantrypro.common.exceptions.*;
-import com.pantrypro.core.service.BodyResponseFactory;
-import com.pantrypro.core.service.endpoints.*;
-import com.pantrypro.model.exceptions.CapReachedException;
-import com.pantrypro.model.exceptions.GenerationException;
-import com.pantrypro.model.exceptions.InvalidAssociatedIdentifierException;
-import com.pantrypro.model.exceptions.InvalidRequestJSONException;
-import com.pantrypro.model.http.client.apple.itunes.exception.AppleItunesResponseException;
-import com.pantrypro.model.http.server.ResponseStatus;
-import com.pantrypro.model.http.server.request.*;
-import com.pantrypro.model.http.server.response.BodyResponse;
-import com.pantrypro.model.http.server.response.ErrorResponse;
+import com.pantrypro.exceptions.*;
+import com.pantrypro.networking.client.apple.itunes.exception.AppleItunesResponseException;
+import com.pantrypro.networking.endpoints.*;
+import com.pantrypro.networking.responsefactories.BodyResponseFactory;
+import com.pantrypro.networking.server.ResponseStatus;
+import com.pantrypro.networking.server.request.*;
+import com.pantrypro.networking.server.response.*;
 import spark.Request;
 import spark.Response;
 import sqlcomponentizer.dbserializer.DBSerializerException;
@@ -65,13 +62,14 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String categorizeIngredients(Request request, Response response) throws MalformedJSONException, IOException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException {
+        public static String categorizeIngredients(Request request, Response response) throws MalformedJSONException, IOException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, OAISerializerException, OAIDeserializerException {
             // Try to parse CategorizeIngredientsRequest
             CategorizeIngredientsRequest ciRequest;
 
             try {
                 ciRequest = new ObjectMapper().readValue(request.body(), CategorizeIngredientsRequest.class);
-                BodyResponse br = CategorizeIngredientsEndpoint.categorizeIngredients(ciRequest);
+                CategorizeIngredientsResponse cir = CategorizeIngredientsEndpoint.categorizeIngredients(ciRequest);
+                BodyResponse br = BodyResponseFactory.createSuccessBodyResponse(cir);
 
                 return new ObjectMapper().writeValueAsString(br);
 
@@ -111,13 +109,14 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String createRecipeIdea(Request request, Response response) throws IOException, MalformedJSONException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException {
+        public static String createRecipeIdea(Request request, Response response) throws IOException, MalformedJSONException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, OAISerializerException, OAIDeserializerException {
             // Try to parse GetRecipeIdeaRequest
             CreateIdeaRecipeRequest criRequest;
 
             try {
                 criRequest = new ObjectMapper().readValue(request.body(), CreateIdeaRecipeRequest.class);
-                BodyResponse br = CreateRecipeIdeaEndpoint.createRecipeIdea(criRequest);
+                CreateIdeaRecipeResponse cirr = CreateRecipeIdeaEndpoint.createRecipeIdea(criRequest);
+                BodyResponse br = BodyResponseFactory.createSuccessBodyResponse(cirr);
 
                 printTimestamped("User with AuthToken " + criRequest.getAuthToken().substring(0, Math.min(criRequest.getAuthToken().length(), 7)) + " generated Recipe Idea for Ingredients - " + criRequest.getIngredients().substring(0, Math.min(criRequest.getIngredients().length(), 39)));
 
@@ -153,13 +152,14 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String makeRecipe(Request request, Response response) throws MalformedJSONException, IOException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, InvalidAssociatedIdentifierException {
+        public static String makeRecipe(Request request, Response response) throws MalformedJSONException, IOException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, InvalidAssociatedIdentifierException, OAISerializerException, OAIDeserializerException {
             // Try to parse MakeRecipeRequest
             MakeRecipeRequest mrRequest;
 
             try {
                 mrRequest = new ObjectMapper().readValue(request.body(), MakeRecipeRequest.class);
-                BodyResponse br = MakeRecipeEndpoint.makeRecipe(mrRequest);
+                MakeRecipeResponse mrr = MakeRecipeEndpoint.makeRecipe(mrRequest);
+                BodyResponse br = BodyResponseFactory.createSuccessBodyResponse(mrr);
 
                 return new ObjectMapper().writeValueAsString(br);
 
@@ -196,13 +196,14 @@ public class Server {
          *
          *
          */
-        public static String regenerateRecipeDirectionsAndIdeaRecipeIngredients(Request request, Response response) throws IOException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, InvalidRequestJSONException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, MalformedJSONException, GenerationException {
+        public static String regenerateRecipeDirectionsAndIdeaRecipeIngredients(Request request, Response response) throws IOException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, InvalidRequestJSONException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, MalformedJSONException, GenerationException, InvalidAssociatedIdentifierException, OAISerializerException, OAIDeserializerException {
             // Try to parse RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest
-            RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest rrdairiRequest;
+            RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest rrdairiRequest;
 
             try {
-                rrdairiRequest = new ObjectMapper().readValue(request.body(), RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest.class);
-                BodyResponse br = RegenerateRecipeDirectionsAndIdeaRecipeIngredientsEndpoint.regenerateRecipeDirectionsAndIdeaRecipeIngredients(rrdairiRequest);
+                rrdairiRequest = new ObjectMapper().readValue(request.body(), RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest.class);
+                RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse rrdaumiResponse = RegenerateRecipeDirectionsAndIdeaRecipeIngredientsEndpoint.regenerateRecipeDirectionsAndUpdateMeasuredIngredients(rrdairiRequest);
+                BodyResponse br = BodyResponseFactory.createSuccessBodyResponse(rrdaumiResponse);
 
                 return new ObjectMapper().writeValueAsString(br);
             } catch (JsonMappingException | JsonParseException e) {
@@ -234,13 +235,14 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String tagRecipeIdea(Request request, Response response) throws IOException, InvalidAssociatedIdentifierException, DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, OpenAIGPTException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MalformedJSONException {
+        public static String tagRecipeIdea(Request request, Response response) throws IOException, InvalidAssociatedIdentifierException, DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, OpenAIGPTException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MalformedJSONException, OAISerializerException, OAIDeserializerException {
             // Try to parse TagRecipeRequest
-            TagRecipeIdeaRequest triRequest;
+            TagRecipeRequest triRequest;
 
             try {
-                triRequest = new ObjectMapper().readValue(request.body(), TagRecipeIdeaRequest.class);
-                BodyResponse br = GetIdeaRecipeTagsEndpoint.tagRecipeIdea(triRequest);
+                triRequest = new ObjectMapper().readValue(request.body(), TagRecipeRequest.class);
+                TagRecipeResponse trr = TagRecipeEndpoint.tagRecipe(triRequest);
+                BodyResponse br = BodyResponseFactory.createSuccessBodyResponse(trr);
 
                 return new ObjectMapper().writeValueAsString(br);
             } catch (JsonMappingException | JsonParseException e) {
@@ -353,7 +355,8 @@ public class Server {
     public static String validateAuthToken(Request request, Response response) throws IOException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
         AuthRequest authRequest = new ObjectMapper().readValue(request.body(), AuthRequest.class);
 
-        BodyResponse br = ValidateAuthTokenEndpoint.validateAuthToken(authRequest);
+        ValidateAuthTokenResponse vatr = ValidateAuthTokenEndpoint.validateAuthToken(authRequest);
+        BodyResponse br = BodyResponseFactory.createSuccessBodyResponse(vatr);
 
         return new ObjectMapper().writeValueAsString(br);
     }

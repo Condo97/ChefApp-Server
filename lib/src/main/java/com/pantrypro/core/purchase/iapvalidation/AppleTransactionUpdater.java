@@ -7,9 +7,9 @@ import appletransactionclient.http.response.status.AppStoreStatusResponse;
 import appletransactionclient.http.response.status.AppStoreStatusResponseLastTransactionItem;
 import appletransactionclient.http.response.status.AppStoreStatusResponseSubscriptionGroupIdentifierItem;
 import com.pantrypro.Constants;
+import com.pantrypro.database.objects.transaction.AppStoreSubscriptionStatus;
+import com.pantrypro.database.objects.transaction.Transaction;
 import com.pantrypro.keys.Keys;
-import com.pantrypro.model.database.AppStoreSubscriptionStatus;
-import com.pantrypro.model.database.objects.Transaction;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

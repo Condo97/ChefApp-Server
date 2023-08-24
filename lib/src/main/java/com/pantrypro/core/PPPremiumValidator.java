@@ -1,13 +1,13 @@
 package com.pantrypro.core;
 
 import appletransactionclient.exception.AppStoreStatusResponseException;
-import com.pantrypro.common.exceptions.DBObjectNotFoundFromQueryException;
-import com.pantrypro.common.exceptions.PreparedStatementMissingArgumentException;
 import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
 import com.pantrypro.core.purchase.iapvalidation.TransactionPersistentAppleUpdater;
-import com.pantrypro.model.database.AppStoreSubscriptionStatusToIsPremiumAdapter;
-import com.pantrypro.model.database.objects.Transaction;
-import com.pantrypro.model.http.client.apple.itunes.exception.AppleItunesResponseException;
+import com.pantrypro.database.adapters.IsPremiumFromAppStoreSubscriptionStatus;
+import com.pantrypro.database.objects.transaction.Transaction;
+import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
+import com.pantrypro.exceptions.PreparedStatementMissingArgumentException;
+import com.pantrypro.networking.client.apple.itunes.exception.AppleItunesResponseException;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 
@@ -44,7 +44,7 @@ public class PPPremiumValidator {
         Transaction transaction = TransactionPersistentAppleUpdater.getCooldownControlledAppleUpdatedMostRecentTransaction(userID);
 
         // Return isPremium using transaction
-        return transaction != null && AppStoreSubscriptionStatusToIsPremiumAdapter.getIsPremium(transaction.getStatus());
+        return transaction != null && IsPremiumFromAppStoreSubscriptionStatus.getIsPremium(transaction.getStatus());
     }
 
 }

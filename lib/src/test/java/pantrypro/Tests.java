@@ -1,38 +1,22 @@
 package pantrypro;
 
 import appletransactionclient.exception.AppStoreStatusResponseException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oaigptconnector.core.OpenAIGPTHttpsHandler;
-import com.oaigptconnector.model.Role;
+import com.dbclient.DBClient;
+import com.oaigptconnector.model.OAIDeserializerException;
+import com.oaigptconnector.model.OAISerializerException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
-import com.oaigptconnector.model.request.chat.completion.OAIGPTChatCompletionRequest;
-import com.oaigptconnector.model.request.chat.completion.OAIGPTChatCompletionRequestMessage;
-import com.oaigptconnector.model.response.chat.completion.http.OAIGPTChatCompletionResponse;
 import com.pantrypro.Constants;
-import com.pantrypro.common.exceptions.AutoIncrementingDBObjectExistsException;
-import com.pantrypro.core.database.adapters.oai.RecipeFromOpenAIAdapter;
-import com.pantrypro.core.generation.openai.OAIRecipeGenerator;
-import com.pantrypro.core.service.endpoints.CreateRecipeIdeaEndpoint;
-import com.pantrypro.core.service.endpoints.MakeRecipeEndpoint;
-import com.pantrypro.core.service.endpoints.RegenerateRecipeDirectionsAndIdeaRecipeIngredientsEndpoint;
-import com.pantrypro.keys.EncryptionManager;
-import com.pantrypro.model.database.objects.Recipe;
-import com.pantrypro.model.exceptions.*;
-import com.pantrypro.common.exceptions.DBObjectNotFoundFromQueryException;
-import com.pantrypro.common.exceptions.PreparedStatementMissingArgumentException;
 import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
-import com.pantrypro.core.PantryPro;
-import com.pantrypro.core.service.endpoints.RegisterUserEndpoint;
+import com.pantrypro.exceptions.*;
+import com.pantrypro.keys.EncryptionManager;
 import com.pantrypro.keys.Keys;
-import com.pantrypro.model.http.client.apple.itunes.exception.AppleItunesResponseException;
-import com.pantrypro.model.http.client.openaigpt.request.builder.OAIGPTChatCompletionRequestFunctionCategorizeIngredientsBuilder;
-import com.pantrypro.model.http.client.openaigpt.response.functioncall.OAIGPTFunctionCallResponseMakeRecipe;
-import com.pantrypro.model.http.server.request.*;
-import com.pantrypro.model.http.server.response.*;
+import com.pantrypro.networking.client.apple.itunes.exception.AppleItunesResponseException;
+import com.pantrypro.networking.endpoints.*;
+import com.pantrypro.networking.server.request.*;
+import com.pantrypro.networking.server.response.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import sqlcomponentizer.DBClient;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 import sqlcomponentizer.preparedstatement.ComponentizedPreparedStatement;
@@ -45,8 +29,6 @@ import sqlcomponentizer.preparedstatement.statement.UpdateComponentizedPreparedS
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
@@ -56,12 +38,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class Tests {
 
@@ -141,31 +120,31 @@ public class Tests {
         }
     }
 
-    @Test
-    @DisplayName("HttpHelper Testing")
-    void testBasicHttpRequest() {
-        HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).connectTimeout(Duration.ofMinutes(Constants.AI_TIMEOUT_MINUTES)).build();
-        OAIGPTChatCompletionRequestMessage promptMessageRequest = new OAIGPTChatCompletionRequestMessage(Role.USER, "write me a short joke");
-        OAIGPTChatCompletionRequest promptRequest = new OAIGPTChatCompletionRequest("gpt-3.5-turbo", 100, 0.7, Arrays.asList(promptMessageRequest));
-        Consumer<HttpRequest.Builder> c = requestBuilder -> {
-            requestBuilder.setHeader("Authorization", "Bearer " + Keys.openAiAPI);
-        };
-
-        OpenAIGPTHttpsHandler httpHelper = new OpenAIGPTHttpsHandler();
-
-        try {
-            OAIGPTChatCompletionResponse response = httpHelper.postChatCompletion(promptRequest, Keys.openAiAPI);
-            System.out.println(response.getChoices()[0].getMessage().getContent());
-
-        } catch (OpenAIGPTException e) {
-            System.out.println(e.getErrorObject().getError().getMessage());
-        } catch (IOException e) {
-             throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
+//    @Test
+//    @DisplayName("HttpHelper Testing")
+//    void testBasicHttpRequest() {
+//        HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).connectTimeout(Duration.ofMinutes(Constants.AI_TIMEOUT_MINUTES)).build();
+//        OAIGPTChatCompletionRequestMessage promptMessageRequest = new OAIGPTChatCompletionRequestMessage(Role.USER, "write me a short joke");
+//        OAIGPTChatCompletionRequest promptRequest = new OAIGPTChatCompletionRequest("gpt-3.5-turbo", 100, 0.7, Arrays.asList(promptMessageRequest));
+//        Consumer<HttpRequest.Builder> c = requestBuilder -> {
+//            requestBuilder.setHeader("Authorization", "Bearer " + Keys.openAiAPI);
+//        };
+//
+//        OpenAIGPTHttpsHandler httpHelper = new OpenAIGPTHttpsHandler();
+//
+//        try {
+//            OAIGPTChatCompletionResponse response = httpHelper.postChatCompletion(promptRequest, Keys.openAiAPI);
+//            System.out.println(response.getChoices()[0].getMessage().getContent());
+//
+//        } catch (OpenAIGPTException e) {
+//            System.out.println(e.getErrorObject().getError().getMessage());
+//        } catch (IOException e) {
+//             throw new RuntimeException(e);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//    }
 
 //    @Test
 //    @DisplayName("Test Registering Transaction")
@@ -244,9 +223,39 @@ public class Tests {
 //        System.out.println("Response:\n" + new ObjectMapper().writeValueAsString(br));
 //    }
 
+//    @Test
+//    @DisplayName("Test Create Recipe Idea Endpoint")
+//    void testCreateRecipeIdeaEndpoint() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, AppStoreStatusResponseException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, NoSuchMethodException, UnrecoverableKeyException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, OAISerializerException, OAIDeserializerException {
+//        // Register user
+//        BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
+//        AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
+//
+//        // Get authToken
+//        String authToken = aResponse.getAuthToken();
+//
+//        // Build CreateRecipeIdeaRequest
+//        CreateIdeaRecipeRequest request = new CreateIdeaRecipeRequest(
+//                authToken,
+//                "peaches, flour, eggs, oatmeal, chocolate chips",
+//                "make souffle",
+//                0
+//        );
+//
+//        // Test Create Recipe Idea Endpoint
+//        CreateIdeaRecipeResponse criResponse = CreateRecipeIdeaEndpoint.createRecipeIdea(request);
+//
+//        // Ensure criResponse is not null and no fields in criResponse are null nor empty nor blank depending on the type
+//        assert(criResponse != null);
+//        assert(criResponse.getRecipeID() != null);
+//        assert(criResponse.getName() != null && !criResponse.getName().isBlank());
+//        assert(criResponse.getSummary() != null && !criResponse.getSummary().isBlank());
+//        assert(criResponse.getIngredients() != null && !criResponse.getIngredients().isEmpty());
+//        assert(criResponse.getRemaining() != null);
+//    }
+
     @Test
-    @DisplayName("Test Create Recipe Idea Endpoint")
-    void testCreateRecipeIdeaEndpoint() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, AppStoreStatusResponseException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, NoSuchMethodException, UnrecoverableKeyException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException {
+    @DisplayName("Test Full Recipe Creation Flow - Create Recipe and Finalize Recipe")
+    void testMakeRecipeEndpiont() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, AppStoreStatusResponseException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, NoSuchMethodException, UnrecoverableKeyException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, InvalidAssociatedIdentifierException, OAISerializerException, OAIDeserializerException {
         // Register user
         BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
         AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
@@ -255,47 +264,53 @@ public class Tests {
         String authToken = aResponse.getAuthToken();
 
         // Build CreateRecipeIdeaRequest
-        CreateIdeaRecipeRequest request = new CreateIdeaRecipeRequest(
+        CreateIdeaRecipeRequest criRequest = new CreateIdeaRecipeRequest(
                 authToken,
                 "peaches, flour, eggs, oatmeal, chocolate chips",
                 "make souffle",
                 0
         );
 
-        // Generate pack save create recipe idea function
-        BodyResponse bResponse = PantryPro.generatePackSaveCreateRecipeIdeaFunction(request);
+        // Test Create Recipe Idea Endpoint
+        CreateIdeaRecipeResponse criResponse = CreateRecipeIdeaEndpoint.createRecipeIdea(criRequest);
 
-        // Ensure body is CreateRecipeIdeaResponse
-        assert(bResponse.getBody() instanceof CreateIdeaRecipeResponse);
-    }
+        // Ensure criResponse is not null and no fields in criResponse are null nor empty nor blank depending on the type
+        assert(criResponse != null);
+        assert(criResponse.getRecipeID() != null);
+        assert(criResponse.getName() != null && !criResponse.getName().isBlank());
+        assert(criResponse.getSummary() != null && !criResponse.getSummary().isBlank());
+        assert(criResponse.getIngredients() != null && !criResponse.getIngredients().isEmpty());
+        assert(criResponse.getRemaining() != null);
 
-    @Test
-    @DisplayName("Test Make Recipe Endpoint")
-    void testMakeRecipeEndpiont() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, AppStoreStatusResponseException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, NoSuchMethodException, UnrecoverableKeyException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException {
         // Register user
-        BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
-        AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
-
-        // Get authToken
-        String authToken = aResponse.getAuthToken();
+//        BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
+//        AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
+//
+//        // Get authToken
+//        String authToken = aResponse.getAuthToken();
 
         // Build MakeRecipeRequest
-        MakeRecipeRequest request = new MakeRecipeRequest(
+        MakeRecipeRequest mrRequest = new MakeRecipeRequest(
                 authToken,
-                274
+                criResponse.getRecipeID()
         );
 
-        try {
-            // Generate pack save make recipe function
-            PantryPro.generatePackSaveMakeRecipe(request);
-        } catch (ResponseStatusException e) {
-            e.printStackTrace();
-        }
+        // Test Make Recipe Endpoint
+        MakeRecipeResponse mrResponse = MakeRecipeEndpoint.makeRecipe(mrRequest);
+
+        // Ensure mrResponse is not null and no fields in mrResponse are null nor empty nor blank depending on the type
+        assert(mrResponse != null);
+        assert(mrResponse.getEstimatedTotalCalories() != null);
+        assert(mrResponse.getEstimatedTotalMinutes() != null);
+        assert(mrResponse.getEstimatedServings() != null);
+        assert(mrResponse.getFeasibility() != null);
+        assert(mrResponse.getIngredientsAndMeasurements() != null && !mrResponse.getIngredientsAndMeasurements().isEmpty());
+        assert(mrResponse.getInstructions() != null && !mrResponse.getInstructions().isEmpty());
     }
 
     @Test
-    @DisplayName("Test Tag Recipe Idea")
-    void testTagRecipeIdea() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, OpenAIGPTException, DBObjectNotFoundFromQueryException, IOException, NoSuchMethodException, InstantiationException, AppStoreStatusResponseException, UnrecoverableKeyException, CapReachedException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException {
+    @DisplayName("Test Tag Recipe Endpoint")
+    void testTagRecipeIdea() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, OpenAIGPTException, DBObjectNotFoundFromQueryException, IOException, NoSuchMethodException, InstantiationException, AppStoreStatusResponseException, UnrecoverableKeyException, CapReachedException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, OAISerializerException, OAIDeserializerException, InvalidAssociatedIdentifierException {
         final String ingredients = "peaches, flour, eggs";
         final String modifiers = null;
 
@@ -304,37 +319,34 @@ public class Tests {
         AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
 
         // Create recipe idea request
-        CreateIdeaRecipeRequest ideaRecipeRequest = new CreateIdeaRecipeRequest(
+        CreateIdeaRecipeRequest criRequest = new CreateIdeaRecipeRequest(
                 aResponse.getAuthToken(),
                 ingredients,
                 modifiers,
                 1
         );
-        BodyResponse recipeIdeaBR = PantryPro.generatePackSaveCreateRecipeIdeaFunction(ideaRecipeRequest);
+        CreateIdeaRecipeResponse criResponse = CreateRecipeIdeaEndpoint.createRecipeIdea(criRequest);
 
-        // Assert recipeIdeaBR body is CreateRecipeIdeaResponse
-        assert(recipeIdeaBR.getBody() instanceof CreateIdeaRecipeResponse);
+        // Parse recipeID out of recipeIdeaBR
+        Integer ideaID = criResponse.getRecipeID();
 
-        // Parse idea ID out of recipeIdeaBR
-        Integer ideaID = ((CreateIdeaRecipeResponse)recipeIdeaBR.getBody()).getIdeaID();
-
-        // Build TagIdeaRecipeRequest
-        TagRecipeIdeaRequest trir = new TagRecipeIdeaRequest(
+        // Build TagRecipeRequest
+        TagRecipeRequest trRequest = new TagRecipeRequest(
                 aResponse.getAuthToken(),
                 ideaID
         );
 
-        try {
-            // Generate pack save make tag recipe idea
-            PantryPro.generatePackSaveIdeaRecipeTags(trir);
-        } catch (ResponseStatusException e) {
-            e.printStackTrace();
-        }
+        // Test Tag Recipe Endpoint
+        TagRecipeResponse trResponse = TagRecipeEndpoint.tagRecipe(trRequest);
+
+        // Ensure trResponse is not null and no fields in trResponse are null nor empty nor blank depending on the type
+        assert(trResponse != null);
+        assert(trResponse.getTags() != null && !trResponse.getTags().isEmpty());
     }
 
     @Test
-    @DisplayName("Test Categorize Ingredients")
-    void testCategorizeIngredients() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, DBObjectNotFoundFromQueryException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException {
+    @DisplayName("Test Categorize Ingredients Endpoint")
+    void testCategorizeIngredients() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, DBObjectNotFoundFromQueryException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, OAISerializerException, OAIDeserializerException {
         final List<String> ingredients = List.of(
                 "peaches",
                 "flour",
@@ -350,24 +362,23 @@ public class Tests {
         AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
 
         // Create categorize ingredients request
-        CategorizeIngredientsRequest categorizeIngredientsRequest = new CategorizeIngredientsRequest(
+        CategorizeIngredientsRequest ciRequest = new CategorizeIngredientsRequest(
                 aResponse.getAuthToken(),
                 ingredients,
                 null
         );
-        BodyResponse categorizeIngredientsBR = PantryPro.generatePackSaveCategorizeIngredientsFunction(categorizeIngredientsRequest);
 
-        // Assert categorizeIngredientsBR body is CategorizeIngredientsResponse
-        assert(categorizeIngredientsBR.getBody() instanceof CategorizeIngredientsResponse);
+        // Test Categorize Ingredients Endpoint
+        CategorizeIngredientsResponse ciResponse = CategorizeIngredientsEndpoint.categorizeIngredients(ciRequest);
 
-        // Print ingredients and categories
-        CategorizeIngredientsResponse categorizeIngredientsResponse = (CategorizeIngredientsResponse)categorizeIngredientsBR.getBody();
-        categorizeIngredientsResponse.getIngredientCategories().forEach(ic -> System.out.println(ic.getIngredient() + " " + ic.getCategory()));
+        // Ensure ciResponse is not null and no fields in ciResponse are null nor empty nor blank depending on the type
+        assert(ciResponse != null);
+        assert(ciResponse.getIngredientCategories() != null && !ciResponse.getIngredientCategories().isEmpty());
     }
 
     @Test
     @DisplayName("Test Regenerate Recipe Directions And Idea Recipe Ingredients")
-    void testRegenerateRecipeDirectionsAndIdeaRecipeIngredients() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, AppStoreStatusResponseException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, NoSuchMethodException, UnrecoverableKeyException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, InvalidAssociatedIdentifierException, InvalidRequestJSONException, GenerationException {
+    void testRegenerateRecipeDirectionsAndIdeaRecipeIngredients() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, AppStoreStatusResponseException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, NoSuchMethodException, UnrecoverableKeyException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, InvalidAssociatedIdentifierException, InvalidRequestJSONException, GenerationException, OAISerializerException, OAIDeserializerException {
         /* Create Idea Recipe and Recipe */
         // Register user
         BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
@@ -385,12 +396,12 @@ public class Tests {
         );
 
         // Generate pack save create recipe idea function
-        BodyResponse criBResponse = CreateRecipeIdeaEndpoint.createRecipeIdea(criRequest);
+        CreateIdeaRecipeResponse criResponse = CreateRecipeIdeaEndpoint.createRecipeIdea(criRequest);
 
         // Get ideaID, name, and summary from bResponse
-        Integer ideaID = ((CreateIdeaRecipeResponse)criBResponse.getBody()).getIdeaID();
-        String name = ((CreateIdeaRecipeResponse)criBResponse.getBody()).getName();
-        String summary = ((CreateIdeaRecipeResponse)criBResponse.getBody()).getSummary();
+        Integer ideaID = criResponse.getRecipeID();
+        String name = criResponse.getName();
+        String summary = criResponse.getSummary();
 
         // Build MakeRecipeRequest
         MakeRecipeRequest mrRequest = new MakeRecipeRequest(
@@ -399,44 +410,47 @@ public class Tests {
         );
 
         // Generate pack save make recipe as body response
-        BodyResponse mrBResponse = MakeRecipeEndpoint.makeRecipe(mrRequest);
+        MakeRecipeResponse mrResponse = MakeRecipeEndpoint.makeRecipe(mrRequest);
 
         // Get measuredIngredients from mrBResponse
-        List<String> measuredIngredients = ((MakeRecipeResponse)mrBResponse.getBody()).getAllIngredientsAndMeasurements();
+        List<MakeRecipeResponse.MakeRecipeResponseIngredientAndMeasurement> measuredIngredients = mrResponse.getIngredientsAndMeasurements();
 
         /* Regenerate Recipe Directions and Idea Recipe Ingredients */
         // Create new name, summary, and measuredIngredients
         String newName = "chicken alfredo";
         String newSummary = "a delicious chicken alfredo dish that uses a lot of cream";
-        List<String> newMeasuredIngredientStrings = List.of(
-                "1 lb chicken",
-                "2 oz heavy cream",
-                "1 lb pasta",
-                "8 oz butter"
+        List<RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest.IngredientsAndMeasurements> newMeasuredIngredients = List.of(
+                new RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest.IngredientsAndMeasurements("chicken", "1 lb"),
+                new RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest.IngredientsAndMeasurements("heavy cream", "2 oz"),
+                new RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest.IngredientsAndMeasurements("pasta", "1 lb"),
+                new RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest.IngredientsAndMeasurements("butter", "8 oz")
         );
 
         // Build RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest
-        RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest rrdairiRequest = new RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest(
+        RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest rrdaumiRequest = new RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest(
                 authToken,
                 ideaID,
                 newName,
                 newSummary,
-                newMeasuredIngredientStrings
+                newMeasuredIngredients
         );
 
         // Generate pack save regenerate recipe directions and idea recipe ingredients as body response
-        BodyResponse rrdairiBResponse = RegenerateRecipeDirectionsAndIdeaRecipeIngredientsEndpoint.regenerateRecipeDirectionsAndIdeaRecipeIngredients(rrdairiRequest);
+        RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse rrdaumiResponse = RegenerateRecipeDirectionsAndIdeaRecipeIngredientsEndpoint.regenerateRecipeDirectionsAndUpdateMeasuredIngredients(rrdaumiRequest);
 
-        // Get recipeDirections and ideaRecipeIngredients from rrdairiBResponse
-        List<String> recipeDirections = ((RegenerateRecipeDirectionsAndIdeaRecipeIngredientsResponse)rrdairiBResponse.getBody()).getRecipeDirections();
-        List<String> ideaRecipeIngredients = ((RegenerateRecipeDirectionsAndIdeaRecipeIngredientsResponse)rrdairiBResponse.getBody()).getIdeaRecipeIngredients();
+        // Get recipeDirections and feasibility from rrdaumiResponse
+        List<String> recipeDirections = rrdaumiResponse.getRecipeDirections();
+        Integer feasibility = rrdaumiResponse.getFeasibility();
+//        List<String> ideaRecipeIngredients = rrdaumiResponse.getIdeaRecipeIngredients();
 
-        // Assert neither are null or empty, and print their values
+        // Assert neither are null and recipeDirections is not empty, and print their values
         assert(recipeDirections != null && !recipeDirections.isEmpty());
-        assert(ideaRecipeIngredients != null && !ideaRecipeIngredients.isEmpty());
+        assert(feasibility != null);
+//        assert(ideaRecipeIngredients != null && !ideaRecipeIngredients.isEmpty());
 
         System.out.println(recipeDirections);
-        System.out.println(ideaRecipeIngredients);
+        System.out.println(feasibility);
+//        System.out.println(ideaRecipeIngredients);
     }
 
     @Test
@@ -451,11 +465,11 @@ public class Tests {
     @DisplayName("Misc Modifyable")
     void misc() throws IOException, DBSerializerException, SQLException, OpenAIGPTException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
 //        System.out.println("Here it is: " + Table.USER_AUTHTOKEN);
-        System.out.println("OAIGPTChatCompletionRequestFunctionCategorizeIngredients:\n" + new ObjectMapper().writeValueAsString(OAIGPTChatCompletionRequestFunctionCategorizeIngredientsBuilder.build()));
-
-        OAIGPTFunctionCallResponseMakeRecipe oaiResponse = OAIRecipeGenerator.generateMakeRecipeFunctionCall("chocolate, flour, milk", 800, 800);
-        Recipe r = RecipeFromOpenAIAdapter.getRecipe(123, oaiResponse);
-        System.out.println(r.getEstimated_total_minutes());
-        System.out.println(r.getFeasibility());
+//        System.out.println("OAIGPTChatCompletionRequestFunctionCategorizeIngredients:\n" + new ObjectMapper().writeValueAsString(OAIGPTChatCompletionRequestFunctionCategorizeIngredientsBuilder.build()));
+//
+//        OAIGPTFunctionCallResponseCreateFinishedRecipe oaiResponse = OAIRecipeGenerator.generateMakeRecipeFunctionCall("chocolate, flour, milk", 800, 800);
+//        Recipe r = RecipeFromOpenAIAdapter.getRecipe(123, oaiResponse);
+//        System.out.println(r.getEstimated_total_minutes());
+//        System.out.println(r.getFeasibility());
     }
 }

@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pantrypro.Constants;
-import com.pantrypro.model.http.client.apple.itunes.exception.AppleItunesResponseException;
-import com.pantrypro.model.http.client.apple.itunes.response.error.AppleItunesErrorResponse;
-import com.pantrypro.model.http.client.apple.itunes.response.verifyreceipt.VerifyReceiptResponse;
+import com.pantrypro.networking.client.apple.itunes.exception.AppleItunesResponseException;
+import com.pantrypro.networking.client.apple.itunes.response.error.AppleItunesErrorResponse;
+import com.pantrypro.networking.client.apple.itunes.response.verifyreceipt.VerifyReceiptResponse;
 import httpson.Httpson;
 
 import java.io.IOException;

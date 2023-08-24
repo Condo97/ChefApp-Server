@@ -5,14 +5,19 @@ import com.pantrypro.Constants;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class TagFetcher {
 
     private static String COMMA_DELIMITER = ", ";
 
-    public static List<String> fetchTagsLowercase() {
+    private static List<String> fetchedTagsLowercase = fetchTagsLowercase();
+
+    public static List<String> getFetchedTagsLowercase() {
+        return fetchedTagsLowercase;
+    }
+
+    private static List<String> fetchTagsLowercase() {
         try (BufferedReader br = new BufferedReader((new FileReader(Constants.Tag_List_Location)))) {
             List<String> tags = new ArrayList<>();
 

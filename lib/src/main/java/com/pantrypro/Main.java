@@ -5,12 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
 import com.pantrypro.core.Server;
+import com.pantrypro.exceptions.ResponseStatusException;
 import com.pantrypro.keys.Keys;
-import com.pantrypro.model.exceptions.ResponseStatusException;
-import com.pantrypro.model.http.server.ResponseStatus;
-import com.pantrypro.model.http.server.response.BodyResponse;
-import com.pantrypro.model.http.server.response.GetIAPStuffResponse;
-import com.pantrypro.model.http.server.response.GetImportantConstantsResponse;
+import com.pantrypro.networking.server.ResponseStatus;
+import com.pantrypro.networking.server.response.BodyResponse;
+import com.pantrypro.networking.server.response.GetIAPStuffResponse;
+import com.pantrypro.networking.server.response.GetImportantConstantsResponse;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;

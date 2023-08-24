@@ -1,32 +1,34 @@
 package com.pantrypro.core;
 
 import appletransactionclient.exception.AppStoreStatusResponseException;
-import com.dbclient.DBManager;
+import com.oaigptconnector.model.*;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
+import com.oaigptconnector.model.request.chat.completion.OAIChatCompletionRequestMessage;
+import com.oaigptconnector.model.response.chat.completion.http.OAIGPTChatCompletionResponse;
 import com.pantrypro.Constants;
-import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
-import com.pantrypro.core.database.adapters.oai.IdeaRecipeTagFromOpenAIAdapter;
-import com.pantrypro.core.database.adapters.oai.RecipeFromOpenAIAdapter;
-import com.pantrypro.core.generation.RecipeDirectionsGenerator;
-import com.pantrypro.core.generation.openai.*;
-import com.pantrypro.core.generation.IdeaRecipeGenerator;
-import com.pantrypro.core.generation.IngredientNamesFromMeasuredIngredientsGenerator;
-import com.pantrypro.core.service.responsefactories.CategorizeIngredientsResponseFactory;
-import com.pantrypro.core.service.responsefactories.MakeRecipeResponseFactory;
-import com.pantrypro.model.exceptions.CapReachedException;
-import com.pantrypro.common.exceptions.DBObjectNotFoundFromQueryException;
-import com.pantrypro.common.exceptions.PreparedStatementMissingArgumentException;
-import com.pantrypro.core.database.managers.IdeaRecipeDBManager;
-import com.pantrypro.core.database.managers.RecipeDBManager;
-import com.pantrypro.core.generation.tagging.TagFilterer;
-import com.pantrypro.core.service.BodyResponseFactory;
-import com.pantrypro.model.database.objects.*;
-import com.pantrypro.model.exceptions.InvalidAssociatedIdentifierException;
-import com.pantrypro.model.generation.IdeaRecipeExpandIngredients;
-import com.pantrypro.model.http.client.openaigpt.response.functioncall.*;
-import com.pantrypro.model.http.client.apple.itunes.exception.AppleItunesResponseException;
-import com.pantrypro.model.http.server.request.*;
-import com.pantrypro.model.http.server.response.*;
+import com.pantrypro.core.generation.IdeaRecipeExpandIngredients;
+import com.pantrypro.database.calculators.RecipeRemainingCalculator;
+import com.pantrypro.database.compoundobjects.IngredientAndCategory;
+import com.pantrypro.database.compoundobjects.IngredientAndMeasurement;
+import com.pantrypro.database.compoundobjects.RecipeWithIngredients;
+import com.pantrypro.database.dao.factory.RecipeFactoryDAO;
+import com.pantrypro.database.dao.pooled.RecipeDAOPooled;
+import com.pantrypro.database.objects.recipe.Recipe;
+import com.pantrypro.database.objects.recipe.RecipeDirection;
+import com.pantrypro.database.objects.recipe.RecipeMeasuredIngredient;
+import com.pantrypro.database.objects.recipe.RecipeTag;
+import com.pantrypro.exceptions.CapReachedException;
+import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
+import com.pantrypro.exceptions.InvalidAssociatedIdentifierException;
+import com.pantrypro.exceptions.PreparedStatementMissingArgumentException;
+import com.pantrypro.keys.Keys;
+import com.pantrypro.networking.client.apple.itunes.exception.AppleItunesResponseException;
+import com.pantrypro.networking.client.oaifunctioncall.categorizeingredients.CategorizeIngredientsFC;
+import com.pantrypro.networking.client.oaifunctioncall.createrecipeidea.CreateRecipeIdeaFC;
+import com.pantrypro.networking.client.oaifunctioncall.finalizerecipe.FinalizeRecipeFC;
+import com.pantrypro.networking.client.oaifunctioncall.finalizerecipe.FinalizeRecipeFCIngredientsAndMeasurements;
+import com.pantrypro.networking.client.oaifunctioncall.generatedirections.GenerateDirectionsFC;
+import com.pantrypro.networking.client.oaifunctioncall.tagrecipe.TagRecipeFC;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 
@@ -38,323 +40,285 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
-import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PantryPro {
 
-    public static BodyResponse generatePackSaveCategorizeIngredientsFunction(CategorizeIngredientsRequest request) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException {
-        // Get userID from PPUserAuthenticator
-        Integer userID = UserAuthenticator.getUserIDFromAuthToken(request.getAuthToken());
-
+    public static List<IngredientAndCategory> categorizeIngredients(List<String> ingredients, String store) throws OAISerializerException, OpenAIGPTException, IOException, InterruptedException, OAIDeserializerException {
         // Create input from ingredients
-        String input = parseCategorizeIngredientsGPTInput(request.getIngredients(), request.getStore());
+        String input = parseCategorizeIngredientsGPTInput(ingredients, store);
 
-        // Generate categorize ingredients function call response
-        OAIGPTFunctionCallResponseCategorizeIngredients categorizeIngredientsFunctionCallResponse = OAICategorizeIngredientsGenerator.generateCategorizeIngredientsFunctionCall(
-                input,
-                Constants.Context_Character_Limit_Categorize_Ingredients,
-                Constants.Response_Token_Limit_Categorize_Ingredients
+        // Create messages list from input
+        List<OAIChatCompletionRequestMessage> messages = new OAIChatCompletionRequestMessagesBuilder()
+                .addUser(input)
+                .build();
+
+        // Generate fcResponse from CategorizeIngredientsFC
+        OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
+                CategorizeIngredientsFC.class,
+                messages,
+                Constants.DEFAULT_MODEL_NAME,
+                Constants.Response_Token_Limit_Categorize_Ingredients,
+                Constants.DEFAULT_TEMPERATURE,
+                Keys.openAiAPI
         );
 
-        // Adapt to CategorizeIngredientsResponse
-        CategorizeIngredientsResponse ciResponse = CategorizeIngredientsResponseFactory.from(categorizeIngredientsFunctionCallResponse);
+        // Deserialize fcResponse to CategorizeIngredientsFC
+        CategorizeIngredientsFC categorizeIngredientsFC = OAIFunctionCallDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getFunction_call().getArguments(), CategorizeIngredientsFC.class);
 
-        // Return in success body response
-        return BodyResponseFactory.createSuccessBodyResponse(ciResponse);
+        // Adapt to IngredientAndCategory list and return
+        List<IngredientAndCategory> ingredientsAndCategories = new ArrayList<>();
+        for (CategorizeIngredientsFC.IngredientsWithCategories fcIngredientsWithCategories: categorizeIngredientsFC.getIngredientsWithCategories()) {
+            ingredientsAndCategories.add(new IngredientAndCategory(
+                    fcIngredientsWithCategories.getIngredient(),
+                    fcIngredientsWithCategories.getCategory()
+            ));
+        }
+
+        return ingredientsAndCategories;
     }
 
-    /* Create idea recipe */
+//    public static BodyResponse generatePackSaveCategorizeIngredientsFunction(CategorizeIngredientsRequest request) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException {
+//        // Get userID from PPUserAuthenticator
+//        Integer userID = UserAuthenticator.getUserIDFromAuthToken(request.getAuthToken());
+//
+//        // Create input from ingredients
+//        String input = parseCategorizeIngredientsGPTInput(request.getIngredients(), request.getStore());
+//
+//        // Generate categorize ingredients function call response
+//        OAIGPTFunctionCallResponseCategorizeIngredients categorizeIngredientsFunctionCallResponse = OAICategorizeIngredientsGenerator.generateCategorizeIngredientsFunctionCall(
+//                input,
+//                Constants.Context_Character_Limit_Categorize_Ingredients,
+//                Constants.Response_Token_Limit_Categorize_Ingredients
+//        );
+//
+//        // Adapt to CategorizeIngredientsResponse
+//        CategorizeIngredientsResponse ciResponse = CategorizeIngredientsResponseFactory.from(categorizeIngredientsFunctionCallResponse);
+//
+//        // Return in success body response
+//        return BodyResponseFactory.createSuccessBodyResponse(ciResponse);
+//    }
 
-    public static IdeaRecipe createSaveIdeaRecipe(String authToken, String ingredientsString, String modifiersString, Integer expandIngredientsMagnitude) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, DBSerializerPrimaryKeyMissingException, AppStoreStatusResponseException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, CapReachedException {
-        // Generate idea recipe with IdeaRecipeGenerator, which validates the user's count as well
-        IdeaRecipe ideaRecipe = IdeaRecipeGenerator.generateForUser(
-                authToken,
-                ingredientsString,
-                modifiersString,
+    public static Long countTodaysRecipes(String authToken) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+        // Get userID from authToken with UserAuthenticator
+        Integer userID = UserAuthenticator.getUserIDFromAuthToken(authToken);
+
+        // Return count of today's recipes for user
+        return RecipeDAOPooled.countForToday(userID);
+    }
+
+    /* Recipe Creation */
+
+    public static RecipeWithIngredients createSaveRecipeIdea(String authToken, String ingredientsString, String modifiersString, Integer expandIngredientsMagnitude) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, AppStoreStatusResponseException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, CapReachedException, OAISerializerException, OAIDeserializerException, DBSerializerPrimaryKeyMissingException, DBSerializerException {
+        /* Validation */
+
+        // Get userID from authToken using UserAuthenticator
+        Integer userID = UserAuthenticator.getUserIDFromAuthToken(authToken);
+
+        // Get remaining Recipe Ideas for user for userID, and if not null (infinite) and less than or equal to 0 throw CapReachedException
+        Long remainingIdeaRecipes = new RecipeRemainingCalculator().calculateRemaining(authToken);
+        if (remainingIdeaRecipes != null && remainingIdeaRecipes <= 0)
+            throw new CapReachedException("CreateRecipeIdea cap reached for user " + userID + "!");
+
+        /* Generation */
+
+        // Get IdeaRecipeExpandIngredients, an enum that stores the system message, function description (unused/deprecated), and Funtion Call class for the expand ingredients magnitude integer provided in the request
+        IdeaRecipeExpandIngredients ideaRecipeExpandIngredients = IdeaRecipeExpandIngredients.from(expandIngredientsMagnitude);
+
+        // Create userInput from ingredientsString and modifiersString
+        String userInput = "Ingredients: " + ingredientsString + "\n" + "Modifiers: " + modifiersString;
+
+        // Create messages array from ingredientsString and modifiersString
+        List<OAIChatCompletionRequestMessage> messages = new OAIChatCompletionRequestMessagesBuilder()
+                .addSystem(ideaRecipeExpandIngredients.getSystemMessage())
+                .addUser(userInput)
+                .build();
+
+        // Get fcResponse from FCClient serializedChatCompletion
+        OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
+                ideaRecipeExpandIngredients.getFcClass(),
+                messages,
+                Constants.DEFAULT_MODEL_NAME,
+                Constants.Response_Token_Limit_Create_Recipe,
+                Constants.DEFAULT_TEMPERATURE,
+                Keys.openAiAPI
+        );
+
+        // Deserialize fcResponse to CreateRecipeIdeaFC
+        CreateRecipeIdeaFC createRecipeIdeaFC = OAIFunctionCallDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getFunction_call().getArguments(), ideaRecipeExpandIngredients.getFcClass());
+
+        // Get and save Recipe and RecipeMeasuredIngredients in RecpieWithIngredients object using RecipeFactoryDAO and return
+        RecipeWithIngredients recipeWithIngredients = RecipeFactoryDAO.createAndSaveRecipe(
+                createRecipeIdeaFC,
+                userID,
+                userInput,
                 expandIngredientsMagnitude
         );
 
-        // Deep insert into DB
-        Connection conn = SQLConnectionPoolInstance.getConnection();
-        try {
-            DBManager.deepInsert(conn, ideaRecipe);
-        } finally {
-            SQLConnectionPoolInstance.releaseConnection(conn);
-        }
-
-        // Return IdeaRecipe
-        return ideaRecipe;
-
-//        List<IdeaRecipeIngredient> ideaRecipeIngredients = IdeaRecipeFromOpenAIAdapter.getIdeaRecipeIngredients(createRecipeIdeaFunctionCallResponse);
-//        List<IdeaRecipeEquipment> ideaRecipeEquipment = IdeaRecipeFromOpenAIAdapter.getIdeaRecipeEquipment(createRecipeIdeaFunctionCallResponse);
-
-        // Insert with PPPersistinator
-//        PPPersistinator.insertIdeaRecipe(ideaRecipe, ideaRecipeIngredients);
-
-        // Adapt to CreateRecipeIdeaResponse and return in success body response
-//        CreateRecipeIdeaResponse ideaResponse = CreateRecipeIdeaResponseFactory.from(
-//                ideaRecipe,
-//                ideaRecipeIngredients,
-//                ideaRecipeEquipment,
-//                remaining == null ? null : remaining - 1
-//        );
-
-//        return BodyResponseFactory.createSuccessBodyResponse(ideaResponse);
+        return recipeWithIngredients;
     }
 
-    /* Regenerate recipe directions and idea recipe ingredients */
+    public static void finalizeSaveRecipe(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, OAIDeserializerException, DBSerializerPrimaryKeyMissingException {
+        /* Generation */
 
-    private static IdeaRecipe updateSaveIdeaRecipe(Integer ideaID, String newName, String newSummary, List<String> measuredIngredientStrings) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, OpenAIGPTException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        /* Update title, summary, and ingredients in DB */
+        // Get Recipe
+        Recipe recipe = RecipeDAOPooled.get(recipeID);
 
-        Connection tsmiUpdateConn = SQLConnectionPoolInstance.getConnection();
-        try {
-            // If newTitle is not null, update in DB
-            if (newName != null)
-                IdeaRecipeDBManager.updateName(tsmiUpdateConn, ideaID, newName);
+        // Get RecipeMeasuredIngredients
+        List<RecipeMeasuredIngredient> recipeMeasuredIngredients = RecipeDAOPooled.getMeasuredIngredients(recipeID);
 
-            // If newSummary is not null, update in DB
-            if (newSummary != null)
-                IdeaRecipeDBManager.updateName(tsmiUpdateConn, ideaID, newSummary);
+        // Create input from recipe and measuredIngredients
+        String input = parseFinalizeRecipeGPTInput(recipe, recipeMeasuredIngredients);
 
-            // If measuredIngredients is not null, update in DB and get ingredients without measurements
-            if (measuredIngredientStrings != null && !measuredIngredientStrings.isEmpty()) {
-                makeSaveIdeaRecipeNames(ideaID, measuredIngredientStrings);
-            }
-        } finally {
-            SQLConnectionPoolInstance.releaseConnection(tsmiUpdateConn);
-        }
-    }
+        // Create messages array from input
+        List<OAIChatCompletionRequestMessage> messages = new OAIChatCompletionRequestMessagesBuilder()
+                .addUser(input)
+                .build();
 
-    private static IdeaRecipe makeSaveIdeaRecipeNames(Integer ideaID, List<String> measuredIngredientStrings) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, DBSerializerPrimaryKeyMissingException, OpenAIGPTException, IOException {
-        Connection tsmiUpdateConn = SQLConnectionPoolInstance.getConnection();
-        try {
-            // Get recipe ID from ideaID
-            Recipe recipe = RecipeDBManager.getFromIdeaID(tsmiUpdateConn, ideaID);
-
-//            // Update measured ingredients
-//            RecipeDBManager.updateMeasuredIngredients(tsmiUpdateConn, recipe.getId(), );
-
-            // Get generate ingredient names and assign to ingredientNames
-            List<IdeaRecipeIngredient> ingredientNames = IngredientNamesFromMeasuredIngredientsGenerator.generateIngredientNames(measuredIngredientStrings);
-
-            // Update idea recipe ingredients in DB
-            IdeaRecipeDBManager.updateIngredients(tsmiUpdateConn, recipe.getIdea_id(), ingredientNames);
-
-            // Get and return ideaRecipe after updates TODO: Is this good practice?
-            return IdeaRecipeDBManager.get(tsmiUpdateConn, ideaID);
-        } finally {
-            SQLConnectionPoolInstance.releaseConnection(tsmiUpdateConn);
-        }
-    }
-
-    public static Recipe remakeSaveRecipeIngredients(Integer ideaID, List<String> measuredIngredientStrings) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException {
-        /* Generate new directions */
-
-        Connection dUpdateConn = SQLConnectionPoolInstance.getConnection();
-        try {
-            // Get IdeaRecipe for name, summary, and ideaID and Recipe for IdeaRecipe ideaID
-            IdeaRecipe ideaRecipe = IdeaRecipeDBManager.get(dUpdateConn, ideaID);
-            Recipe recipe = RecipeDBManager.getFromIdeaID(dUpdateConn, ideaRecipe.getId());
-
-            // Adapt form string list to RecipeMeasuredIngredient list
-            List<RecipeMeasuredIngredient> measuredIngredients =
-
-            // Update measured ingredients
-            RecipeDBManager.updateMeasuredIngredients(dUpdateConn, recipe.getId(), measuredIngredientStrings);
-
-            // Get list of RecipeInstructions from name and summary in ideaRecipe and measuredIngredients in request
-            List<RecipeInstruction> directions = RecipeDirectionsGenerator.generateDirections(
-                    ideaRecipe.getName(),
-                    ideaRecipe.getSummary(),
-                    measuredIngredientStrings
-            );
-
-            // Update recipe directions in DB
-            RecipeDBManager.updateDirections(
-                    dUpdateConn,
-                    recipe.getId(),
-                    directions
-            );
-        } finally {
-            SQLConnectionPoolInstance.releaseConnection(dUpdateConn);
-        }
-    }
-
-
-
-//    public static BodyResponse generatePackSaveRegenerateRecipeDirectionsAndIdeaRecipeIngredients(RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest request) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, CapReachedException, InvalidRequestJSONException, OpenAIGPTException, GenerationException {
-//        // Require ideaID and at least one of newName with text, newSummary with text, or measuredIngredients with at least one
-//        if (request.getIdeaID() == null || ((request.getNewName() == null || request.getNewName().isEmpty()) && (request.getNewSummary() == null || request.getNewSummary().isEmpty()) && (request.getMeasuredIngredients() == null || request.getMeasuredIngredients().size() == 0)))
-//            throw new InvalidRequestJSONException("Missing required object - Please ensure your JSON contains authToken, ideaID, and optionally with at least one required newTitle, newSummary, and/or measuredIngredients.");
-
-
-
-//        // Get recipe ID
-//        final Integer recipeID = PPPersistinator.getRecipeID(request.getIdeaID());
-
-//        // If recipe is null, throw GenerationException
-//        if (recipeID == null)
-//            throw new GenerationException("Could not find Recipe. Please make sure it's generated before trying to update!");
-
-//        // Create a variable for idea recipe ingredients set as null which will be assigned in the getMeasuredIngredients not null or empty conditional, so it can be added to the response if it is not null
-//        List<IdeaRecipeIngredient> ideaRecipeIngredients = null;
-//
-//        // If measuredIngredients is not null, update in DB and get ingredients without measurements
-//        if (request.getMeasuredIngredients() != null && !request.getMeasuredIngredients().isEmpty()) {
-//            // Create recipe measured ingredients from request
-//            List<RecipeMeasuredIngredient> recipeMeasuredIngredients = new ArrayList<>();
-//            request.getMeasuredIngredients().forEach(ingredientString -> {
-//                recipeMeasuredIngredients.add(new RecipeMeasuredIngredient(recipeID, ingredientString));
-//            });
-//
-//            // Generate new idea recipe ingredients from get ingredients without measurements
-//            OAIGPTFunctionCallResponseParseIngredientNames parseIngredientNamesResponse = ParseIngredientNamesGenerator.getParsedIngredientNames(
-//                    request.getMeasuredIngredients(),
-//                    Constants.Context_Character_Limit_Get_Ingredients_Without_Measurements,
-//                    Constants.Response_Token_Limit_Get_Ingredients_Without_Measurements
-//            );
-//
-//            // Replace recipe measured ingredients
-//            PPPersistinator.replaceRecipeMeasuredIngredients(recipeID, recipeMeasuredIngredients);
-//
-//            // Get ideaRecipeIngredients with IdeaRecipeIngredientFromOpenAIAdapter
-//            ideaRecipeIngredients = IdeaRecipeIngredientFromOpenAIAdapter.getIdeaRecipeIngredients(request.getIdeaID(), parseIngredientNamesResponse);
-//
-//        }
-//
-//        // Get updated ideaRecipe and recipeMeasuredIngredients TODO: Optimize this!
-//        IdeaRecipe ideaRecipe = IdeaRecipeDBManager.get(conn, request.getIdeaID());
-//        List<RecipeMeasuredIngredient> recipeMeasuredIngredients = RecipeDBManager.getMeasuredIngredients(conn, recipeID);
-//
-//        // Convert recipeMeasuredIngredients into a string array using their strings
-//        List<String> recipeMeasuredIngredientsStrings = new ArrayList<>();
-//        recipeMeasuredIngredients.forEach(measuredIngredient -> {
-//            recipeMeasuredIngredientsStrings.add(measuredIngredient.getString());
-//        });
-//
-//        // Generate new directions
-//        OAIGPTFunctionCallResponseGenerateDirections generateDirectionsResponse = OAIGenerateDirectionsGenerator.generateDirections(
-//                ideaRecipe.getName(),
-//                ideaRecipe.getSummary(),
-//                recipeMeasuredIngredientsStrings,
-//                Constants.Context_Character_Limit_Generate_Directions,
-//                Constants.Response_Token_Limit_Generate_Directions
-//        );
-//
-//        // Get recipeInstructions from RecipeInstructionFromOpenAIAdapter TODO: Rename to recipeDiretions when I rename the DB object and everything else ree lol
-//        List<RecipeInstruction> recipeInstructions = RecipeInstructionFromOpenAIAdapter.getRecipeInstructions(recipeID, generateDirectionsResponse);
-//
-//        // Delete all recipe directions
-//        RecipeDBManager.deleteAllInstructions(conn, recipeID);
-//
-//        // Insert generated directions
-//        RecipeDBManager.insertRecipeInstructions(conn, recipeInstructions);
-//
-//        // Get feasibility and update in DB
-//        Integer feasibility = generateDirectionsResponse.getFeasibility();
-//        RecipeDBManager.updateFeasibility(conn, recipeID, feasibility);
-//
-//        // Adapt to RegenerateRecipeDirectionAndIdeaRecipeIngredientsResponse
-//        RegenerateRecipeDirectionsAndIdeaRecipeIngredientsResponse response = ResponseFromDBObjectAdapter.from(recipeInstructions, ideaRecipeIngredients, feasibility);
-//
-//        return BodyResponseFactory.createSuccessBodyResponse(response);
-//    }
-
-    public static BodyResponse generatePackSaveMakeRecipe(MakeRecipeRequest request) throws AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InvalidAssociatedIdentifierException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException {
-        Connection conn = SQLConnectionPoolInstance.getConnection();
-        try {
-            return generatePackSaveMakeRecipe(request, conn);
-        } finally {
-            SQLConnectionPoolInstance.releaseConnection(conn);
-        }
-    }
-
-    public static BodyResponse generatePackSaveMakeRecipe(MakeRecipeRequest request, Connection conn) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, DBSerializerPrimaryKeyMissingException, AppStoreStatusResponseException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, CapReachedException, InvalidAssociatedIdentifierException {
-        // Get isPremium
-        boolean isPremium = PPRemainingCalculator.getIsPremium(request.getAuthToken());
-
-        // Get remaining
-//        Long remaining = MakeRecipeRemainingCalculator.calculateRemaining(u_aT.getUserID(), isPremium);
-
-        // If remaining is not null (infinite) and less than 0, throw CapReachedException
-//        if (remaining != null && remaining <= 0) throw new CapReachedException("Cap reached for user when generating recipe ideas");
-
-        // Get idea and ingredients from ideaID
-        IdeaRecipe idea = IdeaRecipeDBManager.get(conn, request.getIdeaID());
-        List<IdeaRecipeIngredient> ideaIngredients = IdeaRecipeDBManager.getIngredients(conn, request.getIdeaID());
-
-        // Throw exception if idea is null
-        if (idea == null)
-            throw new InvalidAssociatedIdentifierException("IdeaRecipe was null!");
-
-        // Create input from ingredients and modifiers
-        String input = parseMakeRecipeGPTInput(idea, ideaIngredients);
-
-        // Generate if validated
-        OAIGPTFunctionCallResponseMakeRecipe makeRecipeFunctionCallResponse = OAIRecipeGenerator.generateMakeRecipeFunctionCall(input, Constants.Context_Character_Limit_Make_Recipe, Constants.Response_Token_Limit_Make_Recipe);
-
-        // Adapt to IdeaRecipe, IdeaRecipeIngredients, and IdeaRecipeEquipment
-        Recipe recipe = RecipeFromOpenAIAdapter.getRecipe(request.getIdeaID(), makeRecipeFunctionCallResponse);
-        List<RecipeInstruction> recipeInstructions = RecipeFromOpenAIAdapter.getRecipeInstructions(makeRecipeFunctionCallResponse);
-        List<RecipeMeasuredIngredient> recipeMeasuredIngredients = RecipeFromOpenAIAdapter.getRecipeMeasuredIngredients(makeRecipeFunctionCallResponse);
-
-        // Insert into database, creating object to use to parse to return
-        RecipeDBManager.insertRecipe(conn, recipe, recipeInstructions, recipeMeasuredIngredients);
-
-        // Adapt to CreateRecipeIdeaResponse and return in success body response
-        MakeRecipeResponse recipeResponse = MakeRecipeResponseFactory.from(
-                recipe,
-                recipeInstructions,
-                recipeMeasuredIngredients
+        // Get fcResponse from FCClient serializedChatCompletion
+        OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
+                FinalizeRecipeFC.class,
+                messages,
+                Constants.DEFAULT_MODEL_NAME,
+                Constants.Response_Token_Limit_Finalize_Recipe,
+                Constants.DEFAULT_TEMPERATURE,
+                Keys.openAiAPI
         );
 
-        return BodyResponseFactory.createSuccessBodyResponse(recipeResponse);
+        // Deserialize fcResponse to FinalizeRecipeFC
+        FinalizeRecipeFC finalizeRecipeFC = OAIFunctionCallDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getFunction_call().getArguments(), FinalizeRecipeFC.class);
+
+        // Update and save Recipe, RecipeMeasuredIngredients, and RecipeDirections in RecipeWithIngredientsAndDirections using RecipeFactoryDAO
+        RecipeFactoryDAO.updateAndSaveRecipe(
+                finalizeRecipeFC,
+                recipeID
+        );
     }
 
-    public static BodyResponse generatePackSaveIdeaRecipeTags(TagRecipeIdeaRequest request) throws InterruptedException, InvalidAssociatedIdentifierException, DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, OpenAIGPTException, DBObjectNotFoundFromQueryException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
-        Connection conn = SQLConnectionPoolInstance.getConnection();
-        try {
-            return generatePackSaveIdeaRecipeTags(request, conn);
-        } finally {
-            SQLConnectionPoolInstance.releaseConnection(conn);
-        }
+    /* Recipe Getters */
+
+    public static Recipe getRecipe(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        // Return Recipe
+        return RecipeDAOPooled.get(recipeID);
     }
 
-    public static BodyResponse generatePackSaveIdeaRecipeTags(TagRecipeIdeaRequest request, Connection conn) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, DBSerializerPrimaryKeyMissingException, InvalidAssociatedIdentifierException, OpenAIGPTException, IOException {
-        //Get idea and ingredients from ideaID
-        IdeaRecipe idea = IdeaRecipeDBManager.get(conn, request.getIdeaID());
-        List<IdeaRecipeIngredient> ideaIngredients = IdeaRecipeDBManager.getIngredients(conn, request.getIdeaID());
+    public static List<RecipeMeasuredIngredient> getRecipeMeasuredIngredients(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        // Return RecipeMeasuredIngredient list
+        return RecipeDAOPooled.getMeasuredIngredients(recipeID);
+    }
 
-        // Throw exception if idea is null
-        if (idea == null)
-            throw new InvalidAssociatedIdentifierException("IdeaRecipe was null!");
+    public static List<RecipeDirection> getRecipeDirections(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        // Get RecipeDirection list
+        return RecipeDAOPooled.getDirections(recipeID);
+    }
 
-        // Create input from ingredients and modifiers
-        String input = parseTagRecipeIdeaGPTInput(idea, ideaIngredients);
+    /* Recipe Tagging */
 
-        // Generate if validated
-        OAIGPTFunctionCallResponseTagRecipeIdea tagRecipeIdeaFunctionCallResponse = OAITagRecipeIdeaGenerator.generateTagRecipeIdea(
-                input,
-                Constants.Context_Character_Limit_Tag_Recipe_Idea,
-                Constants.Response_Token_Limit_Tag_Recipe_Idea
+    public static List<RecipeTag> tagReicpe(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, OAIDeserializerException, DBSerializerPrimaryKeyMissingException {
+        // Get Recipe
+        Recipe recipe = RecipeDAOPooled.get(recipeID);
+
+        // Get RecipeMeasuredIngredients
+        List<RecipeMeasuredIngredient> recipeMeasuredIngredients = RecipeDAOPooled.getMeasuredIngredients(recipeID);
+
+        // Create input from recipe
+        String input = parseTagRecipeInput(recipe, recipeMeasuredIngredients);
+
+        // Create messages array from input
+        List<OAIChatCompletionRequestMessage> messages = new OAIChatCompletionRequestMessagesBuilder()
+                .addUser(input)
+                .build();
+
+        // Get fcResponse from FCClient for TagRecipeFC
+        OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
+                TagRecipeFC.class,
+                messages,
+                Constants.DEFAULT_MODEL_NAME,
+                Constants.Response_Token_Limit_Tag_Recipe,
+                Constants.DEFAULT_TEMPERATURE,
+                Keys.openAiAPI
         );
 
-        // Adapt to IdeaRecipeTag list
-        List<IdeaRecipeTag> ideaRecipeTags = IdeaRecipeTagFromOpenAIAdapter.getIdeaRecipeTags(tagRecipeIdeaFunctionCallResponse, request.getIdeaID());
+        // Deserialize fcResponse to TagRecipeFC
+        TagRecipeFC tagRecipeFC = OAIFunctionCallDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getFunction_call().getArguments(), TagRecipeFC.class);
 
-        // Remove invalid tags
-        TagFilterer.removeInvalidTags(ideaRecipeTags);
+        // Get and save RecipeTag list with RecipeFactoryDAO and return
+        List<RecipeTag> recipeTags = RecipeFactoryDAO.createAndSaveRecipeTags(
+                tagRecipeFC,
+                recipeID
+        );
 
-        // Insert into database
-        IdeaRecipeDBManager.insertIdeaRecipeTags(conn, ideaRecipeTags);
+        return recipeTags;
+    }
 
-        // Adapt to TagIdeaRecipeResponse and return in success body response
-        TagRecipeIdeaResponse tagRecipeIdeaResponse = ResponseFromDBObjectAdapter.from(ideaRecipeTags);
+    /***
+     * Regenerates Recipe Directions from..
+     *  - Recipe Measured Ingredients
+     *  - Recipe name
+     *  - Recipe summary
+     *
+     *  Basically, this function takes a recipeID and gets the Recipe and RecipeMeasuredIngredients (presumably after updating values), regenerates the directions, and updates the recipe directions in the database.
+     *  It's different than finalizeRecipe because it does not generate measuredIngredients, it instead uses them to create the directions. The current use case for this is to regenerate directions if the user changes the ingredients.
+     *
+     * @param recipeID The Recipe's ID
+     */
+    public static void regenerateDirections(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, OAIDeserializerException, DBSerializerPrimaryKeyMissingException {
+        // Get Recipe
+        Recipe recipe = RecipeDAOPooled.get(recipeID);
 
-        return BodyResponseFactory.createSuccessBodyResponse(tagRecipeIdeaResponse);
+        // Get RecipeMeasuredIngredients list
+        List<RecipeMeasuredIngredient> measuredIngredients = RecipeDAOPooled.getMeasuredIngredients(recipeID);
+
+        // Create input from recipe and measuredIngredients
+        String input = parseRegenerateDirectionsInput(recipe, measuredIngredients);
+
+        // Create messages array from input
+        List<OAIChatCompletionRequestMessage> messages = new OAIChatCompletionRequestMessagesBuilder()
+                .addUser(input)
+                .build();
+
+        // Get fcResponse from FCClient serializedChatCompletion
+        OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
+                GenerateDirectionsFC.class,
+                messages,
+                Constants.DEFAULT_MODEL_NAME,
+                Constants.Response_Token_Limit_Generate_Directions,
+                Constants.DEFAULT_TEMPERATURE,
+                Keys.openAiAPI
+        );
+
+        // Deserialize fcResponse to GenerateDirectionsFC
+        GenerateDirectionsFC generateDirectionsFC = OAIFunctionCallDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getFunction_call().getArguments(), GenerateDirectionsFC.class);
+
+        // Update and save directions and feasibility with RecipeFactoryDAO
+        RecipeFactoryDAO.updateAndSaveRecipe(generateDirectionsFC, recipeID);
+    }
+
+    public static void updateIngredientsAndMeasurements(Integer recipeID, List<IngredientAndMeasurement> ingredientsAndMeasurements) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
+        // Adapt ingredientsAndMeasurements list to RecipeMeasuredIngredients list
+        List<RecipeMeasuredIngredient> recipeMeasuredIngredients = new ArrayList<>();
+        for(IngredientAndMeasurement ingredientAndMeasurement: ingredientsAndMeasurements) {
+            recipeMeasuredIngredients.add(new RecipeMeasuredIngredient(
+                    null,
+                    recipeID,
+                    ingredientAndMeasurement.getIngredient(),
+                    ingredientAndMeasurement.getMeasurement()
+            ));
+        }
+
+        // Update ingredients
+        RecipeDAOPooled.updateMeasuredIngredients(recipeID, recipeMeasuredIngredients);
+    }
+
+    public static void validateUserRecipeAssociation(String authToken, Integer recipeID) throws InvalidAssociatedIdentifierException, DBSerializerException, SQLException, InterruptedException, DBObjectNotFoundFromQueryException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+        // Get userID
+        Integer userID = UserAuthenticator.getUserIDFromAuthToken(authToken);
+
+        // Check if user is associated with recipe
+        if(!RecipeDAOPooled.isUserAssociatedWithRecipe(userID, recipeID))
+            throw new InvalidAssociatedIdentifierException("User not associated with Recipe!");
     }
 
     public static String parseCategorizeIngredientsGPTInput(List<String> ingredients, String store) {
@@ -394,7 +358,7 @@ public class PantryPro {
         return sb.toString();
     }
 
-    private static String parseMakeRecipeGPTInput(IdeaRecipe ideaRecipe, List<IdeaRecipeIngredient> ingredients) {
+    private static String parseFinalizeRecipeGPTInput(Recipe recipe, List<RecipeMeasuredIngredient> measuredIngredients) {
         // Make Peach Cobbler with base ingredients peaches flour eggs with the desciption \"A sweet and tangy dessert perfect for summer\" expanding ingredients if necessary
         final String makeString = "Make";
         final String withTheBaseIngredientsString = "with the base ingredients";
@@ -407,13 +371,13 @@ public class PantryPro {
         // Make a Peach Cobbler
         sb.append(makeString);
         sb.append(spaceString);
-        sb.append(ideaRecipe.getName());
+        sb.append(recipe.getName());
 
         // with the base ingredients a, b, c,..,n
         sb.append(withTheBaseIngredientsString);
-        ingredients.forEach(ingredient -> {
+        measuredIngredients.forEach(measuredIngredient -> {
             sb.append(spaceString);
-            sb.append(ingredient.getName());
+            sb.append(measuredIngredient.getIngredientName());
         });
 
         // with the description "description"
@@ -421,19 +385,69 @@ public class PantryPro {
         sb.append(withTheDescriptionString);
         sb.append(spaceString);
         sb.append(quoteString);
-        sb.append(ideaRecipe.getSummary());
+        sb.append(recipe.getSummary());
         sb.append(quoteString);
 
         // expanding ingredients text
-        if (ideaRecipe.getExpandIngredientsMagnitude() != null) {
+        if (recipe.getExpandIngredientsMagnitude() != null) {
             sb.append(spaceString);
-            sb.append(IdeaRecipeExpandIngredients.from(ideaRecipe.getExpandIngredientsMagnitude()).getSystemMessageString());
+            sb.append(IdeaRecipeExpandIngredients.from(recipe.getExpandIngredientsMagnitude()).getSystemMessage());
         }
 
         return sb.toString();
     }
 
-    private static String parseTagRecipeIdeaGPTInput(IdeaRecipe ideaRecipe, List<IdeaRecipeIngredient> ingredients) {
+    private static String parseRegenerateDirectionsInput(Recipe recipe, List<RecipeMeasuredIngredient> measuredIngredients) {
+        // Make Peach Cobbler
+        // With ingredients: peaches flour eggs
+        // With the description A sweet and tangy dessert perfect for summer
+        final String makeString = "Make";
+        final String emptyTitleRecipeString = "recipe";
+        final String withIngredientsString = "With ingredients:";
+        final String withTheDescriptionString = "With the description:";
+        final String commaSpaceDelimiterString = ", ";
+        final String newLineString = "\n";
+        final String spaceString = " ";
+
+        StringBuilder sb = new StringBuilder();
+
+        // "Make Peach Cobbler" or if title is null or empty, "Make Recipe"
+        sb.append(makeString);
+        sb.append(spaceString);
+        sb.append(recipe.getName().isEmpty() ? emptyTitleRecipeString : recipe.getName());
+
+        // "With ingredients: peach, flour, eggs"
+        if (measuredIngredients.size() > 0) {
+            sb.append(newLineString);
+
+            sb.append(withIngredientsString);
+            sb.append(spaceString);
+
+            measuredIngredients.forEach(ingredient -> {
+                sb.append(ingredient);
+                sb.append(commaSpaceDelimiterString);
+            });
+
+            // If the end of sb is commaSpaceDelimiterString, remove it
+            if (sb.substring(sb.length() - commaSpaceDelimiterString.length(), sb.length()).equals(commaSpaceDelimiterString)) {
+                sb.delete(sb.length() - commaSpaceDelimiterString.length(), sb.length());
+            }
+        }
+
+        // "With the description: A sweet and tangy dessert perfect for summer"
+        if (!recipe.getSummary().isEmpty()) {
+            sb.append(newLineString);
+
+            sb.append(withTheDescriptionString);
+            sb.append(spaceString);
+
+            sb.append(recipe.getSummary());
+        }
+
+        return sb.toString();
+    }
+
+    private static String parseTagRecipeInput(Recipe ideaRecipe, List<RecipeMeasuredIngredient> measuredIngredients) {
         // Generate tags for recipe named: RecipeName\nWith ingredients: ingredient, ingredient,..., ingredient
         final String generateTagsString = "Generate tags for recipe named:";
         final String withIngredientsString = "With ingredients:";
@@ -451,9 +465,9 @@ public class PantryPro {
 
         // With ingredients: ingredient, ingredient,..., ingredient
         sb.append(withIngredientsString);
-        ingredients.forEach(ingredient -> {
+        measuredIngredients.forEach(measuredIngredient -> {
             sb.append(spaceString);
-            sb.append(ingredient.getName());
+            sb.append(measuredIngredient.getIngredientName());
         });
 
         return sb.toString();
