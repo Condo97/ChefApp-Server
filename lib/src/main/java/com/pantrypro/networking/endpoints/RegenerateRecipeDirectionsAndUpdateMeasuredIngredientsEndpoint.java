@@ -4,6 +4,7 @@ import com.oaigptconnector.model.OAIDeserializerException;
 import com.oaigptconnector.model.OAISerializerException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.core.PantryPro;
+import com.pantrypro.database.dao.pooled.RecipeDAOPooled;
 import com.pantrypro.database.objects.recipe.Recipe;
 import com.pantrypro.database.objects.recipe.RecipeInstruction;
 import com.pantrypro.database.objects.recipe.RecipeMeasuredIngredient;
@@ -31,6 +32,9 @@ public class RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsEndpoint {
         // Validate user recipe association
         PantryPro.validateUserRecipeAssociation(request.getAuthToken(), request.getRecipeID());
 
+        // Get prev servings for so the recipe can relatively adjust
+        Integer prevServings = RecipeDAOPooled.get(request.getRecipeID()).getEstimatedServings();
+
         // Update name
         if (request.getNewName() != null && !request.getNewName().isEmpty()) {
             PantryPro.updateName(request.getRecipeID(), request.getNewName());
@@ -52,7 +56,7 @@ public class RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsEndpoint {
         }
 
         // Regenerate directions
-        PantryPro.regenerateMeasuredIngredientsAndDirections(request.getRecipeID());
+        PantryPro.regenerateMeasuredIngredientsAndDirections(request.getRecipeID(), prevServings);
 
         // Get Recipe
         Recipe recipe = PantryPro.getRecipe(request.getRecipeID());

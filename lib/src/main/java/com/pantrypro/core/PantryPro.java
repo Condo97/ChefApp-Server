@@ -305,7 +305,7 @@ public class PantryPro {
      *
      * @param recipeID The Recipe's ID
      */
-    public static void regenerateMeasuredIngredientsAndDirections(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, OAIDeserializerException, DBSerializerPrimaryKeyMissingException {
+    public static void regenerateMeasuredIngredientsAndDirections(Integer recipeID, Integer oldServings) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, OAIDeserializerException, DBSerializerPrimaryKeyMissingException {
         // Get Recipe
         Recipe recipe = RecipeDAOPooled.get(recipeID);
 
@@ -313,7 +313,7 @@ public class PantryPro {
         List<RecipeMeasuredIngredient> recipeMeasuredIngredients = RecipeDAOPooled.getMeasuredIngredients(recipeID);
 
         // Create input from recipe and recipeMeasuredIngredients
-        String input = parseRegenerateDirectionsInput(recipe, recipeMeasuredIngredients);
+        String input = parseRegenerateDirectionsInput(recipe, recipeMeasuredIngredients, oldServings);
 
         // Create user message
         OAIChatCompletionRequestMessage userMessage = new OAIChatCompletionRequestMessageBuilder(CompletionRole.USER)
@@ -457,14 +457,15 @@ public class PantryPro {
         return sb.toString();
     }
 
-    private static String parseRegenerateDirectionsInput(Recipe recipe, List<RecipeMeasuredIngredient> measuredIngredients) {
+    private static String parseRegenerateDirectionsInput(Recipe recipe, List<RecipeMeasuredIngredient> measuredIngredients, Integer prevServings) {
         // Make Peach Cobbler
-        // Servings: 3
+        // Servings: 3, previously from 4
         // With ingredients: peaches flour eggs
         // With the description A sweet and tangy dessert perfect for summer
         final String makeString = "Make";
         final String emptyTitleRecipeString = "recipe";
         final String servingsString = "Servings";
+        final String previousServingsString = ", previously from";
         final String withIngredientsString = "With ingredients:";
         final String withTheDescriptionString = "With the description:";
         final String commaSpaceDelimiterString = ", ";
@@ -483,6 +484,13 @@ public class PantryPro {
         sb.append(servingsString);
         sb.append(spaceString);
         sb.append(recipe.getEstimatedServings());
+
+        // ", previously from 4" TODO: This may not be necessary for good generation
+        if (prevServings != null) {
+            sb.append(previousServingsString);
+            sb.append(spaceString);
+            sb.append(prevServings);
+        }
 
         // "With ingredients: peach, flour, eggs"
         if (measuredIngredients.size() > 0) {
