@@ -8,7 +8,7 @@ import java.util.List;
 @FunctionCall(name = "generate_recipe", functionDescription = "Generates measured ingredients and directions to make the recipe")
 public class GenerateMeasuredIngredientsAndDirectionsFC {
 
-    @FCParameter(description = "All of the ingredients including amounts/measurements needed to make this recipe")
+    @FCParameter(description = "The ingredients given in the input with correct measurements.")
     private List<String> allIngredientsAndMeasurements;
 
     @FCParameter(description = "The directions to make the recipe. Do not include enumeration indicators.")
