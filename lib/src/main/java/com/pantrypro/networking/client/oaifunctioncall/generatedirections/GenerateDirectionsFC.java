@@ -8,7 +8,7 @@ import java.util.List;
 @FunctionCall(name = "generate_directions", functionDescription = "Generates directions to make the recipe")
 public class GenerateDirectionsFC {
 
-    @FCParameter(description = "The directions to make the recipe")
+    @FCParameter(description = "The directions to make the recipe. Do not include enumeration indicators.")
     private List<String> directions;
 
     @FCParameter(description = "On a scale of 1-10, how feasible the recipe is to make in reality")
