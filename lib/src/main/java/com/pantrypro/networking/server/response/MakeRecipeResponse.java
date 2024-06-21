@@ -5,54 +5,54 @@ import java.util.Map;
 
 public class MakeRecipeResponse {
 
-    public static class MakeRecipeResponseIngredientAndMeasurement {
+//    public static class MakeRecipeResponseIngredientAndMeasurement {
+//
+//        private String ingredient;
+//        private String measurement;
+//
+//        public MakeRecipeResponseIngredientAndMeasurement() {
+//
+//        }
+//
+//        public MakeRecipeResponseIngredientAndMeasurement(String ingredient, String measurement) {
+//            this.ingredient = ingredient;
+//            this.measurement = measurement;
+//        }
+//
+//        public String getIngredient() {
+//            return ingredient;
+//        }
+//
+//        public String getMeasurement() {
+//            return measurement;
+//        }
+//
+//    }
 
-        private String ingredient;
-        private String measurement;
-
-        public MakeRecipeResponseIngredientAndMeasurement() {
-
-        }
-
-        public MakeRecipeResponseIngredientAndMeasurement(String ingredient, String measurement) {
-            this.ingredient = ingredient;
-            this.measurement = measurement;
-        }
-
-        public String getIngredient() {
-            return ingredient;
-        }
-
-        public String getMeasurement() {
-            return measurement;
-        }
-
-    }
-
-    private Map<Integer, String> directions;
-//    private List<String> allIngredientsAndMeasurements;
-    private List<MakeRecipeResponseIngredientAndMeasurement> ingredientsAndMeasurements;
+    private Map<Integer, String> instructions;
+    private List<String> allIngredientsAndMeasurements;
+//    private List<MakeRecipeResponseIngredientAndMeasurement> ingredientsAndMeasurements;
     private Integer estimatedTotalCalories, estimatedTotalMinutes, estimatedServings, feasibility;
 
     public MakeRecipeResponse() {
 
     }
 
-    public MakeRecipeResponse(Map<Integer, String> directions, List<MakeRecipeResponseIngredientAndMeasurement> ingredientsAndMeasurements, Integer estimatedTotalCalories, Integer estimatedTotalMinutes, Integer estimatedServings, Integer feasibility) {
-        this.directions = directions;
-        this.ingredientsAndMeasurements = ingredientsAndMeasurements;
+    public MakeRecipeResponse(Map<Integer, String> instructions, List<String> allIngredientsAndMeasurements, Integer estimatedTotalCalories, Integer estimatedTotalMinutes, Integer estimatedServings, Integer feasibility) {
+        this.instructions = instructions;
+        this.allIngredientsAndMeasurements = allIngredientsAndMeasurements;
         this.estimatedTotalCalories = estimatedTotalCalories;
         this.estimatedTotalMinutes = estimatedTotalMinutes;
         this.estimatedServings = estimatedServings;
         this.feasibility = feasibility;
     }
 
-    public Map<Integer, String> getDirections() {
-        return directions;
+    public Map<Integer, String> getInstructions() {
+        return instructions;
     }
 
-    public List<MakeRecipeResponseIngredientAndMeasurement> getIngredientsAndMeasurements() {
-        return ingredientsAndMeasurements;
+    public List<String> getAllIngredientsAndMeasurements() {
+        return allIngredientsAndMeasurements;
     }
 
     public Integer getEstimatedTotalCalories() {

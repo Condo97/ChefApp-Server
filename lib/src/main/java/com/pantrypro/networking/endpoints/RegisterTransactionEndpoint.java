@@ -1,6 +1,6 @@
 package com.pantrypro.networking.endpoints;
 
-import appletransactionclient.exception.AppStoreStatusResponseException;
+import appletransactionclient.exception.AppStoreErrorResponseException;
 import com.pantrypro.core.UserAuthenticator;
 import com.pantrypro.core.purchase.iapvalidation.TransactionPersistentAppleUpdater;
 import com.pantrypro.database.adapters.IsPremiumFromAppStoreSubscriptionStatus;
@@ -27,7 +27,7 @@ import java.util.Date;
 
 public class RegisterTransactionEndpoint {
 
-    public static BodyResponse registerTransaction(RegisterTransactionRequest registerTransactionRequest) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, UnrecoverableKeyException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, DBSerializerPrimaryKeyMissingException, AppStoreStatusResponseException {
+    public static BodyResponse registerTransaction(RegisterTransactionRequest registerTransactionRequest) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, UnrecoverableKeyException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, DBSerializerPrimaryKeyMissingException, AppStoreErrorResponseException {
         // Get the userID from authToken using UserAuthenticator
         Integer userID = UserAuthenticator.getUserIDFromAuthToken(registerTransactionRequest.getAuthToken());
 //        User_AuthToken u_aT = User_AuthTokenDBManager.getFromDB(registerTransactionRequest.getAuthToken());

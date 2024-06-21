@@ -13,7 +13,7 @@ public class CreateRecipeIdeaResponseFactory {
         List<String> ingredientStrings = new ArrayList<>();
         List<String> equipmentStrings = new ArrayList<>();
 
-        measuredIngredients.forEach(ingredient -> ingredientStrings.add(ingredient.getIngredientName()));
+        measuredIngredients.forEach(measuredIngredient -> ingredientStrings.add(measuredIngredient.getMeasuredIngredient()));
 //        ideaRecipe.getIngredients().forEach(ingredient -> ingredientStrings.add(ingredient.getName()));
 //        ideaRecipeEquipment.forEach(equipmentObject -> equipmentStrings.add(equipmentObject.getName()));
 
@@ -22,6 +22,7 @@ public class CreateRecipeIdeaResponseFactory {
 //                equipmentStrings,
                 recipe.getName(),
                 recipe.getSummary(),
+                recipe.getCuisineType(),
                 recipe.getRecipe_id(),
                 remaining
         );

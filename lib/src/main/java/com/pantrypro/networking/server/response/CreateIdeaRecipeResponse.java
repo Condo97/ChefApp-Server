@@ -6,21 +6,23 @@ public class CreateIdeaRecipeResponse {
 
     private List<String> ingredients;
 //    private List<String> equipment;
-    private String name, summary;
+    private String name, summary, cuisineType;
     private Integer recipeID;
+    private Integer ideaID;
     private Long remaining;
 
     public CreateIdeaRecipeResponse() {
 
     }
 
-    public CreateIdeaRecipeResponse(List<String> ingredients, String name, String summary, Integer recipeID, Long remaining) {
+    public CreateIdeaRecipeResponse(List<String> ingredients, String name, String summary, String cuisineType, Integer recipeID, Long remaining) {
         this.ingredients = ingredients;
 //        this.equipment = equipment;
         this.name = name;
         this.summary = summary;
-//        this.cuisineType = cuisineType;
+        this.cuisineType = cuisineType;
         this.recipeID = recipeID;
+        this.ideaID = recipeID;
         this.remaining = remaining;
     }
 
@@ -40,9 +42,9 @@ public class CreateIdeaRecipeResponse {
         return summary;
     }
 
-//    public String getCuisineType() {
-//        return cuisineType;
-//    }
+    public String getCuisineType() {
+        return cuisineType;
+    }
 
     public Integer getRecipeID() {
         return recipeID;
@@ -50,6 +52,12 @@ public class CreateIdeaRecipeResponse {
 
     public Long getRemaining() {
         return remaining;
+    }
+
+    // LEGACY //
+
+    public Integer getIdeaID() {
+        return ideaID;
     }
 
 }

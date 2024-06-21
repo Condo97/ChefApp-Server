@@ -1,7 +1,7 @@
 package com.pantrypro.networking.responsefactories;
 
 import com.pantrypro.database.objects.recipe.Recipe;
-import com.pantrypro.database.objects.recipe.RecipeDirection;
+import com.pantrypro.database.objects.recipe.RecipeInstruction;
 import com.pantrypro.database.objects.recipe.RecipeMeasuredIngredient;
 import com.pantrypro.networking.server.response.MakeRecipeResponse;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class MakeRecipeResponseFactory {
 
-    public static MakeRecipeResponse from(Recipe recipe, List<RecipeMeasuredIngredient> measuredIngredients, List<RecipeDirection> directions) {
+    public static MakeRecipeResponse from(Recipe recipe, List<RecipeMeasuredIngredient> measuredIngredients, List<RecipeInstruction> directions) {
         // Put directions in a map with the index to preserve order
         Map<Integer, String> instructionStringsMap = new HashMap<>();
         for (Integer i = 0; i < directions.size(); i++) {
@@ -20,8 +20,8 @@ public class MakeRecipeResponseFactory {
         }
 
         // Put ingredients and measurements in string array
-        List<MakeRecipeResponse.MakeRecipeResponseIngredientAndMeasurement> ingredientsAndMeasurements = new ArrayList<>();
-        measuredIngredients.forEach(measuredIngredient -> ingredientsAndMeasurements.add(new MakeRecipeResponse.MakeRecipeResponseIngredientAndMeasurement(measuredIngredient.getIngredientName(), measuredIngredient.getMeasurement())));
+        List<String> ingredientsAndMeasurements = new ArrayList<>();
+        measuredIngredients.forEach(measuredIngredient -> ingredientsAndMeasurements.add(measuredIngredient.getMeasuredIngredient()));
 
         // Get estimatedTotalMinutes and feasibility
         Integer estimatedTotalCalories = recipe.getEstimatedTotalCalories();

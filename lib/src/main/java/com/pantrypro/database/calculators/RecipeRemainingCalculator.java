@@ -1,6 +1,6 @@
 package com.pantrypro.database.calculators;
 
-import appletransactionclient.exception.AppStoreStatusResponseException;
+import appletransactionclient.exception.AppStoreErrorResponseException;
 import com.pantrypro.Constants;
 import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
 import com.pantrypro.core.PPPremiumValidator;
@@ -30,7 +30,7 @@ public class RecipeRemainingCalculator extends RemainingCalculator {
     }
 
     @Override
-    public Long calculateRemaining(String authToken) throws DBSerializerException, SQLException, InterruptedException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException {
+    public Long calculateRemaining(String authToken) throws DBSerializerException, SQLException, InterruptedException, DBSerializerPrimaryKeyMissingException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, AppStoreErrorResponseException {
         Connection conn = SQLConnectionPoolInstance.getConnection();
         try {
             return calculateRemaining(authToken, conn);
@@ -39,7 +39,7 @@ public class RecipeRemainingCalculator extends RemainingCalculator {
         }
     }
 
-    public Long calculateRemaining(String authToken, Connection conn) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public Long calculateRemaining(String authToken, Connection conn) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, DBSerializerPrimaryKeyMissingException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, AppStoreErrorResponseException {
         // Get count of today's ideaRecipes
         Long count = RecipeCounter.countRecipes(authToken);
 

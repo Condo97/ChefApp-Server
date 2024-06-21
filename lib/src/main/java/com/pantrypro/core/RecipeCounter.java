@@ -17,7 +17,7 @@ public class RecipeCounter {
     }
 
     public static Long countRecipes(Integer userID) throws DBSerializerException, SQLException, InterruptedException {
-        return RecipeDAOPooled.countForToday(userID);
+        return RecipeDAOPooled.countWithInstructionsForToday(userID);
     }
 
 }

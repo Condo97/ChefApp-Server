@@ -1,6 +1,6 @@
 package com.pantrypro;
 
-import com.oaigptconnector.model.Role;
+import com.oaigptconnector.model.CompletionRole;
 
 import java.net.URI;
 
@@ -8,6 +8,10 @@ public final class Constants {
 
     private Constants() {
     }
+
+    /* Filepaths */
+
+    public static final String Create_Panel_Spec_Filepath = "panelSpec.txt";
 
     /* In-App Purchases Pricing */
     public static final int DEFAULT_PRICE_INDEX = 0;
@@ -21,8 +25,9 @@ public final class Constants {
     /* Tiered Limits */
     public static final int Response_Token_Limit_Categorize_Ingredients = 800;
     public static final int Response_Token_Limit_Create_Recipe = 800;
-    public static final int Response_Token_Limit_Generate_Directions = 800;
     public static final int Response_Token_Limit_Finalize_Recipe = 800;
+    public static final int Response_Token_Limit_Generate_Directions = 800;
+    public static final int Response_Token_Limit_Parse_Pantry_Items = 800;
     public static final int Response_Token_Limit_Tag_Recipe = 800;
 
     public static final int Context_Character_Limit_Categorize_Ingredients = 800;
@@ -37,7 +42,7 @@ public final class Constants {
 
     /* Caps */
     public static final int Cap_Free_Total_Essays = 3; // This is just a constant sent to the device, which handles everything
-    public static final Integer Create_Recipe_Idea_Cap_Daily_Free = 10;
+    public static final Integer Create_Recipe_Idea_Cap_Daily_Free = 20;
     public static final Integer Create_Recipe_Idea_Cap_Daily_Paid = null;
 //    public static final Integer Make_Recipe_Cap_Daily_Free = 10;
 //    public static final Integer Make_Recipe_Cap_Daily_Paid = null;
@@ -49,14 +54,16 @@ public final class Constants {
     class URIs {
         public static final String CATEGORIZE_INGREDIENTS = "/categorizeIngredients";
         public static final String CREATE_RECIPE_IDEA = "/createRecipeIdea";
-        public static final String FINALIZE_RECIPE = "/finalizeRecipe";
+        public static final String MAKE_RECIPE_FROM_IDEA = "/makeRecipeFromIdea";
         public static final String REGENERATE_RECIPE_DIRECTIONS_AND_UPDATE_MEASURED_INGREDIENTS = "/regenerateRecipeDirectionsAndUpdateMeasuredIngredients";
         public static final String TAG_RECIPE_IDEA = "/tagRecipeIdea";
         public static final String GET_ALL_TAGS_URI = "/getAllTags";
+        public static final String GET_CREATE_PANELS = "/getCreatePanels";
         public static final String GET_IAP_STUFF_URI = "/getIAPStuff";
         public static final String GET_IMPORTANT_CONSTANTS_URI = "/getImportantConstants";
         public static final String GET_IS_PREMIUM_URI = "/getIsPremium";
         public static final String GET_REMAINING_URI = "/getRemaining";
+        public static final String PARSE_PANTRY_ITEMS_URI = "/parsePantryItems";
         public static final String REGISTER_USER_URI = "/registerUser";
         public static final String REGISTER_TRANSACTION_URI = "/registerTransaction";
         public static final String VALIDATE_AUTH_TOKEN_URI = "/validateAuthToken";
@@ -68,7 +75,7 @@ public final class Constants {
     public static final String VALIDATE_AND_UPDATE_RECEIPT_URI_LEGACY = "/validateAndUpdateReceipt";
 
     /* Share URL */
-    public static final String SHARE_URL = "https://apps.apple.com/us/app/chit-chat-ai-writing-author/id1664039953";
+    public static final String SHARE_URL = "https://apps.apple.com/us/app/chefapp-ai-recipe-creator/id6450523267";
 
     /* Policy Retrieval Constants */
 
@@ -98,10 +105,10 @@ public final class Constants {
     /* OpenAI Constants */
     public static URI OPENAI_URI = URI.create("https://api.openai.com/v1/chat/completions");
     public static long AI_TIMEOUT_MINUTES = 4;
-    public static String DEFAULT_MODEL_NAME = "gpt-3.5-turbo";//"gpt-4";
-    public static String PAID_MODEL_NAME = "gpt-4";
+    public static String DEFAULT_MODEL_NAME = "gpt-4o";
+    public static String PAID_MODEL_NAME = "gpt-4o";
     public static String DEFAULT_BEHAVIOR = null;
-    public static Role LEGACY_DEFAULT_ROLE = Role.USER;
+    public static CompletionRole LEGACY_DEFAULT_ROLE = CompletionRole.USER;
     public static int DEFAULT_TEMPERATURE = 0;
 
 }

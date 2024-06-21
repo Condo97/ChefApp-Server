@@ -5,14 +5,14 @@ import com.oaigptconnector.model.FunctionCall;
 
 import java.util.List;
 
-@FunctionCall(name = "make_recipe", functionDescription = "Creates a recipe from the given summary and ingredients")
+@FunctionCall(name = "make_recipe", functionDescription = "Creates a recipe from the given summary and ingredients, adding measurements to ingredients")
 public class FinalizeRecipeFC {
 
     @FCParameter(description = "The instructions to make the recipe")
     private List<String> instructions;
 
-    @FCParameter(description = "All of the ingredients with amounts/measurements needed to make this recipe")
-    private List<FinalizeRecipeFCIngredientsAndMeasurements> allIngredientsAndMeasurements;
+    @FCParameter(description = "All of the ingredients including amounts/measurements needed to make this recipe")
+    private List<String> allIngredientsAndMeasurements;
 
     @FCParameter(description = "Estimated total number of calories for the recipe")
     private Integer estimatedTotalCalories;
@@ -34,7 +34,7 @@ public class FinalizeRecipeFC {
         return instructions;
     }
 
-    public List<FinalizeRecipeFCIngredientsAndMeasurements> getAllIngredientsAndMeasurements() {
+    public List<String> getAllIngredientsAndMeasurements() {
         return allIngredientsAndMeasurements;
     }
 

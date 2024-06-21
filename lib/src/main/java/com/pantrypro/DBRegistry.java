@@ -37,6 +37,7 @@ public class DBRegistry {
             public static final String input = "input";
             public static final String name = "name";
             public static final String summary = "summary";
+            public static final String cuisine_type = "cuisine_type";
             public static final String expand_ingredients_magnitude = "expand_ingredients_magnitude";
             public static final String estimated_total_calories = "estimated_total_calories";
             public static final String estimated_total_minutes = "estimated_total_minutes";
@@ -46,9 +47,9 @@ public class DBRegistry {
             public static final String modify_date = "creation_date";
         }
 
-        public class RecipeDirection {
-            public static final String TABLE_NAME = "RecipeDirection";
-            public static final String direction_id = "direction_id";
+        public class RecipeInstruction {
+            public static final String TABLE_NAME = "RecipeInstruction";
+            public static final String instruction_id = "instruction_id";
             public static final String recipe_id = "recipe_id";
             public static final String text = "text";
         }
@@ -64,7 +65,7 @@ public class DBRegistry {
             public static final String TABLE_NAME = "RecipeMeasuredIngredient";
             public static final String ingredient_id = "ingredient_id";
             public static final String recipe_id = "recipe_id";
-            public static final String ingredient = "ingredient";
+            public static final String measuredIngredient = "measuredIngredient";
             public static final String measurement = "measurement";
         }
 

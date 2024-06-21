@@ -3,12 +3,13 @@ package com.pantrypro.database.dao;
 import com.dbclient.DBManager;
 import com.pantrypro.DBRegistry;
 import com.pantrypro.database.objects.recipe.Recipe;
-import com.pantrypro.database.objects.recipe.RecipeDirection;
+import com.pantrypro.database.objects.recipe.RecipeInstruction;
 import com.pantrypro.database.objects.recipe.RecipeMeasuredIngredient;
 import com.pantrypro.database.objects.recipe.RecipeTag;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 import sqlcomponentizer.preparedstatement.component.PSComponent;
+import sqlcomponentizer.preparedstatement.component.condition.SQLNullCondition;
 import sqlcomponentizer.preparedstatement.component.condition.SQLOperatorCondition;
 import sqlcomponentizer.preparedstatement.component.condition.SQLOperators;
 
@@ -22,7 +23,7 @@ import java.util.Map;
 
 public class RecipeDAO {
 
-    public static Long countForToday(Connection conn, Integer userID) throws DBSerializerException, SQLException, InterruptedException {
+    public static Long countWithInstructionsForToday(Connection conn, Integer userID) throws DBSerializerException, SQLException, InterruptedException {
         // Get from date as yesterday's date to count all ideaRecipes after it
         LocalDateTime fromDate = LocalDateTime.now().minus(Duration.ofDays(1));
 
@@ -43,10 +44,13 @@ public class RecipeDAO {
         );
 
         // Count where userID
-        return DBManager.countObjectWhere(
+        return DBManager.countObjectWhereInnerJoin(
                 conn,
                 Recipe.class,
-                sqlConditions
+                true,
+                sqlConditions,
+                RecipeInstruction.class,
+                DBRegistry.Table.RecipeInstruction.recipe_id
         );
     }
 
@@ -63,12 +67,12 @@ public class RecipeDAO {
         DBManager.insert(conn, measuredIngredient);
     }
 
-    public static void insertDirections(Connection conn, List<RecipeDirection> directions) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
-        for (RecipeDirection direction: directions)
+    public static void insertDirections(Connection conn, List<RecipeInstruction> directions) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
+        for (RecipeInstruction direction: directions)
             insertDirection(conn, direction);
     }
 
-    public static void insertDirection(Connection conn, RecipeDirection direction) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
+    public static void insertDirection(Connection conn, RecipeInstruction direction) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
         DBManager.insert(conn, direction);
     }
 
@@ -111,17 +115,29 @@ public class RecipeDAO {
         return recipeMeasuredIngredients;
     }
 
-    public static List<RecipeDirection> getDirections(Connection conn, Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public static List<RecipeInstruction> getDirections(Connection conn, Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         // Get all directions for recipeID
-        List<RecipeDirection> recipeDirections = DBManager.selectAllWhere(
+        List<RecipeInstruction> recipeInstructions = DBManager.selectAllWhere(
                 conn,
-                RecipeDirection.class,
+                RecipeInstruction.class,
                 DBRegistry.Table.RecipeMeasuredIngredient.recipe_id,
                 SQLOperators.EQUAL,
                 recipeID
         );
 
-        return recipeDirections;
+        return recipeInstructions;
+    }
+
+    public static void updateDirections(Connection conn, Integer recipeID, List<RecipeInstruction> recipeInstructions) throws DBSerializerException, SQLException, InterruptedException, DBSerializerPrimaryKeyMissingException, InvocationTargetException, IllegalAccessException {
+        // Delete all directions for recipeID
+        deleteAllDirections(conn, recipeID);
+
+        // Insert new directions using recipeID
+        for (RecipeInstruction recipeInstruction : recipeInstructions) {
+            // Set recipeID as the one in the function parameter as the expected functionality is to associate it with this recipeDirection and in the current use case the recipeID should be null at this point anyways
+            recipeInstruction.setRecipeID(recipeID);
+            DBManager.insert(conn, recipeInstruction);
+        }
     }
 
     public static void updateEstimatedServings(Connection conn, Integer recipeID, Integer estimatedServings) throws DBSerializerException, SQLException, InterruptedException {
@@ -188,16 +204,24 @@ public class RecipeDAO {
         );
     }
 
-    public static void updateDirections(Connection conn, Integer recipeID, List<RecipeDirection> recipeDirections) throws DBSerializerException, SQLException, InterruptedException, DBSerializerPrimaryKeyMissingException, InvocationTargetException, IllegalAccessException {
-        // Delete all directions for recipeID
-        deleteAllDirections(conn, recipeID);
+    public static void updateName(Connection conn, Integer recipeID, String name) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, IllegalAccessException {
+        // Update name
+        DBManager.updateWhereByPrimaryKey(
+                conn,
+                Recipe.class,
+                recipeID,
+                DBRegistry.Table.Recipe.name,
+                name
+        );
 
-        // Insert new directions using recipeID
-        for (RecipeDirection recipeDirection: recipeDirections) {
-            // Set recipeID as the one in the function parameter as the expected functionality is to associate it with this recipeDirection and in the current use case the recipeID should be null at this point anyways
-            recipeDirection.setRecipeID(recipeID);
-            DBManager.insert(conn, recipeDirection);
-        }
+        /** TODO: Why is this also valid? This should not be valid because Recipe.class is a class but it's still valid because I guess class is still object anyway is there a way to fix this?
+         * DBManager.updateWhereByPrimaryKey(
+         *                 conn,
+         *                 Recipe.class,
+         *                 DBRegistry.Table.Recipe.name,
+         *                 name
+         *         );
+         */
     }
 
     public static void updateMeasuredIngredients(Connection conn, Integer recipeID, List<RecipeMeasuredIngredient> measuredIngredients) throws DBSerializerException, SQLException, InterruptedException, DBSerializerPrimaryKeyMissingException, InvocationTargetException, IllegalAccessException {
@@ -212,25 +236,22 @@ public class RecipeDAO {
         }
     }
 
-//    public static Integer countForToday(Integer userID) throws DBSerializerException, SQLException, InterruptedException {
-//        // Get from date as yesterday's date to count all ideaRecipes after it
-//        LocalDateTime fromDate = LocalDateTime.now().minus(Duration.ofDays(1));
-//
-//        // Count where userID
-//        return countObjectByColumnWhere(
-//                Recipe.class,
-//                DBRegistry.Table.Recipe.recipe_id,
-//                DBRegistry.Table.Recipe.date,
-//                SQLOperators.GREATER_THAN,
-//                fromDate
-//        );
-//    }
+    public static void updateSummary(Connection conn, Integer recipeID, String summary) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, IllegalAccessException {
+        // Update summary
+        DBManager.updateWhereByPrimaryKey(
+                conn,
+                Recipe.class,
+                recipeID,
+                DBRegistry.Table.Recipe.summary,
+                summary
+        );
+    }
 
     private static void deleteAllDirections(Connection conn, Integer recipeID) throws DBSerializerException, SQLException, InterruptedException {
         DBManager.deleteWhere(
                 conn,
-                RecipeDirection.class,
-                DBRegistry.Table.RecipeDirection.recipe_id,
+                RecipeInstruction.class,
+                DBRegistry.Table.RecipeInstruction.recipe_id,
                 SQLOperators.EQUAL,
                 recipeID
         );

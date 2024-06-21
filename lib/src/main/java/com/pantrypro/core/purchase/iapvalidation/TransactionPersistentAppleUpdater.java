@@ -1,6 +1,6 @@
 package com.pantrypro.core.purchase.iapvalidation;
 
-import appletransactionclient.exception.AppStoreStatusResponseException;
+import appletransactionclient.exception.AppStoreErrorResponseException;
 import com.pantrypro.Constants;
 import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
 import com.pantrypro.database.dao.TransactionDBManager;
@@ -67,7 +67,7 @@ public class TransactionPersistentAppleUpdater {
 ////        return transaction;
 //    }
 
-    public static Transaction getCooldownControlledAppleUpdatedMostRecentTransaction(Integer userID) throws InterruptedException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, InvalidKeySpecException, InstantiationException {
+    public static Transaction getCooldownControlledAppleUpdatedMostRecentTransaction(Integer userID) throws InterruptedException, DBSerializerPrimaryKeyMissingException, SQLException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, InvalidKeySpecException, InstantiationException, AppStoreErrorResponseException {
         Connection conn = SQLConnectionPoolInstance.getConnection();
         try {
             return getCooldownControlledAppleUpdatedMostRecentTransaction(userID, conn);
@@ -76,7 +76,7 @@ public class TransactionPersistentAppleUpdater {
         }
     }
 
-    public static Transaction getCooldownControlledAppleUpdatedMostRecentTransaction(Integer userID, Connection conn) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, AppStoreStatusResponseException, UnrecoverableKeyException, DBSerializerPrimaryKeyMissingException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public static Transaction getCooldownControlledAppleUpdatedMostRecentTransaction(Integer userID, Connection conn) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, UnrecoverableKeyException, DBSerializerPrimaryKeyMissingException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, AppStoreErrorResponseException {
         // Get most recent transaction from database
         Transaction mostRecentTransaction = TransactionDBManager.getMostRecent(conn, userID);
 
@@ -94,7 +94,7 @@ public class TransactionPersistentAppleUpdater {
 
     }
 
-    public static Transaction getAppleUpdatedMostRecentTransaction(Integer userID) throws InterruptedException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, InvalidKeySpecException, InstantiationException {
+    public static Transaction getAppleUpdatedMostRecentTransaction(Integer userID) throws InterruptedException, DBSerializerPrimaryKeyMissingException, SQLException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, InvalidKeySpecException, InstantiationException, AppStoreErrorResponseException {
         Connection conn = SQLConnectionPoolInstance.getConnection();
         try {
             return getAppleUpdatedMostRecentTransaction(userID, conn);
@@ -103,7 +103,7 @@ public class TransactionPersistentAppleUpdater {
         }
     }
 
-    public static Transaction getAppleUpdatedMostRecentTransaction(Integer userID, Connection conn) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, AppStoreStatusResponseException, UnrecoverableKeyException, DBSerializerPrimaryKeyMissingException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public static Transaction getAppleUpdatedMostRecentTransaction(Integer userID, Connection conn) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, UnrecoverableKeyException, DBSerializerPrimaryKeyMissingException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, AppStoreErrorResponseException {
         // Get most recent transaction from database
         Transaction mostRecentTransaction = TransactionDBManager.getMostRecent(conn, userID);
 
@@ -113,7 +113,7 @@ public class TransactionPersistentAppleUpdater {
         return mostRecentTransaction;
     }
 
-    public static void updateAndSaveAppleTransactionStatus(Transaction transaction) throws InterruptedException, AppStoreStatusResponseException, DBSerializerPrimaryKeyMissingException, SQLException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, InvalidKeySpecException, InstantiationException {
+    public static void updateAndSaveAppleTransactionStatus(Transaction transaction) throws InterruptedException, DBSerializerPrimaryKeyMissingException, SQLException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, InvalidKeySpecException, InstantiationException, AppStoreErrorResponseException {
         Connection conn = SQLConnectionPoolInstance.getConnection();
         try {
             updateAndSaveAppleTransactionStatus(transaction, conn);
@@ -122,7 +122,7 @@ public class TransactionPersistentAppleUpdater {
         }
     }
 
-    public static void updateAndSaveAppleTransactionStatus(Transaction transaction, Connection conn) throws AppStoreStatusResponseException, UnrecoverableKeyException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, InterruptedException, DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+    public static void updateAndSaveAppleTransactionStatus(Transaction transaction, Connection conn) throws UnrecoverableKeyException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, InterruptedException, DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, AppStoreErrorResponseException {
         // Update transaction status from Apple
         AppleTransactionUpdater.updateTransactionStatusFromApple(transaction);
 

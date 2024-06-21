@@ -2,7 +2,7 @@ package com.pantrypro.core.purchase.iapvalidation;
 
 import appletransactionclient.JWTGenerator;
 import appletransactionclient.SubscriptionAppleHttpClient;
-import appletransactionclient.exception.AppStoreStatusResponseException;
+import appletransactionclient.exception.AppStoreErrorResponseException;
 import appletransactionclient.http.response.status.AppStoreStatusResponse;
 import appletransactionclient.http.response.status.AppStoreStatusResponseLastTransactionItem;
 import appletransactionclient.http.response.status.AppStoreStatusResponseSubscriptionGroupIdentifierItem;
@@ -25,7 +25,7 @@ public class AppleTransactionUpdater {
     /***
      * Takes given Transaction and updates its status and check date
      */
-    public static void updateTransactionStatusFromApple(Transaction transaction) throws AppStoreStatusResponseException, UnrecoverableKeyException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, InterruptedException {
+    public static void updateTransactionStatusFromApple(Transaction transaction) throws UnrecoverableKeyException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, InterruptedException, AppStoreErrorResponseException {
         // Create SubscriptionAppleHttpClient instance and JWTGenerator instance
         SubscriptionAppleHttpClient subscriptionAppleHttpClient = new SubscriptionAppleHttpClient(Constants.Apple_Storekit_Base_URL, Constants.Apple_Sandbox_Storekit_Base_URL, Constants.Apple_Get_Subscription_Status_V1_Full_URL_Path);
         JWTGenerator jwtGenerator = new JWTGenerator(Constants.Apple_SubscriptionKey_JWS_Path, Keys.appStoreConnectIssuerID, Constants.Apple_Bundle_ID, Keys.appStoreConnectPrivateKeyID);

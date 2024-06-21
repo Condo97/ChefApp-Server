@@ -4,6 +4,7 @@ public enum ResponseStatus {
     SUCCESS(1),
 
     JSON_ERROR(4),
+    MISSING_REQUIRED_REQUEST_OBJECT(5),
     CAP_REACHED_ERROR(51),
 
     // Errors with services

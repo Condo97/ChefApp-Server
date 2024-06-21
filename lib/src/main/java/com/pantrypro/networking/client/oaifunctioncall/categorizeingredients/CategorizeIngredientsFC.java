@@ -5,7 +5,7 @@ import com.oaigptconnector.model.FunctionCall;
 
 import java.util.List;
 
-@FunctionCall(name = "categorize_ingredients", functionDescription = "Categorizes ingredients for easy shopping in a store")
+@FunctionCall(name = "categorize_ingredients", functionDescription = "Categorizes ingredients for easy finding in a list.")
 public class CategorizeIngredientsFC {
 
     public static class IngredientsWithCategories {

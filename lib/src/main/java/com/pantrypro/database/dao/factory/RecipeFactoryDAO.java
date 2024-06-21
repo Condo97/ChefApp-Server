@@ -6,12 +6,11 @@ import com.pantrypro.database.compoundobjects.RecipeWithIngredients;
 import com.pantrypro.database.dao.RecipeDAO;
 import com.pantrypro.database.dao.pooled.RecipeDAOPooled;
 import com.pantrypro.database.objects.recipe.Recipe;
-import com.pantrypro.database.objects.recipe.RecipeDirection;
+import com.pantrypro.database.objects.recipe.RecipeInstruction;
 import com.pantrypro.database.objects.recipe.RecipeMeasuredIngredient;
 import com.pantrypro.database.objects.recipe.RecipeTag;
 import com.pantrypro.networking.client.oaifunctioncall.createrecipeidea.CreateRecipeIdeaFC;
 import com.pantrypro.networking.client.oaifunctioncall.finalizerecipe.FinalizeRecipeFC;
-import com.pantrypro.networking.client.oaifunctioncall.finalizerecipe.FinalizeRecipeFCIngredientsAndMeasurements;
 import com.pantrypro.networking.client.oaifunctioncall.generatedirections.GenerateDirectionsFC;
 import com.pantrypro.networking.client.oaifunctioncall.tagrecipe.TagRecipeFC;
 import sqlcomponentizer.dbserializer.DBSerializerException;
@@ -26,7 +25,7 @@ import java.util.List;
 
 public class RecipeFactoryDAO {
 
-    public static RecipeWithIngredients createAndSaveRecipe(CreateRecipeIdeaFC createRecipeIdeaFC, Integer userID, String input, Integer expandIngredientsMagnitude) throws InterruptedException, SQLException, InvocationTargetException, IllegalAccessException, DBSerializerPrimaryKeyMissingException, DBSerializerException {
+    public static RecipeWithIngredients createAndSaveRecipe(CreateRecipeIdeaFC createRecipeIdeaFC, Integer userID, String input, String cuisineType, Integer expandIngredientsMagnitude) throws InterruptedException, SQLException, InvocationTargetException, IllegalAccessException, DBSerializerPrimaryKeyMissingException, DBSerializerException {
         // Create Recipe
         Recipe recipe = new Recipe(
                 null,
@@ -34,6 +33,7 @@ public class RecipeFactoryDAO {
                 input,
                 createRecipeIdeaFC.getName(),
                 createRecipeIdeaFC.getSummary(),
+                cuisineType,
                 expandIngredientsMagnitude,
                 null,
                 null,
@@ -57,8 +57,7 @@ public class RecipeFactoryDAO {
                 RecipeMeasuredIngredient measuredIngredient = new RecipeMeasuredIngredient(
                         null,
                         recipe.getRecipe_id(),
-                        ingredientName,
-                        null
+                        ingredientName
                 );
 
                 // Save Recipe Measured Ingredient
@@ -108,20 +107,19 @@ public class RecipeFactoryDAO {
     public static void updateAndSaveRecipe(FinalizeRecipeFC finalizeRecipeFC, Integer recipeID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
         // Create RecipeMeasuredIngredients list and update in DB
         List<RecipeMeasuredIngredient> measuredIngredients = new ArrayList<>();
-        for (FinalizeRecipeFCIngredientsAndMeasurements ingredientAndMeasurement: finalizeRecipeFC.getAllIngredientsAndMeasurements()) {
+        for (String ingredientAndMeasurement: finalizeRecipeFC.getAllIngredientsAndMeasurements()) {
             measuredIngredients.add(new RecipeMeasuredIngredient(
                     null,
                     recipeID,
-                    ingredientAndMeasurement.getIngredient(),
-                    ingredientAndMeasurement.getMeasurementOrAmount()
+                    ingredientAndMeasurement
             ));
         }
         RecipeDAOPooled.updateMeasuredIngredients(recipeID, measuredIngredients);
 
         // Create RecipeDirections list and update in DB
-        List<RecipeDirection> directions = new ArrayList<>();
+        List<RecipeInstruction> directions = new ArrayList<>();
         for (String direction: finalizeRecipeFC.getInstructions()) {
-            directions.add(new RecipeDirection(
+            directions.add(new RecipeInstruction(
                     null,
                     recipeID,
                     direction
@@ -147,9 +145,9 @@ public class RecipeFactoryDAO {
 
     public static void updateAndSaveRecipe(GenerateDirectionsFC generateDirectionsFC, Integer recipeID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
         // Create RecipeDirections list and update in DB
-        List<RecipeDirection> directions = new ArrayList<>();
+        List<RecipeInstruction> directions = new ArrayList<>();
         for (String direction: generateDirectionsFC.getDirections()) {
-            directions.add(new RecipeDirection(
+            directions.add(new RecipeInstruction(
                     null,
                     recipeID,
                     direction

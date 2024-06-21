@@ -9,6 +9,7 @@ import com.pantrypro.exceptions.ResponseStatusException;
 import com.pantrypro.keys.Keys;
 import com.pantrypro.networking.server.ResponseStatus;
 import com.pantrypro.networking.server.response.BodyResponse;
+import com.pantrypro.networking.server.response.GetCreatePanelsResponse;
 import com.pantrypro.networking.server.response.GetIAPStuffResponse;
 import com.pantrypro.networking.server.response.GetImportantConstantsResponse;
 
@@ -122,7 +123,8 @@ public class Main {
         // POST Functions
         post(Constants.URIs.CATEGORIZE_INGREDIENTS, Server.Func::categorizeIngredients);
         post(Constants.URIs.CREATE_RECIPE_IDEA, Server.Func::createRecipeIdea);
-        post(Constants.URIs.FINALIZE_RECIPE, Server.Func::finalizeRecipe);
+        post(Constants.URIs.MAKE_RECIPE_FROM_IDEA, Server.Func::finalizeRecipe);
+        post(Constants.URIs.PARSE_PANTRY_ITEMS_URI, Server.Func::parsePantryItems);
         post(Constants.URIs.REGENERATE_RECIPE_DIRECTIONS_AND_UPDATE_MEASURED_INGREDIENTS, Server.Func::regenerateRecipeDirectionsAndUpdateMeasuredIngredients);
         post(Constants.URIs.TAG_RECIPE_IDEA, Server.Func::tagRecipeIdea);
 
@@ -133,12 +135,14 @@ public class Main {
         post(Constants.URIs.REGISTER_USER_URI, Server::registerUser);
         post(Constants.URIs.VALIDATE_AUTH_TOKEN_URI, Server::validateAuthToken);
 
+
         post("/printDidTapWeeklyPrice", (req, res) -> {
             System.out.println("Did tap weekly price");
             return "";
         });
 
         // Get Constants
+        post(Constants.URIs.GET_CREATE_PANELS, (req, res) -> new ObjectMapper().writeValueAsString(new BodyResponse(ResponseStatus.SUCCESS, new GetCreatePanelsResponse())));
         post(Constants.URIs.GET_IMPORTANT_CONSTANTS_URI, (req, res) -> new ObjectMapper().writeValueAsString(new BodyResponse(ResponseStatus.SUCCESS, new GetImportantConstantsResponse())));
         post(Constants.URIs.GET_IAP_STUFF_URI, (req, res) -> new ObjectMapper().writeValueAsString(new BodyResponse(ResponseStatus.SUCCESS, new GetIAPStuffResponse())));
 

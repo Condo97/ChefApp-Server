@@ -13,6 +13,18 @@ public class TagFetcher {
 
     private static List<String> fetchedTagsLowercase = fetchTagsLowercase();
 
+    public static String getFetchedTagsLowercaseAsString() {
+        // Append tags to StringBuilder
+        final String SPACE_STRING = "";
+        StringBuilder sb = new StringBuilder();
+        for (String tag: getFetchedTagsLowercase()) {
+            sb.append(SPACE_STRING);
+            sb.append(tag);
+        }
+
+        return sb.toString();
+    }
+
     public static List<String> getFetchedTagsLowercase() {
         return fetchedTagsLowercase;
     }

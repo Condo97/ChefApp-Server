@@ -21,11 +21,19 @@ import java.util.List;
 public class TagRecipeEndpoint {
 
     public static TagRecipeResponse tagRecipe(TagRecipeRequest tagRecipeRequest) throws InvalidAssociatedIdentifierException, DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, OpenAIGPTException, DBObjectNotFoundFromQueryException, IOException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OAISerializerException, OAIDeserializerException {
+        // COMPATIBILITY - Get recipeID as recipeID if not null, otherwise ideaID
+        Integer recipeID;
+        if (tagRecipeRequest.getRecipeID() != null) {
+            recipeID = tagRecipeRequest.getRecipeID();
+        } else {
+            recipeID = tagRecipeRequest.getIdeaID();
+        }
+
         // Validate user and recipe association
-        PantryPro.validateUserRecipeAssociation(tagRecipeRequest.getAuthToken(), tagRecipeRequest.getRecipeID());
+        PantryPro.validateUserRecipeAssociation(tagRecipeRequest.getAuthToken(), recipeID);
 
         // Tag recipe
-        List<RecipeTag> recipeTags = PantryPro.tagReicpe(tagRecipeRequest.getRecipeID());
+        List<RecipeTag> recipeTags = PantryPro.tagReicpe(recipeID);
 
         // Adapt to TagRecipeResponse and return
         TagRecipeResponse tagRecipeResponse = TagRecipeResponseFactory.from(recipeTags);

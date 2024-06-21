@@ -10,6 +10,21 @@ public abstract class ResponseStatusException extends Exception {
         this.responseMessage = responseMessage;
     }
 
+    public ResponseStatusException(String message, String responseMessage) {
+        super(message);
+        this.responseMessage = responseMessage;
+    }
+
+    public ResponseStatusException(String message, Throwable cause, String responseMessage) {
+        super(message, cause);
+        this.responseMessage = responseMessage;
+    }
+
+    public ResponseStatusException(Throwable cause, String responseMessage) {
+        super(cause);
+        this.responseMessage = responseMessage;
+    }
+
     public abstract ResponseStatus getResponseStatus();
 
     public String getResponseMessage() {

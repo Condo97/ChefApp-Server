@@ -1,22 +1,32 @@
 package com.pantrypro.networking.responsefactories;
 
-import com.pantrypro.database.objects.recipe.RecipeDirection;
+import com.pantrypro.database.objects.recipe.RecipeInstruction;
 import com.pantrypro.networking.server.response.RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class RegenerateRecipeDirectionsAndIdeaRecipeIngredientsResponseFactory {
 
-    public static RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse from(List<RecipeDirection> recipeDirections, Integer feasibility) {
+    public static RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse from(List<RecipeInstruction> recipeInstructions, Integer feasibility) {
         // Convert recipeInstructions and ideaRecipeIngredients to string arrays
-        List<String> recipeInstructionStrings = null, ideaRecipeIngredientStrings = null;
+        Map<Integer, String> recipeInstructionsMap = IntStream.range(0, recipeInstructions.size())
+                .boxed()
+                .collect(Collectors.toMap(
+                        i -> i, // Index as the key
+                        i -> recipeInstructions.get(i).getText() // RecipeInstruction text as the value
+                ));
+        List<String> recipeInstructionStrings_legacy = null, ideaRecipeIngredientStrings = null;
 
-        if (recipeDirections != null && !recipeDirections.isEmpty()) {
-            recipeInstructionStrings = new ArrayList<>();
+        if (recipeInstructions != null && !recipeInstructions.isEmpty()) {
+            recipeInstructionStrings_legacy = new ArrayList<>();
 
-            for (RecipeDirection instruction: recipeDirections) {
-                recipeInstructionStrings.add(instruction.getText());
+            for (RecipeInstruction instruction: recipeInstructions) {
+                recipeInstructionStrings_legacy.add(instruction.getText());
             }
         }
 
@@ -30,8 +40,9 @@ public class RegenerateRecipeDirectionsAndIdeaRecipeIngredientsResponseFactory {
 
         // Construct RegenerateRecipeDirectionsAndIdeaRecipeIngredientsResponse
         RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse response = new RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse(
-                recipeInstructionStrings,
-                feasibility
+                recipeInstructionsMap,
+                feasibility,
+                recipeInstructionStrings_legacy
         );
 
         return response;

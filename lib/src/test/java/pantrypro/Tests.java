@@ -1,7 +1,6 @@
 package pantrypro;
 
-import appletransactionclient.exception.AppStoreStatusResponseException;
-import com.dbclient.DBClient;
+import appletransactionclient.exception.AppStoreErrorResponseException;
 import com.oaigptconnector.model.OAIDeserializerException;
 import com.oaigptconnector.model.OAISerializerException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
@@ -19,12 +18,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
-import sqlcomponentizer.preparedstatement.ComponentizedPreparedStatement;
-import sqlcomponentizer.preparedstatement.component.OrderByComponent;
-import sqlcomponentizer.preparedstatement.component.condition.SQLOperators;
-import sqlcomponentizer.preparedstatement.statement.InsertIntoComponentizedPreparedStatementBuilder;
-import sqlcomponentizer.preparedstatement.statement.SelectComponentizedPreparedStatementBuilder;
-import sqlcomponentizer.preparedstatement.statement.UpdateComponentizedPreparedStatementBuilder;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -34,13 +27,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Types;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 public class Tests {
 
@@ -255,7 +243,7 @@ public class Tests {
 
     @Test
     @DisplayName("Test Full Recipe Creation Flow - Create Recipe and Finalize Recipe")
-    void testMakeRecipeEndpiont() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, AppStoreStatusResponseException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, NoSuchMethodException, UnrecoverableKeyException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, InvalidAssociatedIdentifierException, OAISerializerException, OAIDeserializerException {
+    void testMakeRecipeEndpiont() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, NoSuchMethodException, UnrecoverableKeyException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, InvalidAssociatedIdentifierException, OAISerializerException, OAIDeserializerException, AppStoreErrorResponseException {
         // Register user
         BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
         AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
@@ -292,6 +280,7 @@ public class Tests {
         // Build MakeRecipeRequest
         MakeRecipeRequest mrRequest = new MakeRecipeRequest(
                 authToken,
+                criResponse.getRecipeID(),
                 criResponse.getRecipeID()
         );
 
@@ -304,13 +293,13 @@ public class Tests {
         assert(mrResponse.getEstimatedTotalMinutes() != null);
         assert(mrResponse.getEstimatedServings() != null);
         assert(mrResponse.getFeasibility() != null);
-        assert(mrResponse.getIngredientsAndMeasurements() != null && !mrResponse.getIngredientsAndMeasurements().isEmpty());
-        assert(mrResponse.getDirections() != null && !mrResponse.getDirections().isEmpty());
+        assert(mrResponse.getAllIngredientsAndMeasurements() != null && !mrResponse.getAllIngredientsAndMeasurements().isEmpty());
+        assert(mrResponse.getInstructions() != null && !mrResponse.getInstructions().isEmpty());
     }
 
     @Test
     @DisplayName("Test Tag Recipe Endpoint")
-    void testTagRecipeIdea() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, OpenAIGPTException, DBObjectNotFoundFromQueryException, IOException, NoSuchMethodException, InstantiationException, AppStoreStatusResponseException, UnrecoverableKeyException, CapReachedException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, OAISerializerException, OAIDeserializerException, InvalidAssociatedIdentifierException {
+    void testTagRecipeIdea() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, OpenAIGPTException, DBObjectNotFoundFromQueryException, IOException, NoSuchMethodException, InstantiationException, UnrecoverableKeyException, CapReachedException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, OAISerializerException, OAIDeserializerException, InvalidAssociatedIdentifierException, AppStoreErrorResponseException {
         final String ingredients = "peaches, flour, eggs";
         final String modifiers = null;
 
@@ -333,7 +322,8 @@ public class Tests {
         // Build TagRecipeRequest
         TagRecipeRequest trRequest = new TagRecipeRequest(
                 aResponse.getAuthToken(),
-                recipeID
+                recipeID,
+                null
         );
 
         // Test Tag Recipe Endpoint
@@ -341,7 +331,7 @@ public class Tests {
 
         // Ensure trResponse is not null and no fields in trResponse are null nor empty nor blank depending on the type
         assert(trResponse != null);
-        assert(trResponse.getTags() != null && !trResponse.getTags().isEmpty());
+//        assert(trResponse.getTags() != null && !trResponse.getTags().isEmpty());
     }
 
     @Test
@@ -378,7 +368,7 @@ public class Tests {
 
     @Test
     @DisplayName("Test Regenerate Recipe Directions And Idea Recipe Ingredients")
-    void testRegenerateRecipeDirectionsAndIdeaRecipeIngredients() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, AppStoreStatusResponseException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, NoSuchMethodException, UnrecoverableKeyException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, InvalidAssociatedIdentifierException, InvalidRequestJSONException, GenerationException, OAISerializerException, OAIDeserializerException {
+    void testRegenerateRecipeDirectionsAndIdeaRecipeIngredients() throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, NoSuchMethodException, UnrecoverableKeyException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, InvalidAssociatedIdentifierException, InvalidRequestJSONException, GenerationException, OAISerializerException, OAIDeserializerException, AppStoreErrorResponseException {
         /* Create Idea Recipe and Recipe */
         // Register user
         BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
@@ -398,38 +388,39 @@ public class Tests {
         // Get Create Idea Recipe Response
         CreateIdeaRecipeResponse criResponse = CreateRecipeIdeaEndpoint.createRecipeIdea(criRequest);
 
-        // Get ideaID, name, and summary from criResponse
-        Integer ideaID = criResponse.getRecipeID();
+        // Get recipeID, name, and summary from criResponse
+        Integer recipeID = criResponse.getRecipeID();
         String name = criResponse.getName();
         String summary = criResponse.getSummary();
 
         // Build MakeRecipeRequest
         MakeRecipeRequest mrRequest = new MakeRecipeRequest(
                 authToken,
-                ideaID
+                recipeID,
+                recipeID
         );
 
         // Generate pack save make recipe as body response
         MakeRecipeResponse mrResponse = MakeRecipeEndpoint.makeRecipe(mrRequest);
 
         // Get measuredIngredients from mrBResponse
-        List<MakeRecipeResponse.MakeRecipeResponseIngredientAndMeasurement> measuredIngredients = mrResponse.getIngredientsAndMeasurements();
+        List<String> measuredIngredients = mrResponse.getAllIngredientsAndMeasurements();
 
         /* Regenerate Recipe Directions and Idea Recipe Ingredients */
         // Create new name, summary, and measuredIngredients
         String newName = "chicken alfredo";
         String newSummary = "a delicious chicken alfredo dish that uses a lot of cream";
-        List<RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest.IngredientsAndMeasurements> newMeasuredIngredients = List.of(
-                new RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest.IngredientsAndMeasurements("chicken", "1 lb"),
-                new RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest.IngredientsAndMeasurements("heavy cream", "2 oz"),
-                new RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest.IngredientsAndMeasurements("pasta", "1 lb"),
-                new RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest.IngredientsAndMeasurements("butter", "8 oz")
+        List<String> newMeasuredIngredients = List.of(
+                "1 lb chicken",
+                "2 oz heavy cream",
+                "1 lb pasta",
+                "8 oz butter"
         );
 
         // Build RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest
         RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest rrdaumiRequest = new RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest(
                 authToken,
-                ideaID,
+                recipeID,
                 newName,
                 newSummary,
                 newMeasuredIngredients

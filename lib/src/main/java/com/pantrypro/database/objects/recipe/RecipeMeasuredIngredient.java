@@ -13,21 +13,17 @@ public class RecipeMeasuredIngredient {
     @DBColumn(name = DBRegistry.Table.RecipeMeasuredIngredient.recipe_id)
     private Integer recipeID;
 
-    @DBColumn(name = DBRegistry.Table.RecipeMeasuredIngredient.ingredient)
-    private String ingredientName;
-
-    @DBColumn(name = DBRegistry.Table.RecipeMeasuredIngredient.measurement)
-    private String measurement;
+    @DBColumn(name = DBRegistry.Table.RecipeMeasuredIngredient.measuredIngredient)
+    private String measuredIngredient;
 
     public RecipeMeasuredIngredient() {
 
     }
 
-    public RecipeMeasuredIngredient(Integer ingredientID, Integer recipeID, String ingredientName, String measurement) {
+    public RecipeMeasuredIngredient(Integer ingredientID, Integer recipeID, String measuredIngredient) {
         this.ingredientID = ingredientID;
         this.recipeID = recipeID;
-        this.ingredientName = ingredientName;
-        this.measurement = measurement;
+        this.measuredIngredient = measuredIngredient;
     }
 
     public Integer getIngredientID() {
@@ -42,12 +38,9 @@ public class RecipeMeasuredIngredient {
         this.recipeID = recipeID;
     }
 
-    public String getIngredientName() {
-        return ingredientName;
-    }
-
-    public String getMeasurement() {
-        return measurement;
+    public String getMeasuredIngredient() {
+        System.out.println("Measured Ingredient: " + measuredIngredient);
+        return measuredIngredient;
     }
 
 }

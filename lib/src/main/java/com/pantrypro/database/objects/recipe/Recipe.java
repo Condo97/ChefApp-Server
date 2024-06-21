@@ -24,6 +24,9 @@ public class Recipe {
     @DBColumn(name = DBRegistry.Table.Recipe.summary)
     private String summary;
 
+    @DBColumn(name = DBRegistry.Table.Recipe.cuisine_type)
+    private String cuisineType;
+
     @DBColumn(name = DBRegistry.Table.Recipe.expand_ingredients_magnitude)
     private Integer expandIngredientsMagnitude;
 
@@ -49,12 +52,13 @@ public class Recipe {
 
     }
 
-    public Recipe(Integer recipe_id, Integer user_id, String input, String name, String summary, Integer expandIngredientsMagnitude, Integer estimatedTotalCalories, Integer estimatedTotalMinutes, Integer estimatedServings, Integer feasibility, LocalDateTime creationDate, LocalDateTime modifyDate) {
+    public Recipe(Integer recipe_id, Integer user_id, String input, String name, String summary, String cuisineType, Integer expandIngredientsMagnitude, Integer estimatedTotalCalories, Integer estimatedTotalMinutes, Integer estimatedServings, Integer feasibility, LocalDateTime creationDate, LocalDateTime modifyDate) {
         this.recipe_id = recipe_id;
         this.user_id = user_id;
         this.input = input;
         this.name = name;
         this.summary = summary;
+        this.cuisineType = cuisineType;
         this.expandIngredientsMagnitude = expandIngredientsMagnitude;
         this.estimatedTotalCalories = estimatedTotalCalories;
         this.estimatedTotalMinutes = estimatedTotalMinutes;
@@ -82,6 +86,10 @@ public class Recipe {
 
     public String getSummary() {
         return summary;
+    }
+
+    public String getCuisineType() {
+        return cuisineType;
     }
 
     public Integer getExpandIngredientsMagnitude() {
