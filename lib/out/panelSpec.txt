@@ -1,0 +1,2183 @@
+{
+   "panels":[
+      {
+         "emoji":"🥦",
+         "title":"Vegan Dishes",
+         "summary":"Discover delicious plant-based meals that are both nutritious and satisfying.",
+         "prompt":"Generate a vegan recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Creamy Vegan Alfredo",
+               "promptPrefix":"Title of the vegan recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all the ingredients required for the vegan dish.",
+               "promptPrefix":"Ingredients for the vegan recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the vegan recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "Asian",
+                  "Mediterranean",
+                  "American",
+                  "Mexican",
+                  "Indian"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🌾",
+         "title":"Gluten-Free Recipes",
+         "summary":"Tasty recipes that are entirely gluten-free, perfect for those with gluten sensitivity.",
+         "prompt":"Generate a gluten-free recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Gluten-Free Banana Bread",
+               "promptPrefix":"Title of the gluten-free recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the gluten-free dish.",
+               "promptPrefix":"Ingredients for the gluten-free recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Meal Type",
+               "promptPrefix":"Meal type for the gluten-free recipe",
+               "placeholder":"Select a meal type",
+               "items":[
+                  "Breakfast",
+                  "Lunch",
+                  "Dinner",
+                  "Snack"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"⏰",
+         "title":"Quick 30-Minute Meals",
+         "summary":"Whip up a delicious meal in 30 minutes or less!",
+         "prompt":"Generate a quick 30-minute recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Quick Chicken Stir-Fry",
+               "promptPrefix":"Title of the quick 30-minute recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the quick 30-minute meal.",
+               "promptPrefix":"Ingredients for the quick 30-minute recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the quick recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "Asian",
+                  "Mediterranean",
+                  "American",
+                  "Mexican",
+                  "Italian"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"💖",
+         "title":"Romantic Dinner Ideas",
+         "summary":"Create a romantic dinner to impress your special someone.",
+         "prompt":"Generate a romantic dinner recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Filet Mignon with Red Wine Sauce",
+               "promptPrefix":"Title of the romantic dinner recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the romantic dinner.",
+               "promptPrefix":"Ingredients for the romantic dinner recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the romantic dinner",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "French",
+                  "Italian",
+                  "Mediterranean",
+                  "Fusion"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"👶",
+         "title":"Kid-Friendly Snacks",
+         "summary":"Fun and nutritious snacks that kids will love.",
+         "prompt":"Generate a kid-friendly snack recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Cheesy Veggie Muffins",
+               "promptPrefix":"Title of the kid-friendly snack recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the kid-friendly snack.",
+               "promptPrefix":"Ingredients for the kid-friendly snack recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Snack Type",
+               "promptPrefix":"Type of kid-friendly snack",
+               "placeholder":"Select a snack type",
+               "items":[
+                  "Sweet",
+                  "Savory",
+                  "Healthy"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🏋️‍♂️",
+         "title":"Low-Carb Recipes",
+         "summary":"Delicious recipes with low carbohydrate content for a healthy diet.",
+         "prompt":"Generate a low-carb recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Grilled Salmon with Asparagus",
+               "promptPrefix":"Title of the low-carb recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the low-carb dish.",
+               "promptPrefix":"Ingredients for the low-carb recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Meal Type",
+               "promptPrefix":"Meal type for the low-carb recipe",
+               "placeholder":"Select a meal type",
+               "items":[
+                  "Breakfast",
+                  "Lunch",
+                  "Dinner",
+                  "Snack"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍲",
+         "title":"Classic Comfort Food",
+         "summary":"Wholesome and hearty meals that bring comfort and joy.",
+         "prompt":"Generate a classic comfort food recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Macaroni and Cheese",
+               "promptPrefix":"Title of the classic comfort food recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the classic comfort food.",
+               "promptPrefix":"Ingredients for the classic comfort food recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Meal Type",
+               "promptPrefix":"Meal type for the comfort food recipe",
+               "placeholder":"Select a meal type",
+               "items":[
+                  "Breakfast",
+                  "Lunch",
+                  "Brunch",
+                  "Dinner"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍲",
+         "title":"One-Pot Meals",
+         "summary":"Simple and convenient one-pot meals for easy cooking and cleanup.",
+         "prompt":"Generate a one-pot meal recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: One-Pot Spaghetti",
+               "promptPrefix":"Title of the one-pot meal recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the one-pot meal.",
+               "promptPrefix":"Ingredients for the one-pot meal recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the one-pot meal recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "Asian",
+                  "Mediterranean",
+                  "American",
+                  "Mexican",
+                  "Italian"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🌞",
+         "title":"Breakfast Ideas",
+         "summary":"Start your day with amazing breakfast recipes that energize you.",
+         "prompt":"Generate a breakfast recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Avocado Toast",
+               "promptPrefix":"Title of the breakfast recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the breakfast dish.",
+               "promptPrefix":"Ingredients for the breakfast recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Breakfast Type",
+               "promptPrefix":"Type of breakfast recipe",
+               "placeholder":"Select a breakfast type",
+               "items":[
+                  "Healthy",
+                  "Indulgent",
+                  "Quick",
+                  "Protein-Rich"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍹",
+         "title":"Smoothie Recipes",
+         "summary":"Blended perfection! Smoothie recipes for a healthy and delicious boost.",
+         "prompt":"Generate a smoothie recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Smoothie Name",
+               "example":"Example: Green Detox Smoothie",
+               "promptPrefix":"Name of the smoothie recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the smoothie.",
+               "promptPrefix":"Ingredients for the smoothie recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Smoothie Type",
+               "promptPrefix":"Type of smoothie",
+               "placeholder":"Select a smoothie type",
+               "items":[
+                  "Green",
+                  "Fruit",
+                  "Protein",
+                  "Breakfast"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"💪",
+         "title":"High-Protein Meals",
+         "summary":"Power up with these high-protein meal recipes designed to keep you strong and energized.",
+         "prompt":"Generate a high-protein meal recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Grilled Chicken and Quinoa Bowl",
+               "promptPrefix":"Title of the high-protein meal recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the high-protein meal.",
+               "promptPrefix":"Ingredients for the high-protein meal recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Protein Source",
+               "promptPrefix":"Protein source for the meal",
+               "placeholder":"Select a protein source",
+               "items":[
+                  "Chicken",
+                  "Beef",
+                  "Fish",
+                  "Legumes",
+                  "Tofu"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🥩",
+         "title":"Paleo Diet Recipes",
+         "summary":"Healthy Paleo recipes inspired by the diets of our ancient ancestors.",
+         "prompt":"Generate a Paleo diet recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Paleo Beef Stir-Fry",
+               "promptPrefix":"Title of the Paleo diet recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the Paleo dish.",
+               "promptPrefix":"Ingredients for the Paleo recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the Paleo recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "American",
+                  "Mexican",
+                  "Asian",
+                  "Mediterranean"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🥑",
+         "title":"Keto-Friendly Dishes",
+         "summary":"Discover low-carb, high-fat recipes perfect for a ketogenic diet.",
+         "prompt":"Generate a keto-friendly recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Keto Avocado and Bacon Salad",
+               "promptPrefix":"Title of the keto-friendly recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the keto dish.",
+               "promptPrefix":"Ingredients for the keto recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Meal Type",
+               "promptPrefix":"Meal type for the keto recipe",
+               "placeholder":"Select a meal type",
+               "items":[
+                  "Breakfast",
+                  "Lunch",
+                  "Dinner",
+                  "Snack"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🎄",
+         "title":"Holiday Feast Planner",
+         "summary":"Plan the perfect holiday feast with these festive recipes.",
+         "prompt":"Generate a holiday feast recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Roast Turkey with Stuffing",
+               "promptPrefix":"Title of the holiday feast recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the holiday feast.",
+               "promptPrefix":"Ingredients for the holiday feast recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Holiday Type",
+               "promptPrefix":"Holiday type for the recipe",
+               "placeholder":"Select a holiday",
+               "items":[
+                  "Christmas",
+                  "Thanksgiving",
+                  "Easter",
+                  "New Year's"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍖",
+         "title":"Outdoor BBQ Ideas",
+         "summary":"Enjoy the outdoors with these mouth-watering BBQ recipes.",
+         "prompt":"Generate an outdoor BBQ recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: BBQ Ribs with Homemade Sauce",
+               "promptPrefix":"Title of the BBQ recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the BBQ dish.",
+               "promptPrefix":"Ingredients for the BBQ recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"BBQ Type",
+               "promptPrefix":"Type of BBQ dish",
+               "placeholder":"Select a BBQ type",
+               "items":[
+                  "Meat",
+                  "Seafood",
+                  "Vegetarian",
+                  "Skewers"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🧺",
+         "title":"Picnic Basket Recipes",
+         "summary":"Perfect recipes for a delightful outdoor picnic.",
+         "prompt":"Generate a picnic basket recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Picnic Sandwiches",
+               "promptPrefix":"Title of the picnic basket recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the picnic dish.",
+               "promptPrefix":"Ingredients for the picnic recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Dish Type",
+               "promptPrefix":"Type of picnic dish",
+               "placeholder":"Select a dish type",
+               "items":[
+                  "Sandwiches",
+                  "Wraps",
+                  "Salads",
+                  "Desserts"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"💵",
+         "title":"Budget-Friendly Meals",
+         "summary":"Delicious meals that are easy on the wallet.",
+         "prompt":"Generate a budget-friendly recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Budget-Friendly Chicken Stir-Fry",
+               "promptPrefix":"Title of the budget-friendly recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the budget-friendly meal.",
+               "promptPrefix":"Ingredients for the budget-friendly recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Meal Type",
+               "promptPrefix":"Meal type for the budget-friendly recipe",
+               "placeholder":"Select a meal type",
+               "items":[
+                  "Breakfast",
+                  "Lunch",
+                  "Dinner",
+                  "Snack"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"♻️",
+         "title":"Leftover Transformation",
+         "summary":"Get creative with leftovers and transform them into new dishes.",
+         "prompt":"Generate a recipe using leftovers",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Leftover Turkey Casserole",
+               "promptPrefix":"Title of the leftover recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter main leftovers",
+               "detailTitle":"Leftover Ingredients Information",
+               "detailText":"List all main leftover ingredients required for the dish.",
+               "promptPrefix":"Main leftover ingredients for the recipe",
+               "required":true
+            },
+            {
+               "input":"textField",
+               "title":"Additional Ingredients",
+               "example":"Example: Add some spices, fresh vegetables, etc.",
+               "promptPrefix":"Additional ingredients for the leftover recipe",
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍰",
+         "title":"Fancy Desserts",
+         "summary":"Elevate your dessert game with intricate and fancy dessert recipes.",
+         "prompt":"Generate a fancy dessert recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Dessert Title",
+               "example":"Example: Chocolate Soufflé",
+               "promptPrefix":"Title of the fancy dessert recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the fancy dessert.",
+               "promptPrefix":"Ingredients for the fancy dessert recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Dessert Type",
+               "promptPrefix":"Type of fancy dessert",
+               "placeholder":"Select a dessert type",
+               "items":[
+                  "Cake",
+                  "Pastry",
+                  "Mousse",
+                  "Frozen"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🌮",
+         "title":"Street Food Inspirations",
+         "summary":"Create authentic street food dishes from around the world.",
+         "prompt":"Generate a street food recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Tacos Al Pastor",
+               "promptPrefix":"Title of the street food recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the street food dish.",
+               "promptPrefix":"Ingredients for the street food recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the street food recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "Mexican",
+                  "Indian",
+                  "Thai",
+                  "Middle Eastern"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍜",
+         "title":"Soup & Stew Recipes",
+         "summary":"Warm up with these comforting soup and stew recipes.",
+         "prompt":"Generate a soup or stew recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Hearty Beef Stew",
+               "promptPrefix":"Title of the soup or stew recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the soup or stew.",
+               "promptPrefix":"Ingredients for the soup or stew recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the soup or stew recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "American",
+                  "Italian",
+                  "Asian",
+                  "Mediterranean"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🥪",
+         "title":"Gourmet Sandwiches",
+         "summary":"Gourmet sandwich recipes perfect for any meal.",
+         "prompt":"Generate a gourmet sandwich recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Sandwich Name",
+               "example":"Example: Caprese Panini",
+               "promptPrefix":"Title of the gourmet sandwich recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the gourmet sandwich.",
+               "promptPrefix":"Ingredients for the gourmet sandwich recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Sandwich Type",
+               "promptPrefix":"Type of sandwich",
+               "placeholder":"Select a sandwich type",
+               "items":[
+                  "Hot",
+                  "Cold",
+                  "Vegetarian",
+                  "Meat"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🥗",
+         "title":"Healthy Salads",
+         "summary":"Fresh and nutritious salad recipes.",
+         "prompt":"Generate a healthy salad recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Salad Name",
+               "example":"Example: Mediterranean Quinoa Salad",
+               "promptPrefix":"Title of the healthy salad recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the healthy salad.",
+               "promptPrefix":"Ingredients for the healthy salad recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Salad Type",
+               "promptPrefix":"Type of salad",
+               "placeholder":"Select a salad type",
+               "items":[
+                  "Green",
+                  "Grain",
+                  "Fruit",
+                  "Protein"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍝",
+         "title":"Pasta Dishes",
+         "summary":"Delectable pasta recipes for any occasion.",
+         "prompt":"Generate a pasta recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Pasta Dish Name",
+               "example":"Example: Spaghetti Carbonara",
+               "promptPrefix":"Title of the pasta recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the pasta dish.",
+               "promptPrefix":"Ingredients for the pasta recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the pasta recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "Italian",
+                  "American",
+                  "Mediterranean"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🦐",
+         "title":"Seafood Lover’s Delight",
+         "summary":"Tantalize your taste buds with these seafood recipes.",
+         "prompt":"Generate a seafood recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Seafood Dish Name",
+               "example":"Example: Grilled Shrimp Skewers",
+               "promptPrefix":"Title of the seafood recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the seafood dish.",
+               "promptPrefix":"Ingredients for the seafood recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Seafood Type",
+               "promptPrefix":"Type of seafood",
+               "placeholder":"Select a seafood type",
+               "items":[
+                  "Fish",
+                  "Shrimp",
+                  "Crab",
+                  "Lobster",
+                  "Shellfish"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🥦",
+         "title":"Plant-Based Meals",
+         "summary":"Nutritious and delicious plant-based meal recipes.",
+         "prompt":"Generate a plant-based meal recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Vegan Buddha Bowl",
+               "promptPrefix":"Title of the plant-based meal recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the plant-based meal.",
+               "promptPrefix":"Ingredients for the plant-based meal recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Meal Type",
+               "promptPrefix":"Type of plant-based meal",
+               "placeholder":"Select a meal type",
+               "items":[
+                  "Breakfast",
+                  "Lunch",
+                  "Dinner",
+                  "Snack"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍲",
+         "title":"Soup and Stew Creations",
+         "summary":"Comforting and heartwarming soups and stews for every season.",
+         "prompt":"Generate a soup or stew recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Creamy Tomato Basil Soup",
+               "promptPrefix":"Title of the soup or stew recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the soup or stew.",
+               "promptPrefix":"Ingredients for the soup or stew recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the soup or stew recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "American",
+                  "Italian",
+                  "Asian",
+                  "Mediterranean"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍜",
+         "title":"DIY Asian Cuisine",
+         "summary":"Create authentic Asian dishes in your own kitchen.",
+         "prompt":"Generate an Asian cuisine recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Dish Name",
+               "example":"Example: Pad Thai",
+               "promptPrefix":"Title of the Asian cuisine recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the Asian dish.",
+               "promptPrefix":"Ingredients for the Asian cuisine recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Type of Asian cuisine",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "Chinese",
+                  "Japanese",
+                  "Thai",
+                  "Korean",
+                  "Indian"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🌮",
+         "title":"Mexican Fiesta",
+         "summary":"Lively and flavorful Mexican dishes for a festive meal.",
+         "prompt":"Generate a Mexican recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Dish Name",
+               "example":"Example: Chicken Tacos",
+               "promptPrefix":"Title of the Mexican recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the Mexican dish.",
+               "promptPrefix":"Ingredients for the Mexican recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Meal Type",
+               "promptPrefix":"Type of Mexican meal",
+               "placeholder":"Select a meal type",
+               "items":[
+                  "Appetizer",
+                  "Main Course",
+                  "Dessert"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍆",
+         "title":"Middle Eastern Flavors",
+         "summary":"Explore the rich and aromatic dishes of Middle Eastern cuisine.",
+         "prompt":"Generate a Middle Eastern recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Dish Name",
+               "example":"Example: Hummus with Pita",
+               "promptPrefix":"Title of the Middle Eastern recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the Middle Eastern dish.",
+               "promptPrefix":"Ingredients for the Middle Eastern recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Dish Type",
+               "promptPrefix":"Type of Middle Eastern dish",
+               "placeholder":"Select a dish type",
+               "items":[
+                  "Appetizer",
+                  "Main Course",
+                  "Dessert"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🧂",
+         "title":"Low-Sodium Recipes",
+         "summary":"Delicious recipes with reduced sodium content for a healthier diet.",
+         "prompt":"Generate a low-sodium recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Low-Sodium Chicken Stir-Fry",
+               "promptPrefix":"Title of the low-sodium recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the low-sodium dish.",
+               "promptPrefix":"Ingredients for the low-sodium recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the low-sodium recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "Asian",
+                  "Mediterranean",
+                  "American",
+                  "Mexican"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🏅",
+         "title":"Athlete Training Meals",
+         "summary":"Nutrient-packed meals designed for athletes and active individuals.",
+         "prompt":"Generate an athlete training meal recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Protein-Packed Power Bowl",
+               "promptPrefix":"Title of the athlete training meal recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the athlete training meal.",
+               "promptPrefix":"Ingredients for the athlete training meal recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Meal Type",
+               "promptPrefix":"Type of athlete training meal",
+               "placeholder":"Select a meal type",
+               "items":[
+                  "Pre-Workout",
+                  "Post-Workout",
+                  "Recovery"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🌍",
+         "title":"Cultural Fusion Dishes",
+         "summary":"Exciting recipes that blend flavors from different cultures.",
+         "prompt":"Generate a cultural fusion dish recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Dish Name",
+               "example":"Example: Sushi Burrito",
+               "promptPrefix":"Title of the cultural fusion dish recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the cultural fusion dish.",
+               "promptPrefix":"Ingredients for the cultural fusion recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Fusion Type",
+               "promptPrefix":"Type of cultural fusion",
+               "placeholder":"Select a fusion type",
+               "items":[
+                  "Asian-Mexican",
+                  "Italian-American",
+                  "Indian-British"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍷",
+         "title":"Romantic Picnic Recipes",
+         "summary":"Delightful recipes for a romantic and memorable picnic.",
+         "prompt":"Generate a romantic picnic recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Strawberry and Goat Cheese Salad",
+               "promptPrefix":"Title of the romantic picnic recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the romantic picnic dish.",
+               "promptPrefix":"Ingredients for the romantic picnic recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Dish Type",
+               "promptPrefix":"Type of picnic dish",
+               "placeholder":"Select a dish type",
+               "items":[
+                  "Appetizer",
+                  "Main Course",
+                  "Dessert"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🌾",
+         "title":"High-Fiber Meals",
+         "summary":"Healthy meals loaded with fiber to support digestive health.",
+         "prompt":"Generate a high-fiber meal recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Quinoa and Black Bean Salad",
+               "promptPrefix":"Title of the high-fiber meal recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the high-fiber dish.",
+               "promptPrefix":"Ingredients for the high-fiber recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the high-fiber recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "Asian",
+                  "Mediterranean",
+                  "American",
+                  "Mexican"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🎉",
+         "title":"Fun Party Snacks",
+         "summary":"Exciting and delicious snacks perfect for any party.",
+         "prompt":"Generate a party snack recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Snack Name",
+               "example":"Example: Spicy Nacho Bites",
+               "promptPrefix":"Title of the party snack recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the party snack.",
+               "promptPrefix":"Ingredients for the party snack recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Snack Type",
+               "promptPrefix":"Type of party snack",
+               "placeholder":"Select a snack type",
+               "items":[
+                  "Salty",
+                  "Sweet",
+                  "Healthy"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🏈",
+         "title":"Tailgating Treats",
+         "summary":"Tailgate with style using these tasty treat recipes.",
+         "prompt":"Generate a tailgating treat recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Treat Name",
+               "example":"Example: BBQ Pulled Pork Sliders",
+               "promptPrefix":"Title of the tailgating treat recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the tailgating treat.",
+               "promptPrefix":"Ingredients for the tailgating treat recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Treat Type",
+               "promptPrefix":"Type of tailgating treat",
+               "placeholder":"Select a treat type",
+               "items":[
+                  "Meat",
+                  "Vegetarian",
+                  "Snacks"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍣",
+         "title":"DIY Sushi",
+         "summary":"Create your own delicious and beautifully crafted sushi at home.",
+         "prompt":"Generate a sushi recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Sushi Name",
+               "example":"Example: Spicy Tuna Roll",
+               "promptPrefix":"Title of the sushi recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the sushi.",
+               "promptPrefix":"Ingredients for the sushi recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Sushi Type",
+               "promptPrefix":"Type of sushi",
+               "placeholder":"Select a sushi type",
+               "items":[
+                  "Rolls",
+                  "Nigiri",
+                  "Sashimi"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🦃",
+         "title":"Traditional Thanksgiving Dinner",
+         "summary":"Recipes to create a traditional and delicious Thanksgiving dinner.",
+         "prompt":"Generate a Thanksgiving dinner recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Roast Turkey with Gravy",
+               "promptPrefix":"Title of the Thanksgiving dinner recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the Thanksgiving dish.",
+               "promptPrefix":"Ingredients for the Thanksgiving recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Dish Type",
+               "promptPrefix":"Type of Thanksgiving dish",
+               "placeholder":"Select a dish type",
+               "items":[
+                  "Main Course",
+                  "Side Dish",
+                  "Dessert"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍕",
+         "title":"DIY Pizza Night",
+         "summary":"Create your own pizza with these customizable recipes.",
+         "prompt":"Generate a pizza recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Pizza Name",
+               "example":"Example: Margherita Pizza",
+               "promptPrefix":"Title of the pizza recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the pizza.",
+               "promptPrefix":"Ingredients for the pizza recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Pizza Type",
+               "promptPrefix":"Type of pizza",
+               "placeholder":"Select a pizza type",
+               "items":[
+                  "Neapolitan",
+                  "Sicilian",
+                  "New York Style",
+                  "Deep Dish"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍪",
+         "title":"Holiday Cookie Swap",
+         "summary":"Bake delicious cookies perfect for holiday cookie swaps.",
+         "prompt":"Generate a holiday cookie recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Cookie Name",
+               "example":"Example: Gingerbread Cookies",
+               "promptPrefix":"Title of the holiday cookie recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the holiday cookies.",
+               "promptPrefix":"Ingredients for the holiday cookie recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cookie Type",
+               "promptPrefix":"Type of holiday cookie",
+               "placeholder":"Select a cookie type",
+               "items":[
+                  "Sugar",
+                  "Gingerbread",
+                  "Chocolate Chip",
+                  "Shortbread"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍫",
+         "title":"Chocolate Lover’s Paradise",
+         "summary":"Indulge in decadent chocolate recipes perfect for any chocolate lover.",
+         "prompt":"Generate a chocolate recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Chocolate Lava Cake",
+               "promptPrefix":"Title of the chocolate recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the chocolate dish.",
+               "promptPrefix":"Ingredients for the chocolate recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Chocolate Type",
+               "promptPrefix":"Type of chocolate used",
+               "placeholder":"Select a type of chocolate",
+               "items":[
+                  "Dark",
+                  "Milk",
+                  "White"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🥔",
+         "title":"Nordic Cuisine Recipes",
+         "summary":"Explore traditional and modern Nordic recipes.",
+         "prompt":"Generate a Nordic cuisine recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Swedish Meatballs",
+               "promptPrefix":"Title of the Nordic cuisine recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the Nordic dish.",
+               "promptPrefix":"Ingredients for the Nordic cuisine recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Dish Type",
+               "promptPrefix":"Type of Nordic dish",
+               "placeholder":"Select a dish type",
+               "items":[
+                  "Appetizer",
+                  "Main Course",
+                  "Dessert"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🥖",
+         "title":"French Bistro Classics",
+         "summary":"Perfect recipes to recreate the charm of a French bistro at home.",
+         "prompt":"Generate a French bistro recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Dish Name",
+               "example":"Example: Croque Monsieur",
+               "promptPrefix":"Title of the French bistro recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the French bistro dish.",
+               "promptPrefix":"Ingredients for the French bistro recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Dish Type",
+               "promptPrefix":"Type of French bistro dish",
+               "placeholder":"Select a dish type",
+               "items":[
+                  "Appetizer",
+                  "Main Course",
+                  "Dessert"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍝",
+         "title":"Italian Grandma’s Recipes",
+         "summary":"Authentic Italian recipes passed down through generations.",
+         "prompt":"Generate an Italian grandma’s recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Dish Name",
+               "example":"Example: Nonna’s Lasagna",
+               "promptPrefix":"Title of the Italian grandma’s recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the Italian dish.",
+               "promptPrefix":"Ingredients for the Italian grandma’s recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Dish Type",
+               "promptPrefix":"Type of Italian dish",
+               "placeholder":"Select a dish type",
+               "items":[
+                  "Appetizer",
+                  "Main Course",
+                  "Dessert"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍸",
+         "title":"Holiday Cocktails",
+         "summary":"Festive cocktails to celebrate the holiday season.",
+         "prompt":"Generate a holiday cocktail recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Cocktail Name",
+               "example":"Example: Christmas Eggnog",
+               "promptPrefix":"Title of the holiday cocktail recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the holiday cocktail.",
+               "promptPrefix":"Ingredients for the holiday cocktail recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cocktail Type",
+               "promptPrefix":"Type of holiday cocktail",
+               "placeholder":"Select a cocktail type",
+               "items":[
+                  "Hot",
+                  "Cold",
+                  "Spicy",
+                  "Sweet"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍹",
+         "title":"Mocktail Mixer",
+         "summary":"Explore delicious and refreshing non-alcoholic mocktails.",
+         "prompt":"Generate a mocktail recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Mocktail Name",
+               "example":"Example: Virgin Mojito",
+               "promptPrefix":"Title of the mocktail recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the mocktail.",
+               "promptPrefix":"Ingredients for the mocktail recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Mocktail Type",
+               "promptPrefix":"Type of mocktail",
+               "placeholder":"Select a mocktail type",
+               "items":[
+                  "Fruity",
+                  "Spicy",
+                  "Creamy",
+                  "Herbal"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍞",
+         "title":"DIY Baking Mixes",
+         "summary":"Create your own baking mixes to enjoy fresh homemade treats.",
+         "prompt":"Generate a DIY baking mix recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Mix Name",
+               "example":"Example: Pancake Mix",
+               "promptPrefix":"Title of the baking mix recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the baking mix.",
+               "promptPrefix":"Ingredients for the baking mix recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Mix Type",
+               "promptPrefix":"Type of baking mix",
+               "placeholder":"Select a mix type",
+               "items":[
+                  "Bread",
+                  "Cake",
+                  "Pancake",
+                  "Cookie"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🧣",
+         "title":"Winter Comfort Foods",
+         "summary":"Warm and hearty recipes perfect for cozying up in winter.",
+         "prompt":"Generate a winter comfort food recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Beef and Barley Soup",
+               "promptPrefix":"Title of the winter comfort food recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the winter comfort food.",
+               "promptPrefix":"Ingredients for the winter comfort food recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the winter comfort food recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "American",
+                  "Mediterranean",
+                  "Asian",
+                  "Fusion"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🌶️",
+         "title":"DIY Spice Blends",
+         "summary":"Create your own spice blends to elevate any dish.",
+         "prompt":"Generate a spice blend recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Spice Blend Name",
+               "example":"Example: Cajun Spice Blend",
+               "promptPrefix":"Title of the spice blend recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter spices and ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all spices and ingredients required for the spice blend.",
+               "promptPrefix":"Ingredients for the spice blend recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the spice blend recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "Cajun",
+                  "Indian",
+                  "Italian",
+                  "Mexican"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🥒",
+         "title":"DIY Pickling",
+         "summary":"Learn the art of pickling with these DIY recipes.",
+         "prompt":"Generate a pickling recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Pickling Recipe Name",
+               "example":"Example: Pickled Cucumbers",
+               "promptPrefix":"Title of the pickling recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailText":"List all ingredients required for pickling.",
+               "promptPrefix":"Ingredients for the pickling recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Pickling Type",
+               "promptPrefix":"Type of pickling",
+               "placeholder":"Select a type",
+               "items":[
+                  "Vegetables",
+                  "Fruits",
+                  "Eggs",
+                  "Meat"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"❄️",
+         "title":"Make-Ahead Freezer Meals",
+         "summary":"Convenient freezer meals that you can prepare in advance for busy days.",
+         "prompt":"Generate a make-ahead freezer meal recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Chicken Pot Pie",
+               "promptPrefix":"Title of the make-ahead freezer meal recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the make-ahead freezer meal.",
+               "promptPrefix":"Ingredients for the make-ahead freezer meal recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the make-ahead freezer meal recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "American",
+                  "Mexican",
+                  "Asian",
+                  "Mediterranean"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍱",
+         "title":"Meal Prep Ideas",
+         "summary":"Efficient meal prep ideas to make your week stress-free and healthy.",
+         "prompt":"Generate a meal prep idea recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Quinoa and Veggie Bowls",
+               "promptPrefix":"Title of the meal prep idea recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the meal prep dish.",
+               "promptPrefix":"Ingredients for the meal prep recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Meal Type",
+               "promptPrefix":"Type of meal prep",
+               "placeholder":"Select a meal type",
+               "items":[
+                  "Breakfast",
+                  "Lunch",
+                  "Dinner",
+                  "Snack"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"❤️",
+         "title":"Heart-Healthy Recipes",
+         "summary":"Nutrient-rich recipes designed to support heart health.",
+         "prompt":"Generate a heart-healthy recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Grilled Salmon with Avocado Salsa",
+               "promptPrefix":"Title of the heart-healthy recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the heart-healthy dish.",
+               "promptPrefix":"Ingredients for the heart-healthy recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the heart-healthy recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "Mediterranean",
+                  "American",
+                  "Asian",
+                  "Mexican"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍇",
+         "title":"Mediterranean Diet",
+         "summary":"Explore delicious recipes following the Mediterranean diet.",
+         "prompt":"Generate a Mediterranean diet recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Greek Salad",
+               "promptPrefix":"Title of the Mediterranean diet recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the Mediterranean dish.",
+               "promptPrefix":"Ingredients for the Mediterranean diet recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Meal Type",
+               "promptPrefix":"Type of Mediterranean dish",
+               "placeholder":"Select a meal type",
+               "items":[
+                  "Appetizer",
+                  "Main Course",
+                  "Dessert"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"☕",
+         "title":"Warming Winter Drinks",
+         "summary":"Cozy up with these warming and delightful winter drink recipes.",
+         "prompt":"Generate a winter drink recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Drink Name",
+               "example":"Example: Hot Chocolate with Marshmallows",
+               "promptPrefix":"Title of the winter drink recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the winter drink.",
+               "promptPrefix":"Ingredients for the winter drink recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Drink Type",
+               "promptPrefix":"Type of winter drink",
+               "placeholder":"Select a drink type",
+               "items":[
+                  "Hot",
+                  "Spiced",
+                  "Alcoholic",
+                  "Non-Alcoholic"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍳",
+         "title":"Skillet Suppers",
+         "summary":"One-skillet recipes perfect for quick and easy dinners.",
+         "prompt":"Generate a skillet supper recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Skillet Chicken and Rice",
+               "promptPrefix":"Title of the skillet supper recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the skillet supper.",
+               "promptPrefix":"Ingredients for the skillet supper recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Cuisine Type",
+               "promptPrefix":"Cuisine type for the skillet supper recipe",
+               "placeholder":"Select a cuisine",
+               "items":[
+                  "American",
+                  "Mexican",
+                  "Asian",
+                  "Mediterranean"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🏈",
+         "title":"Game Day Snacks",
+         "summary":"Delicious and easy-to-make snacks perfect for game day.",
+         "prompt":"Generate a game day snack recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Snack Name",
+               "example":"Example: Buffalo Wings",
+               "promptPrefix":"Title of the game day snack recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the game day snack.",
+               "promptPrefix":"Ingredients for the game day snack recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Snack Type",
+               "promptPrefix":"Type of game day snack",
+               "placeholder":"Select a snack type",
+               "items":[
+                  "Meat",
+                  "Vegetarian",
+                  "Dips",
+                  "Finger Foods"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🍲",
+         "title":"Breakfast Bowls",
+         "summary":"Start your day with nutritious and delicious breakfast bowl recipes.",
+         "prompt":"Generate a breakfast bowl recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Bowl Name",
+               "example":"Example: Acai Bowl",
+               "promptPrefix":"Title of the breakfast bowl recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the breakfast bowl.",
+               "promptPrefix":"Ingredients for the breakfast bowl recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Bowl Type",
+               "promptPrefix":"Type of breakfast bowl",
+               "placeholder":"Select a bowl type",
+               "items":[
+                  "Smoothie",
+                  "Grain",
+                  "Protein",
+                  "Fruit"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"👩‍🌾",
+         "title":"Farmers Market Recipes",
+         "summary":"Recipes inspired by fresh and seasonal ingredients from the farmers market.",
+         "prompt":"Generate a farmers market recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Farmers Market Veggie Stir-Fry",
+               "promptPrefix":"Title of the farmers market recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the farmers market dish.",
+               "promptPrefix":"Ingredients for the farmers market recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Season",
+               "promptPrefix":"Season for the farmers market recipe",
+               "placeholder":"Select a season",
+               "items":[
+                  "Spring",
+                  "Summer",
+                  "Fall",
+                  "Winter"
+               ],
+               "required":false
+            }
+         ]
+      },
+      {
+         "emoji":"🎉",
+         "title":"Dinner Party Menus",
+         "summary":"Impress your guests with these elegant and flavorful dinner party recipes.",
+         "prompt":"Generate a dinner party menu",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Menu Title",
+               "example":"Example: Italian Themed Dinner Party",
+               "promptPrefix":"Title of the dinner party menu",
+               "required":true
+            },
+            {
+               "input":"textField",
+               "title":"Main Dish",
+               "example":"Example: Pasta Primavera",
+               "promptPrefix":"Main dish for the dinner party menu",
+               "required":true
+            },
+            {
+               "input":"textField",
+               "title":"Appetizer",
+               "example":"Example: Bruschetta",
+               "promptPrefix":"Appetizer for the dinner party menu",
+               "required":false
+            },
+            {
+               "input":"textField",
+               "title":"Dessert",
+               "example":"Example: Tiramisu",
+               "promptPrefix":"Dessert for the dinner party menu",
+               "required":false
+            }
+         ]
+      }
+   ]
+}
