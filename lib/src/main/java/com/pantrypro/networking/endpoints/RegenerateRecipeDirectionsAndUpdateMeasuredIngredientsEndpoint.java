@@ -6,6 +6,7 @@ import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.core.PantryPro;
 import com.pantrypro.database.objects.recipe.Recipe;
 import com.pantrypro.database.objects.recipe.RecipeInstruction;
+import com.pantrypro.database.objects.recipe.RecipeMeasuredIngredient;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.exceptions.InvalidAssociatedIdentifierException;
 import com.pantrypro.networking.responsefactories.RegenerateRecipeDirectionsAndIdeaRecipeIngredientsResponseFactory;
@@ -51,17 +52,22 @@ public class RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsEndpoint {
         }
 
         // Regenerate directions
-        PantryPro.regenerateDirections(request.getRecipeID());
+        PantryPro.regenerateMeasuredIngredientsAndDirections(request.getRecipeID());
 
         // Get Recipe
         Recipe recipe = PantryPro.getRecipe(request.getRecipeID());
 
+        // Get RecipeMeasuredIngredients
+        List<RecipeMeasuredIngredient> recipeMeasuredIngredients = PantryPro.getRecipeMeasuredIngredients(recipe.getRecipe_id());
+
         // Get RecipeDirections
-        List<RecipeInstruction> recipeInstructions = PantryPro.getRecipeDirections(request.getRecipeID());
+        List<RecipeInstruction> recipeInstructions = PantryPro.getRecipeDirections(recipe.getRecipe_id());
 
         // Create and return RegenerateRecipeDirectionsAndIdeaRecipeIngredientsResponse
         RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse response = RegenerateRecipeDirectionsAndIdeaRecipeIngredientsResponseFactory.from(
+                recipeMeasuredIngredients,
                 recipeInstructions,
+                recipe.getEstimatedServings(),
                 recipe.getFeasibility()
         );
 

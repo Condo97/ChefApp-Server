@@ -8,7 +8,7 @@ import java.util.List;
 @FunctionCall(name = "make_recipe", functionDescription = "Creates a recipe from the given summary and ingredients, adding measurements to ingredients")
 public class FinalizeRecipeFC {
 
-    @FCParameter(description = "The instructions to make the recipe")
+    @FCParameter(description = "The instructions to make the recipe. Do not include enumeration indicators")
     private List<String> instructions;
 
     @FCParameter(description = "All of the ingredients including amounts/measurements needed to make this recipe")

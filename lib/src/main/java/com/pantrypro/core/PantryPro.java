@@ -27,7 +27,7 @@ import com.pantrypro.networking.client.apple.itunes.exception.AppleItunesRespons
 import com.pantrypro.networking.client.oaifunctioncall.categorizeingredients.CategorizeIngredientsFC;
 import com.pantrypro.networking.client.oaifunctioncall.createrecipeidea.CreateRecipeIdeaFC;
 import com.pantrypro.networking.client.oaifunctioncall.finalizerecipe.FinalizeRecipeFC;
-import com.pantrypro.networking.client.oaifunctioncall.generatedirections.GenerateDirectionsFC;
+import com.pantrypro.networking.client.oaifunctioncall.generatedirections.GenerateMeasuredIngredientsAndDirectionsFC;
 import com.pantrypro.networking.client.oaifunctioncall.tagrecipe.TagRecipeFC;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
@@ -305,7 +305,7 @@ public class PantryPro {
      *
      * @param recipeID The Recipe's ID
      */
-    public static void regenerateDirections(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, OAIDeserializerException, DBSerializerPrimaryKeyMissingException {
+    public static void regenerateMeasuredIngredientsAndDirections(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, OAIDeserializerException, DBSerializerPrimaryKeyMissingException {
         // Get Recipe
         Recipe recipe = RecipeDAOPooled.get(recipeID);
 
@@ -327,7 +327,7 @@ public class PantryPro {
 
         // Get fcResponse from FCClient serializedChatCompletion
         OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
-                GenerateDirectionsFC.class,
+                GenerateMeasuredIngredientsAndDirectionsFC.class,
                 OpenAIGPTModels.GPT_4.getName(),
                 Constants.Response_Token_Limit_Generate_Directions,
                 Constants.DEFAULT_TEMPERATURE,
@@ -337,10 +337,10 @@ public class PantryPro {
         );
 
         // Deserialize fcResponse to GenerateDirectionsFC
-        GenerateDirectionsFC generateDirectionsFC = OAIFunctionCallDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), GenerateDirectionsFC.class);
+        GenerateMeasuredIngredientsAndDirectionsFC generateMeasuredIngredientsAndDirectionsFC = OAIFunctionCallDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), GenerateMeasuredIngredientsAndDirectionsFC.class);
 
         // Update and save directions and feasibility with RecipeFactoryDAO
-        RecipeFactoryDAO.updateAndSaveRecipe(generateDirectionsFC, recipeID);
+        RecipeFactoryDAO.updateAndSaveRecipe(generateMeasuredIngredientsAndDirectionsFC, recipeID);
     }
 
     public static void updateIngredientsAndMeasurements(Integer recipeID, List<String> measuredIngredients) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {

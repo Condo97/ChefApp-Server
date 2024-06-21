@@ -11,7 +11,7 @@ import com.pantrypro.database.objects.recipe.RecipeMeasuredIngredient;
 import com.pantrypro.database.objects.recipe.RecipeTag;
 import com.pantrypro.networking.client.oaifunctioncall.createrecipeidea.CreateRecipeIdeaFC;
 import com.pantrypro.networking.client.oaifunctioncall.finalizerecipe.FinalizeRecipeFC;
-import com.pantrypro.networking.client.oaifunctioncall.generatedirections.GenerateDirectionsFC;
+import com.pantrypro.networking.client.oaifunctioncall.generatedirections.GenerateMeasuredIngredientsAndDirectionsFC;
 import com.pantrypro.networking.client.oaifunctioncall.tagrecipe.TagRecipeFC;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
@@ -143,10 +143,21 @@ public class RecipeFactoryDAO {
         RecipeDAOPooled.updateModificationDate(recipeID);
     }
 
-    public static void updateAndSaveRecipe(GenerateDirectionsFC generateDirectionsFC, Integer recipeID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
+    public static void updateAndSaveRecipe(GenerateMeasuredIngredientsAndDirectionsFC generateMeasuredIngredientsAndDirectionsFC, Integer recipeID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
+        // Create RecipeMeasuredIngredients list and update in DB
+        List<RecipeMeasuredIngredient> measuredIngredients = new ArrayList<>();
+        for (String ingredientAndMeasurement: generateMeasuredIngredientsAndDirectionsFC.getAllIngredientsAndMeasurements()) {
+            measuredIngredients.add(new RecipeMeasuredIngredient(
+                    null,
+                    recipeID,
+                    ingredientAndMeasurement
+            ));
+        }
+        RecipeDAOPooled.updateMeasuredIngredients(recipeID, measuredIngredients);
+
         // Create RecipeDirections list and update in DB
         List<RecipeInstruction> directions = new ArrayList<>();
-        for (String direction: generateDirectionsFC.getDirections()) {
+        for (String direction: generateMeasuredIngredientsAndDirectionsFC.getDirections()) {
             directions.add(new RecipeInstruction(
                     null,
                     recipeID,
@@ -156,7 +167,7 @@ public class RecipeFactoryDAO {
         RecipeDAOPooled.updateDirections(recipeID, directions);
 
         // Update feasibility
-        RecipeDAOPooled.updateFeasibility(recipeID, generateDirectionsFC.getFeasibility());
+        RecipeDAOPooled.updateFeasibility(recipeID, generateMeasuredIngredientsAndDirectionsFC.getFeasibility());
 
         // Update modification date
         RecipeDAOPooled.updateModificationDate(recipeID);
