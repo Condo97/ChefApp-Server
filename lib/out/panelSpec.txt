@@ -1,5 +1,115 @@
 {
    "panels":[
+   {
+            "emoji":"🍲",
+            "title":"One-Pot Meals",
+            "summary":"Simple and convenient one-pot meals for easy cooking and cleanup.",
+            "prompt":"Generate a one-pot meal recipe",
+            "components":[
+               {
+                  "input":"textField",
+                  "title":"Recipe Title",
+                  "example":"Example: One-Pot Spaghetti",
+                  "promptPrefix":"Title of the one-pot meal recipe",
+                  "required":true
+               },
+               {
+                  "input":"ingredientsInput",
+                  "title":"Enter ingredients",
+                  "detailTitle":"Ingredients Information",
+                  "detailText":"List all ingredients required for the one-pot meal.",
+                  "promptPrefix":"Ingredients for the one-pot meal recipe",
+                  "required":true
+               },
+               {
+                  "input":"dropdown",
+                  "title":"Cuisine Type",
+                  "promptPrefix":"Cuisine type for the one-pot meal recipe",
+                  "placeholder":"Select a cuisine",
+                  "items":[
+                     "Asian",
+                     "Mediterranean",
+                     "American",
+                     "Mexican",
+                     "Italian"
+                  ],
+                  "required":false
+               }
+            ]
+         },
+         {
+                  "emoji":"💵",
+                  "title":"Budget-Friendly Meals",
+                  "summary":"Delicious meals that are easy on the wallet.",
+                  "prompt":"Generate a budget-friendly recipe",
+                  "components":[
+                     {
+                        "input":"textField",
+                        "title":"Recipe Title",
+                        "example":"Example: Budget-Friendly Chicken Stir-Fry",
+                        "promptPrefix":"Title of the budget-friendly recipe",
+                        "required":true
+                     },
+                     {
+                        "input":"ingredientsInput",
+                        "title":"Enter ingredients",
+                        "detailTitle":"Ingredients Information",
+                        "detailText":"List all ingredients required for the budget-friendly meal.",
+                        "promptPrefix":"Ingredients for the budget-friendly recipe",
+                        "required":true
+                     },
+                     {
+                        "input":"dropdown",
+                        "title":"Meal Type",
+                        "promptPrefix":"Meal type for the budget-friendly recipe",
+                        "placeholder":"Select a meal type",
+                        "items":[
+                           "Breakfast",
+                           "Lunch",
+                           "Dinner",
+                           "Snack"
+                        ],
+                        "required":false
+                     }
+                  ]
+               },
+      {
+         "emoji":"💪",
+         "title":"High-Protein Meals",
+         "summary":"Power up with these high-protein meal recipes designed to keep you strong and energized.",
+         "prompt":"Generate a high-protein meal recipe",
+         "components":[
+            {
+               "input":"textField",
+               "title":"Recipe Title",
+               "example":"Example: Grilled Chicken and Quinoa Bowl",
+               "promptPrefix":"Title of the high-protein meal recipe",
+               "required":true
+            },
+            {
+               "input":"ingredientsInput",
+               "title":"Enter ingredients",
+               "detailTitle":"Ingredients Information",
+               "detailText":"List all ingredients required for the high-protein meal.",
+               "promptPrefix":"Ingredients for the high-protein meal recipe",
+               "required":true
+            },
+            {
+               "input":"dropdown",
+               "title":"Protein Source",
+               "promptPrefix":"Protein source for the meal",
+               "placeholder":"Select a protein source",
+               "items":[
+                  "Chicken",
+                  "Beef",
+                  "Fish",
+                  "Legumes",
+                  "Tofu"
+               ],
+               "required":false
+            }
+         ]
+      },
       {
          "emoji":"🥦",
          "title":"Vegan Dishes",
@@ -254,43 +364,6 @@
          ]
       },
       {
-         "emoji":"🍲",
-         "title":"One-Pot Meals",
-         "summary":"Simple and convenient one-pot meals for easy cooking and cleanup.",
-         "prompt":"Generate a one-pot meal recipe",
-         "components":[
-            {
-               "input":"textField",
-               "title":"Recipe Title",
-               "example":"Example: One-Pot Spaghetti",
-               "promptPrefix":"Title of the one-pot meal recipe",
-               "required":true
-            },
-            {
-               "input":"ingredientsInput",
-               "title":"Enter ingredients",
-               "detailTitle":"Ingredients Information",
-               "detailText":"List all ingredients required for the one-pot meal.",
-               "promptPrefix":"Ingredients for the one-pot meal recipe",
-               "required":true
-            },
-            {
-               "input":"dropdown",
-               "title":"Cuisine Type",
-               "promptPrefix":"Cuisine type for the one-pot meal recipe",
-               "placeholder":"Select a cuisine",
-               "items":[
-                  "Asian",
-                  "Mediterranean",
-                  "American",
-                  "Mexican",
-                  "Italian"
-               ],
-               "required":false
-            }
-         ]
-      },
-      {
          "emoji":"🌞",
          "title":"Breakfast Ideas",
          "summary":"Start your day with amazing breakfast recipes that energize you.",
@@ -357,43 +430,6 @@
                   "Fruit",
                   "Protein",
                   "Breakfast"
-               ],
-               "required":false
-            }
-         ]
-      },
-      {
-         "emoji":"💪",
-         "title":"High-Protein Meals",
-         "summary":"Power up with these high-protein meal recipes designed to keep you strong and energized.",
-         "prompt":"Generate a high-protein meal recipe",
-         "components":[
-            {
-               "input":"textField",
-               "title":"Recipe Title",
-               "example":"Example: Grilled Chicken and Quinoa Bowl",
-               "promptPrefix":"Title of the high-protein meal recipe",
-               "required":true
-            },
-            {
-               "input":"ingredientsInput",
-               "title":"Enter ingredients",
-               "detailTitle":"Ingredients Information",
-               "detailText":"List all ingredients required for the high-protein meal.",
-               "promptPrefix":"Ingredients for the high-protein meal recipe",
-               "required":true
-            },
-            {
-               "input":"dropdown",
-               "title":"Protein Source",
-               "promptPrefix":"Protein source for the meal",
-               "placeholder":"Select a protein source",
-               "items":[
-                  "Chicken",
-                  "Beef",
-                  "Fish",
-                  "Legumes",
-                  "Tofu"
                ],
                "required":false
             }
@@ -574,42 +610,6 @@
                   "Wraps",
                   "Salads",
                   "Desserts"
-               ],
-               "required":false
-            }
-         ]
-      },
-      {
-         "emoji":"💵",
-         "title":"Budget-Friendly Meals",
-         "summary":"Delicious meals that are easy on the wallet.",
-         "prompt":"Generate a budget-friendly recipe",
-         "components":[
-            {
-               "input":"textField",
-               "title":"Recipe Title",
-               "example":"Example: Budget-Friendly Chicken Stir-Fry",
-               "promptPrefix":"Title of the budget-friendly recipe",
-               "required":true
-            },
-            {
-               "input":"ingredientsInput",
-               "title":"Enter ingredients",
-               "detailTitle":"Ingredients Information",
-               "detailText":"List all ingredients required for the budget-friendly meal.",
-               "promptPrefix":"Ingredients for the budget-friendly recipe",
-               "required":true
-            },
-            {
-               "input":"dropdown",
-               "title":"Meal Type",
-               "promptPrefix":"Meal type for the budget-friendly recipe",
-               "placeholder":"Select a meal type",
-               "items":[
-                  "Breakfast",
-                  "Lunch",
-                  "Dinner",
-                  "Snack"
                ],
                "required":false
             }

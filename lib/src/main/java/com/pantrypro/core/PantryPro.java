@@ -363,6 +363,10 @@ public class PantryPro {
         RecipeDAOPooled.updateName(recipeID, name);
     }
 
+    public static void updateEstimatedServings(Integer recipeID, Integer estimatedServings) throws DBSerializerException, SQLException, InterruptedException {
+        RecipeDAOPooled.updateEstimatedServings(recipeID, estimatedServings);
+    }
+
     public static void updateSummary(Integer recipeID, String summary) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, IllegalAccessException {
         // TODO: I should do some error handling around here and stuff lol
         RecipeDAOPooled.updateSummary(recipeID, summary);
@@ -455,10 +459,12 @@ public class PantryPro {
 
     private static String parseRegenerateDirectionsInput(Recipe recipe, List<RecipeMeasuredIngredient> measuredIngredients) {
         // Make Peach Cobbler
+        // Servings: 3
         // With ingredients: peaches flour eggs
         // With the description A sweet and tangy dessert perfect for summer
         final String makeString = "Make";
         final String emptyTitleRecipeString = "recipe";
+        final String servingsString = "Servings";
         final String withIngredientsString = "With ingredients:";
         final String withTheDescriptionString = "With the description:";
         final String commaSpaceDelimiterString = ", ";
@@ -471,6 +477,12 @@ public class PantryPro {
         sb.append(makeString);
         sb.append(spaceString);
         sb.append(recipe.getName().isEmpty() ? emptyTitleRecipeString : recipe.getName());
+
+        // "Servings: 3"
+        sb.append(newLineString);
+        sb.append(servingsString);
+        sb.append(spaceString);
+        sb.append(recipe.getEstimatedServings());
 
         // "With ingredients: peach, flour, eggs"
         if (measuredIngredients.size() > 0) {

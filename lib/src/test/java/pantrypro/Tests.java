@@ -410,6 +410,7 @@ public class Tests {
         // Create new name, summary, and measuredIngredients
         String newName = "chicken alfredo";
         String newSummary = "a delicious chicken alfredo dish that uses a lot of cream";
+        Integer newServings = 5;
         List<String> newMeasuredIngredients = List.of(
                 "1 lb chicken",
                 "2 oz heavy cream",
@@ -423,6 +424,7 @@ public class Tests {
                 recipeID,
                 newName,
                 newSummary,
+                newServings,
                 newMeasuredIngredients
         );
 

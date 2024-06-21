@@ -40,6 +40,11 @@ public class RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsEndpoint {
             PantryPro.updateSummary(request.getRecipeID(), request.getNewSummary());
         }
 
+        // Update estimated servings
+        if (request.getNewServings() != null) {
+            PantryPro.updateEstimatedServings(request.getRecipeID(), request.getNewServings());
+        }
+
         // Update ingredients
         if (request.getMeasuredIngredients() != null && !request.getMeasuredIngredients().isEmpty()) {
             PantryPro.updateIngredientsAndMeasurements(request.getRecipeID(), request.getMeasuredIngredients());
