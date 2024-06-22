@@ -44,7 +44,7 @@ public class ParsePantryItemsEndpoint {
             userMessageBuilder.addText(request.getInput());
 
         if (request.getImageDataInput() != null && !request.getImageDataInput().isEmpty())
-            userMessageBuilder.addImage(request.getImageDataInput(), InputImageDetail.AUTO);
+            userMessageBuilder.addImage("data:image/png;base64,\n" + request.getImageDataInput(), InputImageDetail.AUTO);
 
         OAIChatCompletionRequestMessage userMessage = userMessageBuilder.build();
 
