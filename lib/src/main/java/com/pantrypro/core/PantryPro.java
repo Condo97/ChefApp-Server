@@ -464,8 +464,8 @@ public class PantryPro {
         // With the description A sweet and tangy dessert perfect for summer
         final String makeString = "Make";
         final String emptyTitleRecipeString = "recipe";
-        final String servingsString = "MAKE Servings:";
-        final String previousServingsStringHead = ", re-measure the provided ingredients as they are measured for";
+        final String servingsString = "New Servings:";
+        final String previousServingsStringHead = ", re-measure the provided ingredients to fit the new servings. Ingredients are measured for old servings:";
         final String previousServingsStringTail = "servings";
         final String withIngredientsString = "With ingredients:";
         final String withTheDescriptionString = "With the description:";
