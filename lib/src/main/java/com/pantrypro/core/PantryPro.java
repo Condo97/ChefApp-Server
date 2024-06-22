@@ -465,7 +465,7 @@ public class PantryPro {
         final String makeString = "Make";
         final String emptyTitleRecipeString = "recipe";
         final String servingsString = "MAKE Servings:";
-        final String previousServingsStringHead = ", ingredients measured for";
+        final String previousServingsStringHead = ", re-measure the provided ingredients as they are measured for";
         final String previousServingsStringTail = "servings";
         final String withIngredientsString = "With ingredients:";
         final String withTheDescriptionString = "With the description:";
