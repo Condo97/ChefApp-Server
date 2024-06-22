@@ -29,7 +29,7 @@ public class ParsePantryItemsEndpoint {
 
     public static ParsePantryItemsResponse parsePantryItems(ParsePantryItemsRequest request) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MissingRequiredRequestObjectException, OAISerializerException, OpenAIGPTException, IOException, OAIDeserializerException {
         // If either request authToken or input are null or input is empty, throw MissingRequiredRequestObjectException
-        if (request.getAuthToken() == null || request.getInput() == null || request.getInput().isEmpty())
+        if (request.getAuthToken() == null || ((request.getInput() == null || request.getInput().isEmpty()) && (request.getImageDataInput() == null || request.getImageDataInput().isEmpty())))
             throw new MissingRequiredRequestObjectException("Please make sure authToken and input are included and not null or empty.");
 
         // Validate AuthToken TODO: Is this even necessary, what's the specific use case and how can this implementation be improved?
@@ -37,10 +37,16 @@ public class ParsePantryItemsEndpoint {
 
         // TODO: Move all this logic somewhere else probably lol
 
-        // Create user message
-        OAIChatCompletionRequestMessage userMessage = new OAIChatCompletionRequestMessageBuilder(CompletionRole.USER)
-                .addText(request.getInput())
-                .build();
+        // Create user message with text input, image data input, or both
+        OAIChatCompletionRequestMessageBuilder userMessageBuilder = new OAIChatCompletionRequestMessageBuilder(CompletionRole.USER);
+
+        if (request.getInput() != null && !request.getInput().isEmpty())
+            userMessageBuilder.addText(request.getInput());
+
+        if (request.getImageDataInput() != null && !request.getImageDataInput().isEmpty())
+            userMessageBuilder.addImage(request.getImageDataInput(), InputImageDetail.AUTO);
+
+        OAIChatCompletionRequestMessage userMessage = userMessageBuilder.build();
 
         // Create messages array from userMessage
         List<OAIChatCompletionRequestMessage> messages = List.of(
