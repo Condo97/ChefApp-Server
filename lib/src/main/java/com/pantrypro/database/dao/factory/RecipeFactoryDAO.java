@@ -166,6 +166,9 @@ public class RecipeFactoryDAO {
         }
         RecipeDAOPooled.updateDirections(recipeID, directions);
 
+        // Update estimatedServings
+        RecipeDAOPooled.updateEstimatedServings(recipeID, generateMeasuredIngredientsAndDirectionsFC.getEstimatedServings());
+
         // Update feasibility
         RecipeDAOPooled.updateFeasibility(recipeID, generateMeasuredIngredientsAndDirectionsFC.getFeasibility());
 
