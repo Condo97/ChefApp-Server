@@ -56,7 +56,7 @@ public class ParsePantryItemsEndpoint {
         // Parse bar items
         OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
                 ParsePantryItemsFC.class,
-                OpenAIGPTModels.GPT_4.getName(),
+                OpenAIGPTModels.GPT_4_VISION.getName(),
                 Constants.Response_Token_Limit_Parse_Pantry_Items,
                 Constants.DEFAULT_TEMPERATURE,
                 Keys.openAiAPI,
