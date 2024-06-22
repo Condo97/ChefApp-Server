@@ -464,8 +464,9 @@ public class PantryPro {
         // With the description A sweet and tangy dessert perfect for summer
         final String makeString = "Make";
         final String emptyTitleRecipeString = "recipe";
-        final String servingsString = "Servings";
-        final String previousServingsString = ", previously from";
+        final String servingsString = "MAKE Servings:";
+        final String previousServingsStringHead = ", ingredients measured for";
+        final String previousServingsStringTail = "servings";
         final String withIngredientsString = "With ingredients:";
         final String withTheDescriptionString = "With the description:";
         final String commaSpaceDelimiterString = ", ";
@@ -487,9 +488,11 @@ public class PantryPro {
 
         // ", previously from 4" TODO: This may not be necessary for good generation
         if (prevServings != null) {
-            sb.append(previousServingsString);
+            sb.append(previousServingsStringHead);
             sb.append(spaceString);
             sb.append(prevServings);
+            sb.append(spaceString);
+            sb.append(previousServingsStringTail);
         }
 
         // "With ingredients: peach, flour, eggs"
