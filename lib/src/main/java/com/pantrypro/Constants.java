@@ -109,6 +109,6 @@ public final class Constants {
     public static String PAID_MODEL_NAME = "gpt-4o";
     public static String DEFAULT_BEHAVIOR = null;
     public static CompletionRole LEGACY_DEFAULT_ROLE = CompletionRole.USER;
-    public static int DEFAULT_TEMPERATURE = 0;
+    public static int DEFAULT_TEMPERATURE = 1;
 
 }
