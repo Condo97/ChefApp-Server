@@ -40,8 +40,8 @@ public class RegenerateRecipeDirectionsAndIdeaRecipeIngredientsResponseFactory {
         RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse response = new RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse(
                 recipeMeasuredIngredientStrings,
                 recipeInstructionsMap,
-                feasibility,
                 estimatedServings,
+                feasibility,
                 recipeInstructionStrings_legacy
         );
 
