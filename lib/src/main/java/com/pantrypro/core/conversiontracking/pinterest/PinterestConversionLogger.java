@@ -63,7 +63,7 @@ public class PinterestConversionLogger {
                         new PinterestSendConversionRequest.Data(
                                 eventName,
                                 actionSource,
-                                System.currentTimeMillis(),
+                                System.currentTimeMillis() / 1000, // Pinterest asks for it in seconds lol
                                 eventID,
                                 new PinterestSendConversionRequest.Data.UserData(
                                         List.of(hashedIDFA)
