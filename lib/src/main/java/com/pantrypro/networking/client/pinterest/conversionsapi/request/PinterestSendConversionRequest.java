@@ -16,6 +16,14 @@ public class PinterestSendConversionRequest {
             this.eventName = eventName;
         }
 
+        public static EventNames from(String eventName) {
+            if (eventName.equals(CHECKOUT.eventName)) {
+                return CHECKOUT;
+            }
+
+            return null;
+        }
+
         @JsonValue
         public String getEventName() {
             return eventName;
