@@ -201,6 +201,9 @@ public class Server {
          *     }
          * }
          *
+         * @param request Request object given by Spark
+         * @param response Response object given by Spark
+         * @return Value of JSON response as String
          */
         public static String parsePantryItems(Request request, Response response) throws IOException, MissingRequiredRequestObjectException, DBSerializerException, SQLException, OAISerializerException, OpenAIGPTException, OAIDeserializerException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MalformedJSONException {
             // Try to parse ParsePantryItemsRequest
@@ -302,6 +305,50 @@ public class Server {
                 return new ObjectMapper().writeValueAsString(br);
             } catch (JsonMappingException | JsonParseException e) {
                 System.out.println("Error when Tagging Recipe.. The request: " + request.body());
+                e.printStackTrace();
+                throw new MalformedJSONException("Malformed JSON - " + e.getMessage());
+            }
+        }
+
+    }
+
+    public class Pinterest {
+
+        /***
+         * Log Pinterest Conversion
+         *
+         * Logs a pinterest conversion with Pinterest's Conversions API.
+         *
+         * Request: {
+         *     authToken: String - Authentication token received from the server
+         *     idfa: String - iOS advertising identifier
+         *     eventName: String - Pinterest event name to log
+         * }
+         *
+         * Response: {
+         *     Body: {
+         *          didLog: Boolean - If the logging was successful or not
+         *     }
+         *     Success: Integer - Integer denoting success, 1 if successful
+         * }
+         *
+         * @param req Request object given by Spark
+         * @param res Response object given by Spark
+         * @return Value of JSON response as String
+         */
+        public static Object logPinterestConversion(Request req, Response res) throws IOException, InvalidAssociatedIdentifierException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MalformedJSONException {
+            // Try to parse LogPinterestConversionRequest
+            LogPinterestConversionRequest lpcRequest;
+
+            try {
+                lpcRequest = new ObjectMapper().readValue(req.body(), LogPinterestConversionRequest.class);
+                LogPinterestConversionResponse lpcResponse = LogPinterestConversionEndpoint.logPinterestConversion(lpcRequest);
+                BodyResponse br = BodyResponseFactory.createSuccessBodyResponse(lpcResponse);
+
+                return new ObjectMapper().writeValueAsString(br);
+
+            } catch (JsonMappingException | JsonParseException e) {
+                System.out.println("Error when Making Recipe.. The request: " + req.body());
                 e.printStackTrace();
                 throw new MalformedJSONException("Malformed JSON - " + e.getMessage());
             }

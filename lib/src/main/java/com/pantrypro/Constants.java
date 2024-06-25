@@ -63,6 +63,7 @@ public final class Constants {
         public static final String GET_IMPORTANT_CONSTANTS_URI = "/getImportantConstants";
         public static final String GET_IS_PREMIUM_URI = "/getIsPremium";
         public static final String GET_REMAINING_URI = "/getRemaining";
+        public static final String LOG_PINTEREST_CONVERSION = "/logPinterestConversion";
         public static final String PARSE_PANTRY_ITEMS_URI = "/parsePantryItems";
         public static final String REGISTER_USER_URI = "/registerUser";
         public static final String REGISTER_TRANSACTION_URI = "/registerTransaction";
@@ -110,5 +111,12 @@ public final class Constants {
     public static String DEFAULT_BEHAVIOR = null;
     public static CompletionRole LEGACY_DEFAULT_ROLE = CompletionRole.USER;
     public static int DEFAULT_TEMPERATURE = 1;
+
+    /* Pinterest API Constants */
+    public static String PINTEREST_API_BASE_URI = "https://api.pinterest.com";
+    public static String PINTEREST_V5_URI = "/v5";
+    public static String PINTEREST_AD_ACCOUNTS_URI = "/ad_accounts";
+    public static String PINTEREST_EVENTS_URI = "/events";
+    public static long PINTEREST_TIMEOUT_MINUTES = 4;
 
 }

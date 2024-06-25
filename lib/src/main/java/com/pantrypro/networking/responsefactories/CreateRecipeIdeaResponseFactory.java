@@ -26,7 +26,7 @@ public class CreateRecipeIdeaResponseFactory {
                 recipe.getRecipe_id(),
                 remaining
         );
-
+        
         return response;
     }
 

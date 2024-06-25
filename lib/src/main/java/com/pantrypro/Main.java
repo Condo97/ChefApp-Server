@@ -131,6 +131,7 @@ public class Main {
         post(Constants.URIs.GET_ALL_TAGS_URI, Server::getAllTags);
         post(Constants.URIs.GET_IS_PREMIUM_URI, Server::getIsPremium);
         post(Constants.URIs.GET_REMAINING_URI, Server::getRemainingIdeaRecipes);
+        post(Constants.URIs.LOG_PINTEREST_CONVERSION, Server.Pinterest::logPinterestConversion);
         post(Constants.URIs.REGISTER_TRANSACTION_URI, Server::registerTransaction);
         post(Constants.URIs.REGISTER_USER_URI, Server::registerUser);
         post(Constants.URIs.VALIDATE_AUTH_TOKEN_URI, Server::validateAuthToken);
