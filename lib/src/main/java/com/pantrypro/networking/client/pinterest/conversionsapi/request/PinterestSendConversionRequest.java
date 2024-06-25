@@ -7,86 +7,104 @@ import java.util.List;
 
 public class PinterestSendConversionRequest {
 
-    public enum EventNames {
-        CHECKOUT("checkout");
+    public static class Data {
 
-        private String eventName;
+        public enum EventNames {
+            CHECKOUT("checkout");
 
-        EventNames(String eventName) {
-            this.eventName = eventName;
-        }
+            private String eventName;
 
-        public static EventNames from(String eventName) {
-            if (eventName.equals(CHECKOUT.eventName)) {
-                return CHECKOUT;
+            EventNames(String eventName) {
+                this.eventName = eventName;
             }
 
-            return null;
+            public static EventNames from(String eventName) {
+                if (eventName.equals(CHECKOUT.eventName)) {
+                    return CHECKOUT;
+                }
+
+                return null;
+            }
+
+            @JsonValue
+            public String getEventName() {
+                return eventName;
+            }
+
         }
 
-        @JsonValue
-        public String getEventName() {
+        public static class UserData {
+
+            @JsonProperty("hashed_maids")
+            List<String> hashedMAIDs;
+
+            public UserData() {
+
+            }
+
+            public UserData(List<String> hashedMAIDs) {
+                this.hashedMAIDs = hashedMAIDs;
+            }
+
+            public List<String> getHashedMAIDs() {
+                return hashedMAIDs;
+            }
+
+        }
+
+        @JsonProperty("event_name")
+        private EventNames eventName;
+
+        @JsonProperty("action_source")
+        private String actionSource;
+
+        @JsonProperty("event_time")
+        private Long eventTime;
+
+        @JsonProperty("user_data")
+        private UserData userData;
+
+        public Data() {
+
+        }
+
+        public Data(EventNames eventName, String actionSource, Long eventTime, UserData userData) {
+            this.eventName = eventName;
+            this.actionSource = actionSource;
+            this.eventTime = eventTime;
+            this.userData = userData;
+        }
+
+        public EventNames getEventName() {
             return eventName;
         }
 
-    }
-
-    public static class UserData {
-
-        @JsonProperty("hashed_maids")
-        List<String> hashedMAIDs;
-
-        public UserData() {
-
+        public String getActionSource() {
+            return actionSource;
         }
 
-        public UserData(List<String> hashedMAIDs) {
-            this.hashedMAIDs = hashedMAIDs;
+        public Long getEventTime() {
+            return eventTime;
         }
 
-        public List<String> getHashedMAIDs() {
-            return hashedMAIDs;
+        public UserData getUserData() {
+            return userData;
         }
 
     }
 
-    @JsonProperty("event_name")
-    private EventNames eventName;
-
-    @JsonProperty("action_source")
-    private String actionSource;
-
-    @JsonProperty("event_time")
-    private Long eventTime;
-
-    @JsonProperty("user_data")
-    private UserData userData;
+    private Data data;
 
     public PinterestSendConversionRequest() {
 
     }
 
-    public PinterestSendConversionRequest(EventNames eventName, String actionSource, Long eventTime, UserData userData) {
-        this.eventName = eventName;
-        this.actionSource = actionSource;
-        this.eventTime = eventTime;
-        this.userData = userData;
+    public PinterestSendConversionRequest(Data data) {
+        this.data = data;
     }
 
-    public EventNames getEventName() {
-        return eventName;
-    }
-
-    public String getActionSource() {
-        return actionSource;
-    }
-
-    public Long getEventTime() {
-        return eventTime;
-    }
-
-    public UserData getUserData() {
-        return userData;
+    public Data getData() {
+        return data;
     }
 
 }

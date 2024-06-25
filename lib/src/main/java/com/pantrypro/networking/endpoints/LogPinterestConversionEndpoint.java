@@ -33,7 +33,7 @@ public class LogPinterestConversionEndpoint {
             throw new InvalidAssociatedIdentifierException("Missing eventName!");
 
         // Enum unwrap for eventName
-        PinterestSendConversionRequest.EventNames eventName = PinterestSendConversionRequest.EventNames.from(request.getEventName());
+        PinterestSendConversionRequest.Data.EventNames eventName = PinterestSendConversionRequest.Data.EventNames.from(request.getEventName());
 
         // Log pinterest conversion
         PinterestConversionLogger.logPinterestConversion(

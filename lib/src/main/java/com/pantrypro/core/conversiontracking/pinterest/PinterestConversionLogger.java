@@ -43,7 +43,7 @@ public class PinterestConversionLogger {
     );
 
 
-    public static void logPinterestConversion(PinterestSendConversionRequest.EventNames eventName, String idfa, Boolean test) throws IOException, InterruptedException {
+    public static void logPinterestConversion(PinterestSendConversionRequest.Data.EventNames eventName, String idfa, Boolean test) throws IOException, InterruptedException {
         logPinterestConversion(
                 eventName,
                 defaultIOSAppActionSource,
@@ -52,17 +52,19 @@ public class PinterestConversionLogger {
         );
     }
 
-    public static void logPinterestConversion(PinterestSendConversionRequest.EventNames eventName, String actionSource, String idfa, Boolean test) throws IOException, InterruptedException {
+    public static void logPinterestConversion(PinterestSendConversionRequest.Data.EventNames eventName, String actionSource, String idfa, Boolean test) throws IOException, InterruptedException {
         // Hash IDFA
         String hashedIDFA = Hashing.sha256().hashString(idfa, StandardCharsets.UTF_8).toString();
 
         // Create PinterestConversionAPIRequest
         PinterestSendConversionRequest pscRequest = new PinterestSendConversionRequest(
-                eventName,
-                actionSource,
-                System.currentTimeMillis(),
-                new PinterestSendConversionRequest.UserData(
-                        List.of(hashedIDFA)
+                new PinterestSendConversionRequest.Data(
+                    eventName,
+                    actionSource,
+                    System.currentTimeMillis(),
+                    new PinterestSendConversionRequest.Data.UserData(
+                            List.of(hashedIDFA)
+                    )
                 )
         );
 
