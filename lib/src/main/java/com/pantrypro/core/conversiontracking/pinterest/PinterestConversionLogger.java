@@ -58,13 +58,15 @@ public class PinterestConversionLogger {
 
         // Create PinterestConversionAPIRequest
         PinterestSendConversionRequest pscRequest = new PinterestSendConversionRequest(
-                new PinterestSendConversionRequest.Data(
-                    eventName,
-                    actionSource,
-                    System.currentTimeMillis(),
-                    new PinterestSendConversionRequest.Data.UserData(
-                            List.of(hashedIDFA)
-                    )
+                List.of(
+                        new PinterestSendConversionRequest.Data(
+                                eventName,
+                                actionSource,
+                                System.currentTimeMillis(),
+                                new PinterestSendConversionRequest.Data.UserData(
+                                        List.of(hashedIDFA)
+                                )
+                            )
                 )
         );
 

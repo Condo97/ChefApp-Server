@@ -93,17 +93,17 @@ public class PinterestSendConversionRequest {
 
     }
 
-    private Data data;
+    private List<Data> data;
 
     public PinterestSendConversionRequest() {
 
     }
 
-    public PinterestSendConversionRequest(Data data) {
+    public PinterestSendConversionRequest(List<Data> data) {
         this.data = data;
     }
 
-    public Data getData() {
+    public List<Data> getData() {
         return data;
     }
 
