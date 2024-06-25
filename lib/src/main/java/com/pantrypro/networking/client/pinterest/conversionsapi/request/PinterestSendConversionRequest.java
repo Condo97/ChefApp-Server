@@ -61,6 +61,9 @@ public class PinterestSendConversionRequest {
         @JsonProperty("event_time")
         private Long eventTime;
 
+        @JsonProperty("event_id")
+        private String eventID;
+
         @JsonProperty("user_data")
         private UserData userData;
 
@@ -68,10 +71,11 @@ public class PinterestSendConversionRequest {
 
         }
 
-        public Data(EventNames eventName, String actionSource, Long eventTime, UserData userData) {
+        public Data(EventNames eventName, String actionSource, Long eventTime, String eventID, UserData userData) {
             this.eventName = eventName;
             this.actionSource = actionSource;
             this.eventTime = eventTime;
+            this.eventID = eventID;
             this.userData = userData;
         }
 
@@ -85,6 +89,10 @@ public class PinterestSendConversionRequest {
 
         public Long getEventTime() {
             return eventTime;
+        }
+
+        public String getEventID() {
+            return eventID;
         }
 
         public UserData getUserData() {

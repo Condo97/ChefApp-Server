@@ -28,6 +28,10 @@ public class LogPinterestConversionEndpoint {
         if (request.getIdfa() == null || request.getIdfa().isEmpty())
             throw new InvalidAssociatedIdentifierException("Missing IDFA!");
 
+        // Null or empty check for eventID
+        if (request.getEventID() == null || request.getEventID().isEmpty())
+            throw new InvalidAssociatedIdentifierException("Missing eventID!");
+
         // Null or empty check for eventName
         if (request.getEventName() == null || request.getEventName().isEmpty())
             throw new InvalidAssociatedIdentifierException("Missing eventName!");
@@ -39,6 +43,7 @@ public class LogPinterestConversionEndpoint {
         PinterestConversionLogger.logPinterestConversion(
                 eventName,
                 request.getIdfa(),
+                request.getEventID(),
                 request.getTest()
         );
 
