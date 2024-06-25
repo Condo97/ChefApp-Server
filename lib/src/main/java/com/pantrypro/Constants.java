@@ -117,6 +117,7 @@ public final class Constants {
     public static String PINTEREST_V5_URI = "/v5";
     public static String PINTEREST_AD_ACCOUNTS_URI = "/ad_accounts";
     public static String PINTEREST_EVENTS_URI = "/events";
+    public static String PINTEREST_TEST_URI_ARGUMENT = "test=true";
     public static long PINTEREST_TIMEOUT_MINUTES = 4;
 
 }

@@ -38,7 +38,8 @@ public class LogPinterestConversionEndpoint {
         // Log pinterest conversion
         PinterestConversionLogger.logPinterestConversion(
                 eventName,
-                request.getIdfa()
+                request.getIdfa(),
+                request.getTest()
         );
 
         // Return LogPinterestConversionResponse with didLog to true:)

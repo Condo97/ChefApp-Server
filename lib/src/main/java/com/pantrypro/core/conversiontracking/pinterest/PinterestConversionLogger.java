@@ -33,16 +33,26 @@ public class PinterestConversionLogger {
             + Constants.PINTEREST_EVENTS_URI
     );
 
+    private static final URI fullPinterestSendConversionsTestURI = URI.create(
+            Constants.PINTEREST_API_BASE_URI
+                    + Constants.PINTEREST_V5_URI
+                    + Constants.PINTEREST_AD_ACCOUNTS_URI
+                    + "/" + adAccountID
+                    + Constants.PINTEREST_EVENTS_URI
+                    + "?" + Constants.PINTEREST_TEST_URI_ARGUMENT
+    );
 
-    public static void logPinterestConversion(PinterestSendConversionRequest.EventNames eventName, String idfa) throws IOException, InterruptedException {
+
+    public static void logPinterestConversion(PinterestSendConversionRequest.EventNames eventName, String idfa, Boolean test) throws IOException, InterruptedException {
         logPinterestConversion(
                 eventName,
                 defaultIOSAppActionSource,
-                idfa
+                idfa,
+                test
         );
     }
 
-    public static void logPinterestConversion(PinterestSendConversionRequest.EventNames eventName, String actionSource, String idfa) throws IOException, InterruptedException {
+    public static void logPinterestConversion(PinterestSendConversionRequest.EventNames eventName, String actionSource, String idfa, Boolean test) throws IOException, InterruptedException {
         // Hash IDFA
         String hashedIDFA = Hashing.sha256().hashString(idfa, StandardCharsets.UTF_8).toString();
 
@@ -65,7 +75,7 @@ public class PinterestConversionLogger {
         JsonNode pscResponse = Httpson.sendPOST(
                 pscRequest,
                 httpClient,
-                fullPinterestSendConversionsURI,
+                test == null || !test ? fullPinterestSendConversionsURI : fullPinterestSendConversionsTestURI,
                 httpRequestBuilder
         );
 

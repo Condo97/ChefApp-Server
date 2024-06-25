@@ -5,6 +5,7 @@ public class LogPinterestConversionRequest {
     private String authToken;
     private String idfa;
     private String eventName;
+    private Boolean test;
 
     public LogPinterestConversionRequest() {
 
@@ -26,6 +27,10 @@ public class LogPinterestConversionRequest {
 
     public String getEventName() {
         return eventName;
+    }
+
+    public Boolean getTest() {
+        return test;
     }
 
 }
