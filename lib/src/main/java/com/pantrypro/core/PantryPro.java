@@ -433,6 +433,9 @@ public class PantryPro {
         sb.append(spaceString);
         sb.append(recipe.getName());
 
+        // TODO: Better servings
+        sb.append("measure the ingredients and include their measurements for an appropriate serving size");
+
         // with the base ingredients a, b, c,..,n
         sb.append(withTheBaseIngredientsString);
         measuredIngredients.forEach(measuredIngredient -> {
