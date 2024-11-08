@@ -3,7 +3,11 @@ package com.pantrypro.networking.endpoints;
 import com.oaigptconnector.model.*;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.oaigptconnector.model.generation.OpenAIGPTModels;
+import com.oaigptconnector.model.request.chat.completion.CompletionRole;
 import com.oaigptconnector.model.request.chat.completion.OAIChatCompletionRequestMessage;
+import com.oaigptconnector.model.request.chat.completion.OAIChatCompletionRequestResponseFormat;
+import com.oaigptconnector.model.request.chat.completion.ResponseFormatType;
+import com.oaigptconnector.model.request.chat.completion.content.InputImageDetail;
 import com.oaigptconnector.model.response.chat.completion.http.OAIGPTChatCompletionResponse;
 import com.pantrypro.Constants;
 import com.pantrypro.core.UserAuthenticator;
@@ -27,7 +31,7 @@ public class ParsePantryItemsEndpoint {
 
     private static final HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).connectTimeout(Duration.ofMinutes(com.oaigptconnector.Constants.AI_TIMEOUT_MINUTES)).build();
 
-    public static ParsePantryItemsResponse parsePantryItems(ParsePantryItemsRequest request) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MissingRequiredRequestObjectException, OAISerializerException, OpenAIGPTException, IOException, OAIDeserializerException {
+    public static ParsePantryItemsResponse parsePantryItems(ParsePantryItemsRequest request) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MissingRequiredRequestObjectException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException {
         // If either request authToken or input are null or input is empty, throw MissingRequiredRequestObjectException
         if (request.getAuthToken() == null || ((request.getInput() == null || request.getInput().isEmpty()) && (request.getImageDataInput() == null || request.getImageDataInput().isEmpty())))
             throw new MissingRequiredRequestObjectException("Please make sure authToken and input are included and not null or empty.");
@@ -59,12 +63,13 @@ public class ParsePantryItemsEndpoint {
                 OpenAIGPTModels.GPT_4_VISION.getName(),
                 Constants.Response_Token_Limit_Parse_Pantry_Items,
                 Constants.DEFAULT_TEMPERATURE,
+                new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
                 Keys.openAiAPI,
                 httpClient,
                 messages);
 
         // Deserialize fcResponse to ParsePantryItemsFC
-        ParsePantryItemsFC parseBarItemsFC = OAIFunctionCallDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), ParsePantryItemsFC.class);
+        ParsePantryItemsFC parseBarItemsFC = JSONSchemaDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), ParsePantryItemsFC.class);
 
         // Map to ParsePantryItemsResponse.BarItem List
         List<ParsePantryItemsResponse.PantryItem> pantryItems = parseBarItemsFC.getBarItems().stream()

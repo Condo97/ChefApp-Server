@@ -1,6 +1,6 @@
 package com.pantrypro.networking.endpoints;
 
-import com.oaigptconnector.model.OAIDeserializerException;
+import com.oaigptconnector.model.JSONSchemaDeserializerException;
 import com.oaigptconnector.model.OAISerializerException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.core.PantryPro;
@@ -20,7 +20,7 @@ import java.util.List;
 
 public class TagRecipeEndpoint {
 
-    public static TagRecipeResponse tagRecipe(TagRecipeRequest tagRecipeRequest) throws InvalidAssociatedIdentifierException, DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, OpenAIGPTException, DBObjectNotFoundFromQueryException, IOException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OAISerializerException, OAIDeserializerException {
+    public static TagRecipeResponse tagRecipe(TagRecipeRequest tagRecipeRequest) throws InvalidAssociatedIdentifierException, DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, OpenAIGPTException, DBObjectNotFoundFromQueryException, IOException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OAISerializerException, JSONSchemaDeserializerException {
         // COMPATIBILITY - Get recipeID as recipeID if not null, otherwise ideaID
         Integer recipeID;
         if (tagRecipeRequest.getRecipeID() != null) {

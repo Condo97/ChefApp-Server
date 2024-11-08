@@ -1,6 +1,6 @@
 package com.pantrypro.networking.endpoints;
 
-import com.oaigptconnector.model.OAIDeserializerException;
+import com.oaigptconnector.model.JSONSchemaDeserializerException;
 import com.oaigptconnector.model.OAISerializerException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.core.PantryPro;
@@ -24,7 +24,7 @@ import java.util.List;
 public class RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsEndpoint {
 
     // The big difference between this and MakeRecipeEndpoint is that this one has a more extensive request object that includes the name, summary, and ingredients and updates them before generating the recipe.. It should be able to be simplified to one class
-    public static RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse regenerateRecipeDirectionsAndUpdateMeasuredIngredients(RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest request) throws InvalidAssociatedIdentifierException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, DBSerializerPrimaryKeyMissingException, OAISerializerException, OpenAIGPTException, OAIDeserializerException, IOException {
+    public static RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse regenerateRecipeDirectionsAndUpdateMeasuredIngredients(RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest request) throws InvalidAssociatedIdentifierException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, DBSerializerPrimaryKeyMissingException, OAISerializerException, OpenAIGPTException, JSONSchemaDeserializerException, IOException {
         // Ensure request getIngredientsAndMeasurements is not null, otherwise return null TODO: Also ensure name and summary, also make this better maybe throw an exception or something
         if (request.getMeasuredIngredients() == null)
             return null;

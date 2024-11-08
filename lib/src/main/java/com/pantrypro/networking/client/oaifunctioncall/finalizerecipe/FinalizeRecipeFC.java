@@ -1,29 +1,29 @@
 package com.pantrypro.networking.client.oaifunctioncall.finalizerecipe;
 
-import com.oaigptconnector.model.FCParameter;
-import com.oaigptconnector.model.FunctionCall;
+import com.oaigptconnector.model.JSONSchema;
+import com.oaigptconnector.model.JSONSchemaParameter;
 
 import java.util.List;
 
-@FunctionCall(name = "make_recipe", functionDescription = "Creates a recipe from the given summary and ingredients, adding measurements to ingredients")
+@JSONSchema(name = "make_recipe", functionDescription = "Creates a recipe from the given summary and ingredients, adding measurements to ingredients")
 public class FinalizeRecipeFC {
 
-    @FCParameter(description = "The instructions to make the recipe. Do not include enumeration indicators")
+    @JSONSchemaParameter(description = "The instructions to make the recipe. Do not include enumeration indicators")
     private List<String> instructions;
 
-    @FCParameter(description = "All of the ingredients including amounts/measurements needed to make this recipe")
+    @JSONSchemaParameter(description = "All of the ingredients including amounts/measurements needed to make this recipe")
     private List<String> allIngredientsAndMeasurements;
 
-    @FCParameter(description = "Estimated total number of calories for the recipe")
+    @JSONSchemaParameter(description = "Estimated total number of calories for the recipe")
     private Integer estimatedTotalCalories;
 
-    @FCParameter(description = "Estimated total time in minutes needed to make the recipe")
+    @JSONSchemaParameter(description = "Estimated total time in minutes needed to make the recipe")
     private Integer estimatedTotalMinutes;
 
-    @FCParameter(description = "Estimated number of servings the recipe makes")
+    @JSONSchemaParameter(description = "Estimated number of servings the recipe makes")
     private Integer estimatedServings;
 
-    @FCParameter(description = "On a scale of 1-10, how feasible the recipe is to make in reality")
+    @JSONSchemaParameter(description = "On a scale of 1-10, how feasible the recipe is to make in reality")
     private Integer feasibility;
 
     public FinalizeRecipeFC() {

@@ -1,7 +1,7 @@
 package com.pantrypro.networking.endpoints;
 
 import appletransactionclient.exception.AppStoreErrorResponseException;
-import com.oaigptconnector.model.OAIDeserializerException;
+import com.oaigptconnector.model.JSONSchemaDeserializerException;
 import com.oaigptconnector.model.OAISerializerException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.core.PantryPro;
@@ -29,7 +29,7 @@ import java.sql.SQLException;
 
 public class CreateRecipeIdeaEndpoint {
 
-    public static CreateIdeaRecipeResponse createRecipeIdea(CreateIdeaRecipeRequest createIdeaRecipeRequest) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, UnrecoverableKeyException, CapReachedException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, OAISerializerException, OAIDeserializerException, DBSerializerPrimaryKeyMissingException, DBSerializerException, AppStoreErrorResponseException {
+    public static CreateIdeaRecipeResponse createRecipeIdea(CreateIdeaRecipeRequest createIdeaRecipeRequest) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, UnrecoverableKeyException, CapReachedException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, OAISerializerException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException, DBSerializerException, AppStoreErrorResponseException {
         // Create save recipe idea
         RecipeWithIngredients recipeWithIngredients = PantryPro.createSaveRecipeIdea(
                 createIdeaRecipeRequest.getAuthToken(),

@@ -4,7 +4,7 @@ import appletransactionclient.exception.AppStoreErrorResponseException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oaigptconnector.model.OAIDeserializerException;
+import com.oaigptconnector.model.JSONSchemaDeserializerException;
 import com.oaigptconnector.model.OAISerializerException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.exceptions.*;
@@ -62,7 +62,7 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String categorizeIngredients(Request request, Response response) throws MalformedJSONException, IOException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, OAISerializerException, OAIDeserializerException {
+        public static String categorizeIngredients(Request request, Response response) throws MalformedJSONException, IOException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, OAISerializerException, JSONSchemaDeserializerException {
             // Try to parse CategorizeIngredientsRequest
             CategorizeIngredientsRequest ciRequest;
 
@@ -110,7 +110,7 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String createRecipeIdea(Request request, Response response) throws IOException, MalformedJSONException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, OAISerializerException, OAIDeserializerException, AppStoreErrorResponseException {
+        public static String createRecipeIdea(Request request, Response response) throws IOException, MalformedJSONException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, OAISerializerException, JSONSchemaDeserializerException, AppStoreErrorResponseException {
             // Try to parse GetRecipeIdeaRequest
             CreateIdeaRecipeRequest criRequest;
 
@@ -162,7 +162,7 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String finalizeRecipe(Request request, Response response) throws MalformedJSONException, IOException, DBSerializerPrimaryKeyMissingException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, DBSerializerException, OpenAIGPTException, InstantiationException, InvalidAssociatedIdentifierException, OAISerializerException, OAIDeserializerException {
+        public static String finalizeRecipe(Request request, Response response) throws MalformedJSONException, IOException, DBSerializerPrimaryKeyMissingException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, DBSerializerException, OpenAIGPTException, InstantiationException, InvalidAssociatedIdentifierException, OAISerializerException, JSONSchemaDeserializerException {
             // Try to parse MakeRecipeRequest
             MakeRecipeRequest mrRequest;
 
@@ -205,7 +205,7 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String parsePantryItems(Request request, Response response) throws IOException, MissingRequiredRequestObjectException, DBSerializerException, SQLException, OAISerializerException, OpenAIGPTException, OAIDeserializerException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MalformedJSONException {
+        public static String parsePantryItems(Request request, Response response) throws IOException, MissingRequiredRequestObjectException, DBSerializerException, SQLException, OAISerializerException, OpenAIGPTException, JSONSchemaDeserializerException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MalformedJSONException {
             // Try to parse ParsePantryItemsRequest
             ParsePantryItemsRequest ppiRequest;
 
@@ -254,7 +254,7 @@ public class Server {
          *
          *
          */
-        public static String regenerateRecipeDirectionsAndUpdateMeasuredIngredients(Request request, Response response) throws IOException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, InvalidRequestJSONException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, MalformedJSONException, GenerationException, InvalidAssociatedIdentifierException, OAISerializerException, OAIDeserializerException {
+        public static String regenerateRecipeDirectionsAndUpdateMeasuredIngredients(Request request, Response response) throws IOException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, InvalidRequestJSONException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, MalformedJSONException, GenerationException, InvalidAssociatedIdentifierException, OAISerializerException, JSONSchemaDeserializerException {
             // Try to parse RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest
             RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest rrdairiRequest;
 
@@ -293,7 +293,7 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String tagRecipeIdea(Request request, Response response) throws IOException, InvalidAssociatedIdentifierException, DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, OpenAIGPTException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MalformedJSONException, OAISerializerException, OAIDeserializerException {
+        public static String tagRecipeIdea(Request request, Response response) throws IOException, InvalidAssociatedIdentifierException, DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, OpenAIGPTException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MalformedJSONException, OAISerializerException, JSONSchemaDeserializerException {
             // Try to parse TagRecipeRequest
             TagRecipeRequest triRequest;
 

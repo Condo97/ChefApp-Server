@@ -4,7 +4,10 @@ import appletransactionclient.exception.AppStoreErrorResponseException;
 import com.oaigptconnector.model.*;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.oaigptconnector.model.generation.OpenAIGPTModels;
+import com.oaigptconnector.model.request.chat.completion.CompletionRole;
 import com.oaigptconnector.model.request.chat.completion.OAIChatCompletionRequestMessage;
+import com.oaigptconnector.model.request.chat.completion.OAIChatCompletionRequestResponseFormat;
+import com.oaigptconnector.model.request.chat.completion.ResponseFormatType;
 import com.oaigptconnector.model.response.chat.completion.http.OAIGPTChatCompletionResponse;
 import com.pantrypro.Constants;
 import com.pantrypro.core.generation.IdeaRecipeExpandIngredients;
@@ -51,7 +54,7 @@ public class PantryPro {
     // Create HttpClient
     private static final HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).connectTimeout(Duration.ofMinutes(com.oaigptconnector.Constants.AI_TIMEOUT_MINUTES)).build();
 
-    public static List<IngredientAndCategory> categorizeIngredients(List<String> ingredients, String store) throws OAISerializerException, OpenAIGPTException, IOException, InterruptedException, OAIDeserializerException {
+    public static List<IngredientAndCategory> categorizeIngredients(List<String> ingredients, String store) throws OAISerializerException, OpenAIGPTException, IOException, InterruptedException, JSONSchemaDeserializerException {
         // Create input from ingredients
         String input = parseCategorizeIngredientsGPTInput(ingredients, store);
 
@@ -71,13 +74,14 @@ public class PantryPro {
                 Constants.DEFAULT_MODEL_NAME,
                 Constants.Response_Token_Limit_Categorize_Ingredients,
                 Constants.DEFAULT_TEMPERATURE,
+                new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
                 Keys.openAiAPI,
                 httpClient,
                 userMessage
         );
 
         // Deserialize fcResponse to CategorizeIngredientsFC
-        CategorizeIngredientsFC categorizeIngredientsFC = OAIFunctionCallDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), CategorizeIngredientsFC.class);
+        CategorizeIngredientsFC categorizeIngredientsFC = JSONSchemaDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), CategorizeIngredientsFC.class);
 
         // Adapt to IngredientAndCategory list and return
         List<IngredientAndCategory> ingredientsAndCategories = new ArrayList<>();
@@ -122,7 +126,7 @@ public class PantryPro {
 
     /* Recipe Creation */
 
-    public static RecipeWithIngredients createSaveRecipeIdea(String authToken, String ingredientsString, String modifiersString, Integer expandIngredientsMagnitude) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, CapReachedException, OAISerializerException, OAIDeserializerException, DBSerializerPrimaryKeyMissingException, DBSerializerException, AppStoreErrorResponseException {
+    public static RecipeWithIngredients createSaveRecipeIdea(String authToken, String ingredientsString, String modifiersString, Integer expandIngredientsMagnitude) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, CapReachedException, OAISerializerException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException, DBSerializerException, AppStoreErrorResponseException {
         /* Validation */
 
         // Get userID from authToken using UserAuthenticator
@@ -162,6 +166,7 @@ public class PantryPro {
                 OpenAIGPTModels.GPT_4.getName(),
                 Constants.Response_Token_Limit_Create_Recipe,
                 Constants.DEFAULT_TEMPERATURE,
+                new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
                 Keys.openAiAPI,
                 httpClient,
                 systemMessage,
@@ -169,7 +174,7 @@ public class PantryPro {
         );
 
         // Deserialize fcResponse to CreateRecipeIdeaFC
-        CreateRecipeIdeaFC createRecipeIdeaFC = OAIFunctionCallDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), ideaRecipeExpandIngredients.getFcClass());
+        CreateRecipeIdeaFC createRecipeIdeaFC = JSONSchemaDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), ideaRecipeExpandIngredients.getFcClass());
 
         // Get and save Recipe and RecipeMeasuredIngredients in RecpieWithIngredients object using RecipeFactoryDAO and return
         RecipeWithIngredients recipeWithIngredients = RecipeFactoryDAO.createAndSaveRecipe(
@@ -183,7 +188,7 @@ public class PantryPro {
         return recipeWithIngredients;
     }
 
-    public static void finalizeSaveRecipe(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, OAIDeserializerException, DBSerializerPrimaryKeyMissingException {
+    public static void finalizeSaveRecipe(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException {
         /* Generation */
 
         // Get Recipe
@@ -211,13 +216,14 @@ public class PantryPro {
                 OpenAIGPTModels.GPT_4.getName(),
                 Constants.Response_Token_Limit_Finalize_Recipe,
                 Constants.DEFAULT_TEMPERATURE,
+                new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
                 Keys.openAiAPI,
                 httpClient,
                 userMessage
         );
 
         // Deserialize fcResponse to FinalizeRecipeFC
-        FinalizeRecipeFC finalizeRecipeFC = OAIFunctionCallDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), FinalizeRecipeFC.class);
+        FinalizeRecipeFC finalizeRecipeFC = JSONSchemaDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), FinalizeRecipeFC.class);
 
         // Update and save Recipe, RecipeMeasuredIngredients, and RecipeDirections in RecipeWithIngredientsAndDirections using RecipeFactoryDAO
         RecipeFactoryDAO.updateAndSaveRecipe(
@@ -245,7 +251,7 @@ public class PantryPro {
 
     /* Recipe Tagging */
 
-    public static List<RecipeTag> tagReicpe(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, OAIDeserializerException, DBSerializerPrimaryKeyMissingException {
+    public static List<RecipeTag> tagReicpe(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException {
         // Get Recipe
         Recipe recipe = RecipeDAOPooled.get(recipeID);
 
@@ -277,13 +283,14 @@ public class PantryPro {
                 OpenAIGPTModels.GPT_4.getName(),
                 Constants.Response_Token_Limit_Tag_Recipe,
                 Constants.DEFAULT_TEMPERATURE,
+                new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
                 Keys.openAiAPI,
                 httpClient,
                 messages
         );
 
         // Deserialize fcResponse to TagRecipeFC
-        TagRecipeFC tagRecipeFC = OAIFunctionCallDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), TagRecipeFC.class);
+        TagRecipeFC tagRecipeFC = JSONSchemaDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), TagRecipeFC.class);
 
         // Get and save RecipeTag list with RecipeFactoryDAO and return
         List<RecipeTag> recipeTags = RecipeFactoryDAO.createAndSaveRecipeTags(
@@ -305,7 +312,7 @@ public class PantryPro {
      *
      * @param recipeID The Recipe's ID
      */
-    public static void regenerateMeasuredIngredientsAndDirections(Integer recipeID, Integer oldServings) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, OAIDeserializerException, DBSerializerPrimaryKeyMissingException {
+    public static void regenerateMeasuredIngredientsAndDirections(Integer recipeID, Integer oldServings) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException {
         // Get Recipe
         Recipe recipe = RecipeDAOPooled.get(recipeID);
 
@@ -331,13 +338,14 @@ public class PantryPro {
                 OpenAIGPTModels.GPT_4.getName(),
                 Constants.Response_Token_Limit_Generate_Directions,
                 Constants.DEFAULT_TEMPERATURE,
+                new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
                 Keys.openAiAPI,
                 httpClient,
                 userMessage
         );
 
         // Deserialize fcResponse to GenerateDirectionsFC
-        GenerateMeasuredIngredientsAndDirectionsFC generateMeasuredIngredientsAndDirectionsFC = OAIFunctionCallDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), GenerateMeasuredIngredientsAndDirectionsFC.class);
+        GenerateMeasuredIngredientsAndDirectionsFC generateMeasuredIngredientsAndDirectionsFC = JSONSchemaDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), GenerateMeasuredIngredientsAndDirectionsFC.class);
 
         // Update and save directions and feasibility with RecipeFactoryDAO
         RecipeFactoryDAO.updateAndSaveRecipe(generateMeasuredIngredientsAndDirectionsFC, recipeID);

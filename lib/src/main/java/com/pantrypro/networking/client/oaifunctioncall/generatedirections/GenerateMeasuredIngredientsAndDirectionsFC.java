@@ -1,23 +1,23 @@
 package com.pantrypro.networking.client.oaifunctioncall.generatedirections;
 
-import com.oaigptconnector.model.FCParameter;
-import com.oaigptconnector.model.FunctionCall;
+import com.oaigptconnector.model.JSONSchema;
+import com.oaigptconnector.model.JSONSchemaParameter;
 
 import java.util.List;
 
-@FunctionCall(name = "generate_recipe", functionDescription = "Generates measured ingredients and directions to make the recipe")
+@JSONSchema(name = "generate_recipe", functionDescription = "Generates measured ingredients and directions to make the recipe")
 public class GenerateMeasuredIngredientsAndDirectionsFC {
 
-    @FCParameter(description = "The ingredients given in the input with correct measurements.")
+    @JSONSchemaParameter(description = "The ingredients given in the input with correct measurements.")
     private List<String> allIngredientsAndMeasurements;
 
-    @FCParameter(description = "The directions to make the recipe. Do not include enumeration indicators.")
+    @JSONSchemaParameter(description = "The directions to make the recipe. Do not include enumeration indicators.")
     private List<String> directions;
 
-    @FCParameter(description = "The estimated servings for the recipe")
+    @JSONSchemaParameter(description = "The estimated servings for the recipe")
     private Integer estimatedServings;
 
-    @FCParameter(description = "On a scale of 1-10, how feasible the recipe is to make in reality")
+    @JSONSchemaParameter(description = "On a scale of 1-10, how feasible the recipe is to make in reality")
     private Integer feasibility;
 
     public GenerateMeasuredIngredientsAndDirectionsFC() {

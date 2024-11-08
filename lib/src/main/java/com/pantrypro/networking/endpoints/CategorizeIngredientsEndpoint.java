@@ -1,6 +1,6 @@
 package com.pantrypro.networking.endpoints;
 
-import com.oaigptconnector.model.OAIDeserializerException;
+import com.oaigptconnector.model.JSONSchemaDeserializerException;
 import com.oaigptconnector.model.OAISerializerException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.core.PantryPro;
@@ -18,7 +18,7 @@ import java.util.List;
 
 public class CategorizeIngredientsEndpoint {
 
-    public static CategorizeIngredientsResponse categorizeIngredients(CategorizeIngredientsRequest categorizeIngredientsRequest) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, OAISerializerException, OAIDeserializerException {
+    public static CategorizeIngredientsResponse categorizeIngredients(CategorizeIngredientsRequest categorizeIngredientsRequest) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, OAISerializerException, JSONSchemaDeserializerException {
         // TODO: User validation, including some sort of count
 
         // Categorize ingredients

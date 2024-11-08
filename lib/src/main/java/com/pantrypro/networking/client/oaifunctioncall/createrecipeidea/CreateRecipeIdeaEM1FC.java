@@ -1,23 +1,23 @@
 package com.pantrypro.networking.client.oaifunctioncall.createrecipeidea;
 
-import com.oaigptconnector.model.FCParameter;
-import com.oaigptconnector.model.FunctionCall;
+import com.oaigptconnector.model.JSONSchema;
+import com.oaigptconnector.model.JSONSchemaParameter;
 
 import java.util.List;
 
-@FunctionCall(name = "create_recipe_idea", functionDescription = "Creates a recipe from ingredients, adding as necessary")
+@JSONSchema(name = "create_recipe_idea", functionDescription = "Creates a recipe from ingredients, adding as necessary")
 public class CreateRecipeIdeaEM1FC implements CreateRecipeIdeaFC {
 
-    @FCParameter(description = "All of the ingredients needed, no measurements, adding as necessary")
+    @JSONSchemaParameter(description = "All of the ingredients needed, no measurements, adding as necessary")
     private List<String> ingredients;
 
-    @FCParameter(description = "An interesting and fitting name for the recipe")
+    @JSONSchemaParameter(description = "An interesting and fitting name for the recipe")
     private String name;
 
-    @FCParameter(name = "short10To24WordEngagingInterestingSummary", description = "A short 10-24 word engaging summary for the recipe")
+    @JSONSchemaParameter(name = "short10To24WordEngagingInterestingSummary", description = "A short 10-24 word engaging summary for the recipe")
     private String summary;
 
-    @FCParameter(description = "A 1-5 word cuisine type for the recipe")
+    @JSONSchemaParameter(description = "A 1-5 word cuisine type for the recipe")
     private String cuisineType;
 
     public CreateRecipeIdeaEM1FC() {

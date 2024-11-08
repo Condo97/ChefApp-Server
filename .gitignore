@@ -1,4 +1,4 @@
-# Ignore Gradle project-specific cache directory
+ # Ignore Gradle project-specific cache directory
 .gradle
 
 # Ignore Gradle build output directory
@@ -6,3 +6,4 @@ build
 /lib/keys/
 /lib/src/main/java/com/pantrypro/keys/
 /lib/out/
+/lib/out/PantryPro_Server.jar

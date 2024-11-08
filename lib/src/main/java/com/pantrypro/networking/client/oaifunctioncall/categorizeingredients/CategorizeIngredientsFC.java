@@ -1,19 +1,19 @@
 package com.pantrypro.networking.client.oaifunctioncall.categorizeingredients;
 
-import com.oaigptconnector.model.FCParameter;
-import com.oaigptconnector.model.FunctionCall;
+import com.oaigptconnector.model.JSONSchema;
+import com.oaigptconnector.model.JSONSchemaParameter;
 
 import java.util.List;
 
-@FunctionCall(name = "categorize_ingredients", functionDescription = "Categorizes ingredients for easy finding in a list.")
+@JSONSchema(name = "categorize_ingredients", functionDescription = "Categorizes ingredients for easy finding in a list.")
 public class CategorizeIngredientsFC {
 
     public static class IngredientsWithCategories {
 
-        @FCParameter(description = "The ingredient")
+        @JSONSchemaParameter(description = "The ingredient")
         private String ingredient;
 
-        @FCParameter(description = "The category for the ingredient")
+        @JSONSchemaParameter(description = "The category for the ingredient")
         private String category;
 
         public IngredientsWithCategories() {
@@ -35,7 +35,7 @@ public class CategorizeIngredientsFC {
 
     }
 
-    @FCParameter(description = "A list of ingredients each mapped to a category")
+    @JSONSchemaParameter(description = "A list of ingredients each mapped to a category")
     List<IngredientsWithCategories> ingredientsWithCategories;
 
     public CategorizeIngredientsFC() {
