@@ -40,7 +40,9 @@ public class RecipeFactoryDAO {
                 null,
                 null,
                 LocalDateTime.now(),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                0,
+                0
         );
 
         Connection c = SQLConnectionPoolInstance.getConnection();

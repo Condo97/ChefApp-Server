@@ -52,6 +52,7 @@ public final class Constants {
 
     /* URIs for HTTPSServer */
     class URIs {
+        public static final String ADD_OR_REMOVE_LIKE_OR_DISLIKE = "/addOrRemoveLikeOrDislike";
         public static final String CATEGORIZE_INGREDIENTS = "/categorizeIngredients";
         public static final String CREATE_RECIPE_IDEA = "/createRecipeIdea";
         public static final String MAKE_RECIPE_FROM_IDEA = "/makeRecipeFromIdea";
@@ -65,8 +66,10 @@ public final class Constants {
         public static final String GET_REMAINING_URI = "/getRemaining";
         public static final String LOG_PINTEREST_CONVERSION = "/logPinterestConversion";
         public static final String PARSE_PANTRY_ITEMS_URI = "/parsePantryItems";
-        public static final String REGISTER_USER_URI = "/registerUser";
+        public static final String REGISTER_APNS = "/registerAPNS";
         public static final String REGISTER_TRANSACTION_URI = "/registerTransaction";
+        public static final String REGISTER_USER_URI = "/registerUser";
+        public static final String TIK_TOK_SEARCH = "/tikTokSearch";
         public static final String VALIDATE_AUTH_TOKEN_URI = "/validateAuthToken";
     }
 
@@ -119,5 +122,8 @@ public final class Constants {
     public static String PINTEREST_EVENTS_URI = "/events";
     public static String PINTEREST_TEST_URI_ARGUMENT = "test=true";
     public static long PINTEREST_TIMEOUT_MINUTES = 4;
+
+    /* TikAPI Constants */
+    public static String TIK_API_SEARCH_URI = "https://api.tikapi.io/public/search";
 
 }

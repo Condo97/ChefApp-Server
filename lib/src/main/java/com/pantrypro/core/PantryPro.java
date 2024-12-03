@@ -163,7 +163,7 @@ public class PantryPro {
         // Get fcResponse from FCClient serializedChatCompletion
         OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
                 ideaRecipeExpandIngredients.getFcClass(),
-                OpenAIGPTModels.GPT_4.getName(),
+                OpenAIGPTModels.GPT_4_MINI.getName(),
                 Constants.Response_Token_Limit_Create_Recipe,
                 Constants.DEFAULT_TEMPERATURE,
                 new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
@@ -188,7 +188,7 @@ public class PantryPro {
         return recipeWithIngredients;
     }
 
-    public static void finalizeSaveRecipe(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException {
+    public static void finalizeSaveRecipe(Integer recipeID, String additionalInput) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException {
         /* Generation */
 
         // Get Recipe
@@ -199,6 +199,10 @@ public class PantryPro {
 
         // Create input from recipe and measuredIngredients
         String input = parseFinalizeRecipeGPTInput(recipe, recipeMeasuredIngredients);
+
+        // Append additionalInput to input
+        if (additionalInput != null && !additionalInput.isEmpty())
+            input += "\n\n" + additionalInput;
 
         // Create user message
         OAIChatCompletionRequestMessage userMessage = new OAIChatCompletionRequestMessageBuilder(CompletionRole.USER)
@@ -213,7 +217,7 @@ public class PantryPro {
         // Get fcResponse from FCClient serializedChatCompletion
         OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
                 FinalizeRecipeFC.class,
-                OpenAIGPTModels.GPT_4.getName(),
+                OpenAIGPTModels.GPT_4_MINI.getName(),
                 Constants.Response_Token_Limit_Finalize_Recipe,
                 Constants.DEFAULT_TEMPERATURE,
                 new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
@@ -280,7 +284,7 @@ public class PantryPro {
         // Get fcResponse from FCClient for TagRecipeFC
         OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
                 TagRecipeFC.class,
-                OpenAIGPTModels.GPT_4.getName(),
+                OpenAIGPTModels.GPT_4_MINI.getName(),
                 Constants.Response_Token_Limit_Tag_Recipe,
                 Constants.DEFAULT_TEMPERATURE,
                 new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
@@ -312,7 +316,7 @@ public class PantryPro {
      *
      * @param recipeID The Recipe's ID
      */
-    public static void regenerateMeasuredIngredientsAndDirections(Integer recipeID, Integer oldServings) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException {
+    public static void regenerateMeasuredIngredientsAndDirections(Integer recipeID, Integer oldServings, String additionalInput) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException {
         // Get Recipe
         Recipe recipe = RecipeDAOPooled.get(recipeID);
 
@@ -321,6 +325,10 @@ public class PantryPro {
 
         // Create input from recipe and recipeMeasuredIngredients
         String input = parseRegenerateDirectionsInput(recipe, recipeMeasuredIngredients, oldServings);
+
+        // Append additionalInput two lines down if not null or empty
+        if (additionalInput != null && !additionalInput.isEmpty())
+            input += "\n\n" + additionalInput;
 
         // Create user message
         OAIChatCompletionRequestMessage userMessage = new OAIChatCompletionRequestMessageBuilder(CompletionRole.USER)
@@ -335,7 +343,7 @@ public class PantryPro {
         // Get fcResponse from FCClient serializedChatCompletion
         OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
                 GenerateMeasuredIngredientsAndDirectionsFC.class,
-                OpenAIGPTModels.GPT_4.getName(),
+                OpenAIGPTModels.GPT_4_MINI.getName(),
                 Constants.Response_Token_Limit_Generate_Directions,
                 Constants.DEFAULT_TEMPERATURE,
                 new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),

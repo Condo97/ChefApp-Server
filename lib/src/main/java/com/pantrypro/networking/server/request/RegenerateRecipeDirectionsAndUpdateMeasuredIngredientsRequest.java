@@ -32,18 +32,20 @@ public class RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest exten
     String newSummary;
     Integer newServings;
     List<String> measuredIngredients;
+    String additionalInput;
 
     public RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest() {
 
     }
 
-    public RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest(String authToken, Integer recipeID, String newName, String newSummary, Integer newServings, List<String> measuredIngredients) {
+    public RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest(String authToken, Integer recipeID, String newName, String newSummary, Integer newServings, List<String> measuredIngredients, String additionalInput) {
         super(authToken);
         this.recipeID = recipeID;
         this.newName = newName;
         this.newSummary = newSummary;
         this.newServings = newServings;
         this.measuredIngredients = measuredIngredients;
+        this.additionalInput = additionalInput;
     }
 
     public Integer getRecipeID() {
@@ -64,6 +66,10 @@ public class RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest exten
 
     public List<String> getMeasuredIngredients() {
         return measuredIngredients;
+    }
+
+    public String getAdditionalInput() {
+        return additionalInput;
     }
 
 }

@@ -142,6 +142,24 @@ public class RecipeDAOPooled {
         }
     }
 
+    public static void updateLikesCount(Integer recipeID, Integer likesCount) throws SQLException, InterruptedException, DBSerializerPrimaryKeyMissingException, DBSerializerException, IllegalAccessException {
+        Connection conn = SQLConnectionPoolInstance.getConnection();
+        try {
+            RecipeDAO.updateLikesCount(conn, recipeID, likesCount);
+        } finally {
+            SQLConnectionPoolInstance.releaseConnection(conn);
+        }
+    }
+
+    public static void updateDislikesCount(Integer recipeID, Integer dislikesCount) throws SQLException, InterruptedException, DBSerializerPrimaryKeyMissingException, DBSerializerException, IllegalAccessException {
+        Connection conn = SQLConnectionPoolInstance.getConnection();
+        try {
+            RecipeDAO.updateDislikesCount(conn, recipeID, dislikesCount);
+        } finally {
+            SQLConnectionPoolInstance.releaseConnection(conn);
+        }
+    }
+
     public static boolean isUserAssociatedWithRecipe(Integer userID, Integer recipeID) throws DBSerializerException, SQLException, InterruptedException {
         Connection conn = SQLConnectionPoolInstance.getConnection();
         try {

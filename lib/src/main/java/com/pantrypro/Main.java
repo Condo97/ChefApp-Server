@@ -7,7 +7,13 @@ import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
 import com.pantrypro.core.Server;
 import com.pantrypro.exceptions.ResponseStatusException;
 import com.pantrypro.keys.Keys;
+import com.pantrypro.networking.endpoints.APNSRegistrationEndpoint;
+import com.pantrypro.networking.endpoints.AddOrRemoveLikeOrDislikeEndpoint;
+import com.pantrypro.networking.endpoints.TikTokSearchEndpoint;
 import com.pantrypro.networking.server.ResponseStatus;
+import com.pantrypro.networking.server.request.APNSRegistrationRequest;
+import com.pantrypro.networking.server.request.AddOrRemoveLikeOrDislikeRequest;
+import com.pantrypro.networking.server.request.TikTokSearchRequest;
 import com.pantrypro.networking.server.response.BodyResponse;
 import com.pantrypro.networking.server.response.GetCreatePanelsResponse;
 import com.pantrypro.networking.server.response.GetIAPStuffResponse;
@@ -121,6 +127,10 @@ public class Main {
 
     private static void configureHttpEndpoints(boolean dev) {
         // POST Functions
+        post(Constants.URIs.ADD_OR_REMOVE_LIKE_OR_DISLIKE, (req, res) -> Server.respond(req, AddOrRemoveLikeOrDislikeRequest.class, new AddOrRemoveLikeOrDislikeEndpoint()));
+        post(Constants.URIs.REGISTER_APNS, (req, res) -> Server.respond(req, APNSRegistrationRequest.class, new APNSRegistrationEndpoint()));
+        post(Constants.URIs.TIK_TOK_SEARCH, (req, res) -> Server.respond(req, TikTokSearchRequest.class, new TikTokSearchEndpoint()));
+
         post(Constants.URIs.CATEGORIZE_INGREDIENTS, Server.Func::categorizeIngredients);
         post(Constants.URIs.CREATE_RECIPE_IDEA, Server.Func::createRecipeIdea);
         post(Constants.URIs.MAKE_RECIPE_FROM_IDEA, Server.Func::finalizeRecipe);

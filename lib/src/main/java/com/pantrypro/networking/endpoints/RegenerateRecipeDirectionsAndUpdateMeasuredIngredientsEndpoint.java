@@ -56,7 +56,7 @@ public class RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsEndpoint {
         }
 
         // Regenerate directions
-        PantryPro.regenerateMeasuredIngredientsAndDirections(request.getRecipeID(), prevServings);
+        PantryPro.regenerateMeasuredIngredientsAndDirections(request.getRecipeID(), prevServings, request.getAdditionalInput());
 
         // Get Recipe
         Recipe recipe = PantryPro.getRecipe(request.getRecipeID());

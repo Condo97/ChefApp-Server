@@ -35,7 +35,7 @@ public class MakeRecipeEndpoint {
         PantryPro.validateUserRecipeAssociation(makeRecipeRequest.getAuthToken(), recipeID);
 
         // Finalize and save recipe
-        PantryPro.finalizeSaveRecipe(recipeID);
+        PantryPro.finalizeSaveRecipe(recipeID, makeRecipeRequest.getAdditionalInput());
 
         // Get Recipe
         Recipe recipe = PantryPro.getRecipe(recipeID);

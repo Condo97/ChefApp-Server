@@ -357,6 +357,35 @@ public class Server {
     }
 
     /***
+     * Generic respond lol
+     */
+    public static <RQ> Object respond(Request request, Class<RQ> requestClass, Endpoint<RQ> endpoint) throws Exception {
+        RQ requestObject;
+
+        try {
+            requestObject = new ObjectMapper().readValue(request.body(), requestClass);
+        } catch (JsonMappingException | JsonParseException e) {
+            System.out.println("Exception when getting response... The request: " + request.body());
+            e.printStackTrace();
+            throw new MalformedJSONException("Malformed JSON - " + e.getMessage());
+        }
+
+        Object responseObject = endpoint.getResponse(requestObject);
+
+        BodyResponse bodyResponse = BodyResponseFactory.createSuccessBodyResponse(responseObject);
+
+        return new ObjectMapper().writeValueAsString(bodyResponse);
+    }
+
+    public static Object respond(Request request, Endpoint<?> endpoint) throws Exception {
+        Object responseObject = endpoint.getResponse(null);
+
+        BodyResponse bodyResponse = BodyResponseFactory.createSuccessBodyResponse(responseObject);
+
+        return new ObjectMapper().writeValueAsString(bodyResponse);
+    }
+
+    /***
      * Get All Tags
      *
      * Gets all the tags that are available in PantryPro. This is the list that tagRecipeIdea selects from, and the list that can be provided to users to select from when generating a recipe idea for convenience

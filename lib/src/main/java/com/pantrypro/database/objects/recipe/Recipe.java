@@ -48,11 +48,17 @@ public class Recipe {
     @DBColumn(name = DBRegistry.Table.Recipe.modify_date)
     private LocalDateTime modifyDate;
 
+    @DBColumn(name = DBRegistry.Table.Recipe.likes_count)
+    private Integer likesCount;
+
+    @DBColumn(name = DBRegistry.Table.Recipe.dislikes_count)
+    private Integer dislikesCount;
+
     public Recipe() {
 
     }
 
-    public Recipe(Integer recipe_id, Integer user_id, String input, String name, String summary, String cuisineType, Integer expandIngredientsMagnitude, Integer estimatedTotalCalories, Integer estimatedTotalMinutes, Integer estimatedServings, Integer feasibility, LocalDateTime creationDate, LocalDateTime modifyDate) {
+    public Recipe(Integer recipe_id, Integer user_id, String input, String name, String summary, String cuisineType, Integer expandIngredientsMagnitude, Integer estimatedTotalCalories, Integer estimatedTotalMinutes, Integer estimatedServings, Integer feasibility, LocalDateTime creationDate, LocalDateTime modifyDate, Integer likesCount, Integer dislikesCount) {
         this.recipe_id = recipe_id;
         this.user_id = user_id;
         this.input = input;
@@ -66,6 +72,8 @@ public class Recipe {
         this.feasibility = feasibility;
         this.creationDate = creationDate;
         this.modifyDate = modifyDate;
+        this.likesCount = likesCount;
+        this.dislikesCount = dislikesCount;
     }
 
     public Integer getRecipe_id() {
@@ -118,6 +126,14 @@ public class Recipe {
 
     public LocalDateTime getModifyDate() {
         return modifyDate;
+    }
+
+    public Integer getLikesCount() {
+        return likesCount;
+    }
+
+    public Integer getDislikesCount() {
+        return dislikesCount;
     }
 
 }

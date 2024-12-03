@@ -247,6 +247,26 @@ public class RecipeDAO {
         );
     }
 
+    public static void updateLikesCount(Connection conn, Integer recipeID, Integer likesCount) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, IllegalAccessException {
+        DBManager.updateWhereByPrimaryKey(
+                conn,
+                Recipe.class,
+                recipeID,
+                DBRegistry.Table.Recipe.likes_count,
+                likesCount
+        );
+    }
+
+    public static void updateDislikesCount(Connection conn, Integer recipeID, Integer dislikesCount) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, IllegalAccessException {
+        DBManager.updateWhereByPrimaryKey(
+                conn,
+                Recipe.class,
+                recipeID,
+                DBRegistry.Table.Recipe.dislikes_count,
+                dislikesCount
+        );
+    }
+
     private static void deleteAllDirections(Connection conn, Integer recipeID) throws DBSerializerException, SQLException, InterruptedException {
         DBManager.deleteWhere(
                 conn,

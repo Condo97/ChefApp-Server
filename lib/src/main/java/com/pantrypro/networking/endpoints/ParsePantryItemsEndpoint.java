@@ -60,7 +60,7 @@ public class ParsePantryItemsEndpoint {
         // Parse bar items
         OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
                 ParsePantryItemsFC.class,
-                OpenAIGPTModels.GPT_4_VISION.getName(),
+                OpenAIGPTModels.GPT_4_MINI.getName(),
                 Constants.Response_Token_Limit_Parse_Pantry_Items,
                 Constants.DEFAULT_TEMPERATURE,
                 new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
@@ -69,7 +69,13 @@ public class ParsePantryItemsEndpoint {
                 messages);
 
         // Deserialize fcResponse to ParsePantryItemsFC
-        ParsePantryItemsFC parseBarItemsFC = JSONSchemaDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), ParsePantryItemsFC.class);
+        ParsePantryItemsFC parseBarItemsFC;
+        try {
+            parseBarItemsFC = JSONSchemaDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), ParsePantryItemsFC.class);
+        } catch (Exception e) {
+            System.out.println(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments());
+            throw e;
+        }
 
         // Map to ParsePantryItemsResponse.BarItem List
         List<ParsePantryItemsResponse.PantryItem> pantryItems = parseBarItemsFC.getBarItems().stream()

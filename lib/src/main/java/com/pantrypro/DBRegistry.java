@@ -30,6 +30,17 @@ public class DBRegistry {
 //            public static final String name = "name";
 //        }
 
+        public class APNSRegistration {
+
+            public static final String TABLE_NAME = "APNSRegistration";
+            public static final String id = "id";
+            public static final String user_id = "user_id";
+            public static final String device_id = "device_id";
+            public static final String add_date = "add_date";
+            public static final String update_date = "update_date";
+
+        }
+
         public class Recipe {
             public static final String TABLE_NAME = "Recipe";
             public static final String recipe_id = "recipe_id";
@@ -45,6 +56,8 @@ public class DBRegistry {
             public static final String feasibility = "feasibility";
             public static final String creation_date = "creation_date";
             public static final String modify_date = "creation_date";
+            public static final String likes_count = "likes_count";
+            public static final String dislikes_count = "dislikes_count";
         }
 
         public class RecipeInstruction {

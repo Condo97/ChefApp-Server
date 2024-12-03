@@ -281,6 +281,7 @@ public class Tests {
         MakeRecipeRequest mrRequest = new MakeRecipeRequest(
                 authToken,
                 criResponse.getRecipeID(),
+                null,
                 criResponse.getRecipeID()
         );
 
@@ -397,6 +398,7 @@ public class Tests {
         MakeRecipeRequest mrRequest = new MakeRecipeRequest(
                 authToken,
                 recipeID,
+                null,
                 recipeID
         );
 
@@ -425,7 +427,8 @@ public class Tests {
                 newName,
                 newSummary,
                 newServings,
-                newMeasuredIngredients
+                newMeasuredIngredients,
+                null
         );
 
         // Generate pack save regenerate recipe directions and idea recipe ingredients as body response
