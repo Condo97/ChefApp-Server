@@ -2,17 +2,17 @@ package com.pantrypro.database.dao.factory;
 
 import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
 import com.pantrypro.core.generation.tagging.TagFilterer;
-import com.pantrypro.database.compoundobjects.RecipeWithIngredients;
+import com.pantrypro.database.compoundobjects.RecipeWithIngredientsAndDirections;
 import com.pantrypro.database.dao.RecipeDAO;
 import com.pantrypro.database.dao.pooled.RecipeDAOPooled;
 import com.pantrypro.database.objects.recipe.Recipe;
 import com.pantrypro.database.objects.recipe.RecipeInstruction;
 import com.pantrypro.database.objects.recipe.RecipeMeasuredIngredient;
 import com.pantrypro.database.objects.recipe.RecipeTag;
-import com.pantrypro.networking.client.oaifunctioncall.createrecipeidea.CreateRecipeIdeaFC;
-import com.pantrypro.networking.client.oaifunctioncall.finalizerecipe.FinalizeRecipeFC;
-import com.pantrypro.networking.client.oaifunctioncall.generatedirections.GenerateMeasuredIngredientsAndDirectionsFC;
-import com.pantrypro.networking.client.oaifunctioncall.tagrecipe.TagRecipeFC;
+import com.pantrypro.networking.client.oaifunctioncall.createrecipeidea.CreateRecipeIdeaSO;
+import com.pantrypro.networking.client.oaifunctioncall.finalizerecipe.FinalizeRecipeSO;
+import com.pantrypro.networking.client.oaifunctioncall.generatedirections.GenerateMeasuredIngredientsAndDirectionsSO;
+import com.pantrypro.networking.client.oaifunctioncall.tagrecipe.TagRecipeSO;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 
@@ -25,14 +25,14 @@ import java.util.List;
 
 public class RecipeFactoryDAO {
 
-    public static RecipeWithIngredients createAndSaveRecipe(CreateRecipeIdeaFC createRecipeIdeaFC, Integer userID, String input, String cuisineType, Integer expandIngredientsMagnitude) throws InterruptedException, SQLException, InvocationTargetException, IllegalAccessException, DBSerializerPrimaryKeyMissingException, DBSerializerException {
+    public static RecipeWithIngredientsAndDirections createAndSaveRecipe(CreateRecipeIdeaSO createRecipeIdeaSO, Integer userID, String input, String cuisineType, Integer expandIngredientsMagnitude) throws InterruptedException, SQLException, InvocationTargetException, IllegalAccessException, DBSerializerPrimaryKeyMissingException, DBSerializerException {
         // Create Recipe
         Recipe recipe = new Recipe(
                 null,
                 userID,
                 input,
-                createRecipeIdeaFC.getName(),
-                createRecipeIdeaFC.getSummary(),
+                createRecipeIdeaSO.getName(),
+                createRecipeIdeaSO.getSummary(),
                 cuisineType,
                 expandIngredientsMagnitude,
                 null,
@@ -41,6 +41,7 @@ public class RecipeFactoryDAO {
                 null,
                 LocalDateTime.now(),
                 LocalDateTime.now(),
+                null,
                 0,
                 0
         );
@@ -54,7 +55,7 @@ public class RecipeFactoryDAO {
             List<RecipeMeasuredIngredient> recipeMeasuredIngredients = new ArrayList<>();
 
             // Loop through ingredients from createRecipeIdeaFC
-            for (String ingredientName: createRecipeIdeaFC.getIngredients()) {
+            for (String ingredientName: createRecipeIdeaSO.getIngredients()) {
                 // Get RecipeMeasuredIngredient
                 RecipeMeasuredIngredient measuredIngredient = new RecipeMeasuredIngredient(
                         null,
@@ -69,18 +70,50 @@ public class RecipeFactoryDAO {
                 recipeMeasuredIngredients.add(measuredIngredient);
             }
 
-            return new RecipeWithIngredients(recipe, recipeMeasuredIngredients);
+            return new RecipeWithIngredientsAndDirections(recipe, recipeMeasuredIngredients);
         } finally {
             SQLConnectionPoolInstance.releaseConnection(c);
         }
     }
 
-    public static List<RecipeTag> createAndSaveRecipeTags(TagRecipeFC tagRecipeFC, Integer recipeID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
+    public static RecipeWithIngredientsAndDirections createDuplicatedRecipe(Recipe recipe, List<RecipeMeasuredIngredient> measuredIngredients, List<RecipeInstruction> instructions, Integer userID) throws SQLException, InterruptedException, DBSerializerPrimaryKeyMissingException, DBSerializerException, InvocationTargetException, IllegalAccessException {
+        // Set recipeID to null
+        recipe.setRecipe_id(null);
+
+        // Set recipe userID to userID
+        recipe.setUser_id(userID);
+
+        // Get connection
+        Connection c = SQLConnectionPoolInstance.getConnection();
+
+        // Save recipe
+        RecipeDAO.insert(c, recipe);
+
+        // Set measuredIngredients and directions recipeID and save
+        for (RecipeMeasuredIngredient measuredIngredient: measuredIngredients) {
+            measuredIngredient.setIngredientID(null);
+            measuredIngredient.setRecipeID(recipe.getRecipe_id());
+            RecipeDAO.insertMeasuredIngredient(c, measuredIngredient);
+        }
+        for (RecipeInstruction instruction: instructions) {
+            instruction.setID(null);
+            instruction.setRecipeID(recipe.getRecipe_id());
+            RecipeDAO.insertDirection(c, instruction);
+        }
+
+        return new RecipeWithIngredientsAndDirections(
+                recipe,
+                measuredIngredients,
+                instructions
+        );
+    }
+
+    public static List<RecipeTag> createAndSaveRecipeTags(TagRecipeSO tagRecipeSO, Integer recipeID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
         Connection c = SQLConnectionPoolInstance.getConnection();
         try {
             // Create, adapt to, and save RecipeTag list
             List<RecipeTag> recipeTags = new ArrayList<>();
-            for (String tag : tagRecipeFC.getTags()) {
+            for (String tag : tagRecipeSO.getTags()) {
                 // Create RecipeTag with lowercase tag
                 RecipeTag recipeTag = RecipeTag.withLowercaseTag(
                         null,
@@ -106,10 +139,10 @@ public class RecipeFactoryDAO {
         }
     }
 
-    public static void updateAndSaveRecipe(FinalizeRecipeFC finalizeRecipeFC, Integer recipeID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
+    public static void updateAndSaveRecipe(FinalizeRecipeSO finalizeRecipeSO, Integer recipeID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
         // Create RecipeMeasuredIngredients list and update in DB
         List<RecipeMeasuredIngredient> measuredIngredients = new ArrayList<>();
-        for (String ingredientAndMeasurement: finalizeRecipeFC.getAllIngredientsAndMeasurements()) {
+        for (String ingredientAndMeasurement: finalizeRecipeSO.getAllIngredientsAndMeasurements()) {
             measuredIngredients.add(new RecipeMeasuredIngredient(
                     null,
                     recipeID,
@@ -120,35 +153,35 @@ public class RecipeFactoryDAO {
 
         // Create RecipeDirections list and update in DB
         List<RecipeInstruction> directions = new ArrayList<>();
-        for (String direction: finalizeRecipeFC.getInstructions()) {
+        for (int i = 0; i < finalizeRecipeSO.getInstructions().size(); i++) {
             directions.add(new RecipeInstruction(
                     null,
                     recipeID,
-                    direction
+                    finalizeRecipeSO.getInstructions().get(i)
             ));
         }
         RecipeDAOPooled.updateDirections(recipeID, directions);
 
         // Update feasibility
-        RecipeDAOPooled.updateFeasibility(recipeID, finalizeRecipeFC.getFeasibility());
+        RecipeDAOPooled.updateFeasibility(recipeID, finalizeRecipeSO.getFeasibility());
 
         // Update estimated total minutes
-        RecipeDAOPooled.updateEstimatedTotalMinutes(recipeID, finalizeRecipeFC.getEstimatedTotalMinutes());
+        RecipeDAOPooled.updateEstimatedTotalMinutes(recipeID, finalizeRecipeSO.getEstimatedTotalMinutes());
 
         // Update estimated servings
-        RecipeDAOPooled.updateEstimatedServings(recipeID, finalizeRecipeFC.getEstimatedServings());
+        RecipeDAOPooled.updateEstimatedServings(recipeID, finalizeRecipeSO.getEstimatedServings());
 
         // Update estimated total calories
-        RecipeDAOPooled.updateEstimatedTotalCalories(recipeID, finalizeRecipeFC.getEstimatedTotalCalories());
+        RecipeDAOPooled.updateEstimatedTotalCalories(recipeID, finalizeRecipeSO.getEstimatedTotalCalories());
 
         // Update modification date
         RecipeDAOPooled.updateModificationDate(recipeID);
     }
 
-    public static void updateAndSaveRecipe(GenerateMeasuredIngredientsAndDirectionsFC generateMeasuredIngredientsAndDirectionsFC, Integer recipeID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
+    public static void updateAndSaveRecipe(GenerateMeasuredIngredientsAndDirectionsSO generateMeasuredIngredientsAndDirectionsSO, Integer recipeID) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
         // Create RecipeMeasuredIngredients list and update in DB
         List<RecipeMeasuredIngredient> measuredIngredients = new ArrayList<>();
-        for (String ingredientAndMeasurement: generateMeasuredIngredientsAndDirectionsFC.getAllIngredientsAndMeasurements()) {
+        for (String ingredientAndMeasurement: generateMeasuredIngredientsAndDirectionsSO.getAllIngredientsAndMeasurements()) {
             measuredIngredients.add(new RecipeMeasuredIngredient(
                     null,
                     recipeID,
@@ -159,20 +192,21 @@ public class RecipeFactoryDAO {
 
         // Create RecipeDirections list and update in DB
         List<RecipeInstruction> directions = new ArrayList<>();
-        for (String direction: generateMeasuredIngredientsAndDirectionsFC.getDirections()) {
+//        for (String direction: generateMeasuredIngredientsAndDirectionsSO.getDirections()) {
+        for (int i = 0; i < generateMeasuredIngredientsAndDirectionsSO.getDirections().size(); i++) {
             directions.add(new RecipeInstruction(
                     null,
                     recipeID,
-                    direction
+                    generateMeasuredIngredientsAndDirectionsSO.getDirections().get(i)
             ));
         }
         RecipeDAOPooled.updateDirections(recipeID, directions);
 
         // Update estimatedServings
-        RecipeDAOPooled.updateEstimatedServings(recipeID, generateMeasuredIngredientsAndDirectionsFC.getEstimatedServings());
+        RecipeDAOPooled.updateEstimatedServings(recipeID, generateMeasuredIngredientsAndDirectionsSO.getEstimatedServings());
 
         // Update feasibility
-        RecipeDAOPooled.updateFeasibility(recipeID, generateMeasuredIngredientsAndDirectionsFC.getFeasibility());
+        RecipeDAOPooled.updateFeasibility(recipeID, generateMeasuredIngredientsAndDirectionsSO.getFeasibility());
 
         // Update modification date
         RecipeDAOPooled.updateModificationDate(recipeID);

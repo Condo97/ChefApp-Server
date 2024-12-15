@@ -6,7 +6,7 @@ import com.oaigptconnector.model.OAISerializerException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.core.PantryPro;
 import com.pantrypro.database.calculators.RecipeRemainingCalculator;
-import com.pantrypro.database.compoundobjects.RecipeWithIngredients;
+import com.pantrypro.database.compoundobjects.RecipeWithIngredientsAndDirections;
 import com.pantrypro.exceptions.CapReachedException;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.exceptions.PreparedStatementMissingArgumentException;
@@ -31,7 +31,7 @@ public class CreateRecipeIdeaEndpoint {
 
     public static CreateIdeaRecipeResponse createRecipeIdea(CreateIdeaRecipeRequest createIdeaRecipeRequest) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, UnrecoverableKeyException, CapReachedException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, OAISerializerException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException, DBSerializerException, AppStoreErrorResponseException {
         // Create save recipe idea
-        RecipeWithIngredients recipeWithIngredients = PantryPro.createSaveRecipeIdea(
+        RecipeWithIngredientsAndDirections recipeWithIngredientsAndDirections = PantryPro.createSaveRecipeIdea(
                 createIdeaRecipeRequest.getAuthToken(),
                 createIdeaRecipeRequest.getIngredients(),
                 createIdeaRecipeRequest.getModifiers(),
@@ -43,8 +43,8 @@ public class CreateRecipeIdeaEndpoint {
 
         // Adapt to CreateIdeaRecipeResponse
         CreateIdeaRecipeResponse createIdeaRecipeResponse = CreateRecipeIdeaResponseFactory.from(
-                recipeWithIngredients.getRecipe(),
-                recipeWithIngredients.getMeasuredIngredients(),
+                recipeWithIngredientsAndDirections.getRecipe(),
+                recipeWithIngredientsAndDirections.getMeasuredIngredients(),
                 remaining
         );
 

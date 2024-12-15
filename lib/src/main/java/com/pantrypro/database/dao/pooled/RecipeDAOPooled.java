@@ -97,6 +97,15 @@ public class RecipeDAOPooled {
         }
     }
 
+    public static void updateImageURL(Integer recipeID, String imageURL) throws SQLException, InterruptedException, DBSerializerException {
+        Connection conn = SQLConnectionPoolInstance.getConnection();
+        try {
+            RecipeDAO.updateImageURL(conn, recipeID, imageURL);
+        } finally {
+            SQLConnectionPoolInstance.releaseConnection(conn);
+        }
+    }
+
     public static void updateModificationDate(Integer recipeID) throws InterruptedException, DBSerializerException, SQLException {
         Connection conn = SQLConnectionPoolInstance.getConnection();
         try {

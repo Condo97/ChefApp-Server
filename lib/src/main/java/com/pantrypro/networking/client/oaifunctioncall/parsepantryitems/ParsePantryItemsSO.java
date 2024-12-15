@@ -5,8 +5,8 @@ import com.oaigptconnector.model.JSONSchemaParameter;
 
 import java.util.List;
 
-@JSONSchema(name = "parse_pantry_items", functionDescription = "Parses pantry items from input with fitting categories making them easy to find in a list. Does not include anything not in the list, and does not include any items if there is nothing on the list.")
-public class ParsePantryItemsFC {
+@JSONSchema(name = "parse_pantry_items", functionDescription = "Parses pantry items from input with fitting categories making them easy to find in a list. Does not include anything not in the list, and does not include any items if there is nothing on the list.", strict = JSONSchema.NullableBool.TRUE)
+public class ParsePantryItemsSO {
 
     public static class PantryItem {
 
@@ -33,7 +33,7 @@ public class ParsePantryItemsFC {
     @JSONSchemaParameter()
     private List<PantryItem> pantryItems;
 
-    public ParsePantryItemsFC() {
+    public ParsePantryItemsSO() {
 
     }
 

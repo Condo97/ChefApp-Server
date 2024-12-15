@@ -48,6 +48,9 @@ public class Recipe {
     @DBColumn(name = DBRegistry.Table.Recipe.modify_date)
     private LocalDateTime modifyDate;
 
+    @DBColumn(name = DBRegistry.Table.Recipe.image_url)
+    private String imageURL;
+
     @DBColumn(name = DBRegistry.Table.Recipe.likes_count)
     private Integer likesCount;
 
@@ -58,7 +61,7 @@ public class Recipe {
 
     }
 
-    public Recipe(Integer recipe_id, Integer user_id, String input, String name, String summary, String cuisineType, Integer expandIngredientsMagnitude, Integer estimatedTotalCalories, Integer estimatedTotalMinutes, Integer estimatedServings, Integer feasibility, LocalDateTime creationDate, LocalDateTime modifyDate, Integer likesCount, Integer dislikesCount) {
+    public Recipe(Integer recipe_id, Integer user_id, String input, String name, String summary, String cuisineType, Integer expandIngredientsMagnitude, Integer estimatedTotalCalories, Integer estimatedTotalMinutes, Integer estimatedServings, Integer feasibility, LocalDateTime creationDate, LocalDateTime modifyDate, String imageURL, Integer likesCount, Integer dislikesCount) {
         this.recipe_id = recipe_id;
         this.user_id = user_id;
         this.input = input;
@@ -72,6 +75,7 @@ public class Recipe {
         this.feasibility = feasibility;
         this.creationDate = creationDate;
         this.modifyDate = modifyDate;
+        this.imageURL = imageURL;
         this.likesCount = likesCount;
         this.dislikesCount = dislikesCount;
     }
@@ -80,8 +84,16 @@ public class Recipe {
         return recipe_id;
     }
 
+    public void setRecipe_id(Integer recipe_id) {
+        this.recipe_id = recipe_id;
+    }
+
     public Integer getUser_id() {
         return user_id;
+    }
+
+    public void setUser_id(Integer user_id) {
+        this.user_id = user_id;
     }
 
     public String getInput() {
@@ -126,6 +138,10 @@ public class Recipe {
 
     public LocalDateTime getModifyDate() {
         return modifyDate;
+    }
+
+    public String getImageURL() {
+        return imageURL;
     }
 
     public Integer getLikesCount() {

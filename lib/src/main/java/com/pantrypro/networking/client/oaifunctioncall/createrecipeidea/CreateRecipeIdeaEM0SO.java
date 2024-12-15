@@ -5,10 +5,10 @@ import com.oaigptconnector.model.JSONSchemaParameter;
 
 import java.util.List;
 
-@JSONSchema(name = "create_recipe_idea", functionDescription = "Creates a recipe from ingredients, adding as necessary")
-public class CreateRecipeIdeaEM1FC implements CreateRecipeIdeaFC {
+@JSONSchema(name = "create_recipe_idea", functionDescription = "Creates a recipe", strict = JSONSchema.NullableBool.TRUE)
+public class CreateRecipeIdeaEM0SO implements CreateRecipeIdeaSO {
 
-    @JSONSchemaParameter(description = "All of the ingredients needed, no measurements, adding as necessary")
+    @JSONSchemaParameter(description = "All of the ingredients needed, no measurements")
     private List<String> ingredients;
 
     @JSONSchemaParameter(description = "An interesting and fitting name for the recipe")
@@ -20,7 +20,7 @@ public class CreateRecipeIdeaEM1FC implements CreateRecipeIdeaFC {
     @JSONSchemaParameter(description = "A 1-5 word cuisine type for the recipe")
     private String cuisineType;
 
-    public CreateRecipeIdeaEM1FC() {
+    public CreateRecipeIdeaEM0SO() {
 
     }
 

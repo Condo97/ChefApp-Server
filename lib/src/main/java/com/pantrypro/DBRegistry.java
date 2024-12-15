@@ -56,6 +56,7 @@ public class DBRegistry {
             public static final String feasibility = "feasibility";
             public static final String creation_date = "creation_date";
             public static final String modify_date = "creation_date";
+            public static final String image_url = "image_url";
             public static final String likes_count = "likes_count";
             public static final String dislikes_count = "dislikes_count";
         }
@@ -65,6 +66,7 @@ public class DBRegistry {
             public static final String instruction_id = "instruction_id";
             public static final String recipe_id = "recipe_id";
             public static final String text = "text";
+            public static final String index = "recipe_index";
         }
 
 //        public class RecipeEquipment {

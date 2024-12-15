@@ -5,8 +5,8 @@ import com.oaigptconnector.model.JSONSchemaParameter;
 
 import java.util.List;
 
-@JSONSchema(name = "make_recipe", functionDescription = "Creates a recipe from the given summary and ingredients, adding measurements to ingredients")
-public class FinalizeRecipeFC {
+@JSONSchema(name = "make_recipe", functionDescription = "Creates a recipe from the given summary and ingredients, adding measurements to ingredients", strict = JSONSchema.NullableBool.TRUE)
+public class FinalizeRecipeSO {
 
     @JSONSchemaParameter(description = "The instructions to make the recipe. Do not include enumeration indicators")
     private List<String> instructions;
@@ -26,7 +26,7 @@ public class FinalizeRecipeFC {
     @JSONSchemaParameter(description = "On a scale of 1-10, how feasible the recipe is to make in reality")
     private Integer feasibility;
 
-    public FinalizeRecipeFC() {
+    public FinalizeRecipeSO() {
 
     }
 

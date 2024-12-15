@@ -1,20 +1,17 @@
 package com.pantrypro.networking.endpoints;
 
-import com.oaigptconnector.model.*;
+import com.oaigptconnector.model.JSONSchemaDeserializerException;
+import com.oaigptconnector.model.OAIChatCompletionRequestMessageBuilder;
+import com.oaigptconnector.model.OAISerializerException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
-import com.oaigptconnector.model.generation.OpenAIGPTModels;
 import com.oaigptconnector.model.request.chat.completion.CompletionRole;
 import com.oaigptconnector.model.request.chat.completion.OAIChatCompletionRequestMessage;
-import com.oaigptconnector.model.request.chat.completion.OAIChatCompletionRequestResponseFormat;
-import com.oaigptconnector.model.request.chat.completion.ResponseFormatType;
 import com.oaigptconnector.model.request.chat.completion.content.InputImageDetail;
-import com.oaigptconnector.model.response.chat.completion.http.OAIGPTChatCompletionResponse;
-import com.pantrypro.Constants;
+import com.pantrypro.core.PantryPro;
 import com.pantrypro.core.UserAuthenticator;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.exceptions.MissingRequiredRequestObjectException;
-import com.pantrypro.keys.Keys;
-import com.pantrypro.networking.client.oaifunctioncall.parsepantryitems.ParsePantryItemsFC;
+import com.pantrypro.networking.client.oaifunctioncall.parsepantryitems.ParsePantryItemsSO;
 import com.pantrypro.networking.server.request.ParsePantryItemsRequest;
 import com.pantrypro.networking.server.response.ParsePantryItemsResponse;
 import sqlcomponentizer.dbserializer.DBSerializerException;
@@ -57,28 +54,14 @@ public class ParsePantryItemsEndpoint {
                 userMessage
         );
 
-        // Parse bar items
-        OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
-                ParsePantryItemsFC.class,
-                OpenAIGPTModels.GPT_4_MINI.getName(),
-                Constants.Response_Token_Limit_Parse_Pantry_Items,
-                Constants.DEFAULT_TEMPERATURE,
-                new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
-                Keys.openAiAPI,
-                httpClient,
-                messages);
-
-        // Deserialize fcResponse to ParsePantryItemsFC
-        ParsePantryItemsFC parseBarItemsFC;
-        try {
-            parseBarItemsFC = JSONSchemaDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), ParsePantryItemsFC.class);
-        } catch (Exception e) {
-            System.out.println(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments());
-            throw e;
-        }
+        // Deserialize soResponse to ParsePantryItemsSO
+        ParsePantryItemsSO parsePantryItemsSO = PantryPro.getStructuredOutput(
+                    ParsePantryItemsSO.class,
+                    messages
+            );
 
         // Map to ParsePantryItemsResponse.BarItem List
-        List<ParsePantryItemsResponse.PantryItem> pantryItems = parseBarItemsFC.getBarItems().stream()
+        List<ParsePantryItemsResponse.PantryItem> pantryItems = parsePantryItemsSO.getBarItems().stream()
                 .map(b -> new ParsePantryItemsResponse.PantryItem(
                         b.getItem(),
                         b.getCategory()))

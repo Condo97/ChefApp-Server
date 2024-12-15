@@ -23,19 +23,7 @@ public final class Constants {
     public static final String YEARLY_NAME = "pantryproultrayearly";
 
     /* Tiered Limits */
-    public static final int Response_Token_Limit_Categorize_Ingredients = 800;
-    public static final int Response_Token_Limit_Create_Recipe = 800;
-    public static final int Response_Token_Limit_Finalize_Recipe = 800;
-    public static final int Response_Token_Limit_Generate_Directions = 800;
-    public static final int Response_Token_Limit_Parse_Pantry_Items = 800;
-    public static final int Response_Token_Limit_Tag_Recipe = 800;
-
-    public static final int Context_Character_Limit_Categorize_Ingredients = 800;
-    public static final int Context_Character_Limit_Create_Recipe_Idea = 800;
-    public static final int Context_Character_Limit_Generate_Directions = 800;
-    public static final int Context_Character_Limit_Get_Ingredients_Without_Measurements = 800;
-    public static final int Context_Character_Limit_Make_Recipe = 800;
-    public static final int Context_Character_Limit_Tag_Recipe_Idea = 800;
+    public static final int Response_Token_Limit = 4000;
 
     /* Delays and Cooldowns */
     public static final int Transaction_Status_Apple_Update_Cooldown = 60;
@@ -60,6 +48,7 @@ public final class Constants {
         public static final String TAG_RECIPE_IDEA = "/tagRecipeIdea";
         public static final String GET_ALL_TAGS_URI = "/getAllTags";
         public static final String GET_CREATE_PANELS = "/getCreatePanels";
+        public static final String GET_AND_DUPLICATE_RECIPE = "/getAndDuplicateRecipe";
         public static final String GET_IAP_STUFF_URI = "/getIAPStuff";
         public static final String GET_IMPORTANT_CONSTANTS_URI = "/getImportantConstants";
         public static final String GET_IS_PREMIUM_URI = "/getIsPremium";
@@ -69,7 +58,9 @@ public final class Constants {
         public static final String REGISTER_APNS = "/registerAPNS";
         public static final String REGISTER_TRANSACTION_URI = "/registerTransaction";
         public static final String REGISTER_USER_URI = "/registerUser";
+        public static final String SEND_PUSH_NOTIFICATION = "/sendPushNotification";
         public static final String TIK_TOK_SEARCH = "/tikTokSearch";
+        public static final String UPDATE_RECIPE_IMAGE_URL = "/updateRecipeImageURL";
         public static final String VALIDATE_AUTH_TOKEN_URI = "/validateAuthToken";
     }
 
@@ -88,12 +79,15 @@ public final class Constants {
 
     /* Apple Server Constants */
     public static final String Apple_Bundle_ID = "com.acapplications.PantryPal";
+    public static final String Apple_Sandbox_APNS_Base_URL = "https://api.sandbox.push.apple.com:443";
+    public static final String Apple_APNS_Base_URL = "https://api.push.apple.com:443";
     public static final String Apple_Sandbox_Storekit_Base_URL = "https://api.storekit-sandbox.itunes.apple.com";
     public static final String Apple_Storekit_Base_URL = "https://api.storekit.itunes.apple.com";
     public static final String Apple_In_Apps_URL_Path = "/inApps";
     public static final String Apple_V1_URL_Path = "/v1";
     public static final String Apple_Subscriptions_URL_Path = "/subscriptions";
     public static final String Apple_Get_Subscription_Status_V1_Full_URL_Path = Apple_In_Apps_URL_Path + Apple_V1_URL_Path + Apple_Subscriptions_URL_Path;
+    public static final String Apple_APNS_AuthKey_JWS_Path = "keys/AuthKey_HZ574FFQUD.p8";
     public static final String Apple_SubscriptionKey_JWS_Path = "keys/SubscriptionKey_253R52D9UP.p8";
 
     public static final String Sandbox_Apple_Verify_Receipt_URL = "https://sandbox.itunes.apple.com/verifyReceipt";
@@ -109,7 +103,7 @@ public final class Constants {
     /* OpenAI Constants */
     public static URI OPENAI_URI = URI.create("https://api.openai.com/v1/chat/completions");
     public static long AI_TIMEOUT_MINUTES = 4;
-    public static String DEFAULT_MODEL_NAME = "gpt-4o";
+    public static String DEFAULT_MODEL_NAME = "gpt-4o-mini";
     public static String PAID_MODEL_NAME = "gpt-4o";
     public static String DEFAULT_BEHAVIOR = null;
     public static CompletionRole LEGACY_DEFAULT_ROLE = CompletionRole.USER;

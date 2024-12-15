@@ -2,7 +2,7 @@ package com.pantrypro.networking.client.oaifunctioncall.createrecipeidea;
 
 import java.util.List;
 
-public interface CreateRecipeIdeaFC {
+public interface CreateRecipeIdeaSO {
 
     List<String> getIngredients();
     String getName();

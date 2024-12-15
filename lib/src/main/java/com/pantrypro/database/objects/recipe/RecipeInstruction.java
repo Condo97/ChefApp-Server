@@ -30,6 +30,10 @@ public class RecipeInstruction {
         return instructionID;
     }
 
+    public void setID(Integer instructionID) {
+        this.instructionID = instructionID;
+    }
+
     public Integer getRecipeID() {
         return recipeID;
     }

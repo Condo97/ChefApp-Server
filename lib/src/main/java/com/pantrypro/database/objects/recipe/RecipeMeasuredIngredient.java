@@ -30,6 +30,10 @@ public class RecipeMeasuredIngredient {
         return ingredientID;
     }
 
+    public void setIngredientID(Integer ingredientID) {
+        this.ingredientID = ingredientID;
+    }
+
     public Integer getRecipeID() {
         return recipeID;
     }
@@ -39,7 +43,7 @@ public class RecipeMeasuredIngredient {
     }
 
     public String getMeasuredIngredient() {
-        System.out.println("Measured Ingredient: " + measuredIngredient);
+//        System.out.println("Measured Ingredient: " + measuredIngredient);
         return measuredIngredient;
     }
 

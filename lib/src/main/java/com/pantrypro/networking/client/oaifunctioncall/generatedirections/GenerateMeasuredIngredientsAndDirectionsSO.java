@@ -5,8 +5,8 @@ import com.oaigptconnector.model.JSONSchemaParameter;
 
 import java.util.List;
 
-@JSONSchema(name = "generate_recipe", functionDescription = "Generates measured ingredients and directions to make the recipe")
-public class GenerateMeasuredIngredientsAndDirectionsFC {
+@JSONSchema(name = "generate_recipe", functionDescription = "Generates measured ingredients and directions to make the recipe", strict = JSONSchema.NullableBool.TRUE)
+public class GenerateMeasuredIngredientsAndDirectionsSO {
 
     @JSONSchemaParameter(description = "The ingredients given in the input with correct measurements.")
     private List<String> allIngredientsAndMeasurements;
@@ -20,7 +20,7 @@ public class GenerateMeasuredIngredientsAndDirectionsFC {
     @JSONSchemaParameter(description = "On a scale of 1-10, how feasible the recipe is to make in reality")
     private Integer feasibility;
 
-    public GenerateMeasuredIngredientsAndDirectionsFC() {
+    public GenerateMeasuredIngredientsAndDirectionsSO() {
 
     }
 

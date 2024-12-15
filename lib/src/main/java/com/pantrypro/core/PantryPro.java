@@ -3,18 +3,15 @@ package com.pantrypro.core;
 import appletransactionclient.exception.AppStoreErrorResponseException;
 import com.oaigptconnector.model.*;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
-import com.oaigptconnector.model.generation.OpenAIGPTModels;
-import com.oaigptconnector.model.request.chat.completion.CompletionRole;
-import com.oaigptconnector.model.request.chat.completion.OAIChatCompletionRequestMessage;
-import com.oaigptconnector.model.request.chat.completion.OAIChatCompletionRequestResponseFormat;
-import com.oaigptconnector.model.request.chat.completion.ResponseFormatType;
+import com.oaigptconnector.model.jsonschema.isobase.SOBase;
+import com.oaigptconnector.model.request.chat.completion.*;
 import com.oaigptconnector.model.response.chat.completion.http.OAIGPTChatCompletionResponse;
 import com.pantrypro.Constants;
 import com.pantrypro.core.generation.IdeaRecipeExpandIngredients;
 import com.pantrypro.core.generation.tagging.TagFetcher;
 import com.pantrypro.database.calculators.RecipeRemainingCalculator;
 import com.pantrypro.database.compoundobjects.IngredientAndCategory;
-import com.pantrypro.database.compoundobjects.RecipeWithIngredients;
+import com.pantrypro.database.compoundobjects.RecipeWithIngredientsAndDirections;
 import com.pantrypro.database.dao.factory.RecipeFactoryDAO;
 import com.pantrypro.database.dao.pooled.RecipeDAOPooled;
 import com.pantrypro.database.objects.recipe.Recipe;
@@ -27,11 +24,11 @@ import com.pantrypro.exceptions.InvalidAssociatedIdentifierException;
 import com.pantrypro.exceptions.PreparedStatementMissingArgumentException;
 import com.pantrypro.keys.Keys;
 import com.pantrypro.networking.client.apple.itunes.exception.AppleItunesResponseException;
-import com.pantrypro.networking.client.oaifunctioncall.categorizeingredients.CategorizeIngredientsFC;
-import com.pantrypro.networking.client.oaifunctioncall.createrecipeidea.CreateRecipeIdeaFC;
-import com.pantrypro.networking.client.oaifunctioncall.finalizerecipe.FinalizeRecipeFC;
-import com.pantrypro.networking.client.oaifunctioncall.generatedirections.GenerateMeasuredIngredientsAndDirectionsFC;
-import com.pantrypro.networking.client.oaifunctioncall.tagrecipe.TagRecipeFC;
+import com.pantrypro.networking.client.oaifunctioncall.categorizeingredients.CategorizeIngredientsSO;
+import com.pantrypro.networking.client.oaifunctioncall.createrecipeidea.CreateRecipeIdeaSO;
+import com.pantrypro.networking.client.oaifunctioncall.finalizerecipe.FinalizeRecipeSO;
+import com.pantrypro.networking.client.oaifunctioncall.generatedirections.GenerateMeasuredIngredientsAndDirectionsSO;
+import com.pantrypro.networking.client.oaifunctioncall.tagrecipe.TagRecipeSO;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 
@@ -63,32 +60,17 @@ public class PantryPro {
                 .addText(input)
                 .build();
 
-//        // Create messages list from input
-//        List<OAIChatCompletionRequestMessage> messages = new OAIChatCompletionRequestMessagesBuilder()
-//                .addUser(input)
-//                .build();
-
-        // Generate fcResponse from CategorizeIngredientsFC
-        OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
-                CategorizeIngredientsFC.class,
-                Constants.DEFAULT_MODEL_NAME,
-                Constants.Response_Token_Limit_Categorize_Ingredients,
-                Constants.DEFAULT_TEMPERATURE,
-                new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
-                Keys.openAiAPI,
-                httpClient,
-                userMessage
-        );
-
-        // Deserialize fcResponse to CategorizeIngredientsFC
-        CategorizeIngredientsFC categorizeIngredientsFC = JSONSchemaDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), CategorizeIngredientsFC.class);
+        // Get structured output
+        CategorizeIngredientsSO categorizeIngredientsSO = getStructuredOutput(
+                CategorizeIngredientsSO.class,
+                userMessage);
 
         // Adapt to IngredientAndCategory list and return
         List<IngredientAndCategory> ingredientsAndCategories = new ArrayList<>();
-        for (CategorizeIngredientsFC.IngredientsWithCategories fcIngredientsWithCategories: categorizeIngredientsFC.getIngredientsWithCategories()) {
+        for (CategorizeIngredientsSO.IngredientsWithCategories soIngredientsWithCategories: categorizeIngredientsSO.getIngredientsWithCategories()) {
             ingredientsAndCategories.add(new IngredientAndCategory(
-                    fcIngredientsWithCategories.getIngredient(),
-                    fcIngredientsWithCategories.getCategory()
+                    soIngredientsWithCategories.getIngredient(),
+                    soIngredientsWithCategories.getCategory()
             ));
         }
 
@@ -126,7 +108,7 @@ public class PantryPro {
 
     /* Recipe Creation */
 
-    public static RecipeWithIngredients createSaveRecipeIdea(String authToken, String ingredientsString, String modifiersString, Integer expandIngredientsMagnitude) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, CapReachedException, OAISerializerException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException, DBSerializerException, AppStoreErrorResponseException {
+    public static RecipeWithIngredientsAndDirections createSaveRecipeIdea(String authToken, String ingredientsString, String modifiersString, Integer expandIngredientsMagnitude) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, CapReachedException, OAISerializerException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException, DBSerializerException, AppStoreErrorResponseException {
         /* Validation */
 
         // Get userID from authToken using UserAuthenticator
@@ -160,32 +142,22 @@ public class PantryPro {
 //                .addUser(userInput)
 //                .build();
 
-        // Get fcResponse from FCClient serializedChatCompletion
-        OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
+        // Get structured output
+        CreateRecipeIdeaSO createRecipeIdeaSO = getStructuredOutput(
                 ideaRecipeExpandIngredients.getFcClass(),
-                OpenAIGPTModels.GPT_4_MINI.getName(),
-                Constants.Response_Token_Limit_Create_Recipe,
-                Constants.DEFAULT_TEMPERATURE,
-                new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
-                Keys.openAiAPI,
-                httpClient,
                 systemMessage,
-                userMessage
-        );
-
-        // Deserialize fcResponse to CreateRecipeIdeaFC
-        CreateRecipeIdeaFC createRecipeIdeaFC = JSONSchemaDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), ideaRecipeExpandIngredients.getFcClass());
+                userMessage);
 
         // Get and save Recipe and RecipeMeasuredIngredients in RecpieWithIngredients object using RecipeFactoryDAO and return
-        RecipeWithIngredients recipeWithIngredients = RecipeFactoryDAO.createAndSaveRecipe(
-                createRecipeIdeaFC,
+        RecipeWithIngredientsAndDirections recipeWithIngredientsAndDirections = RecipeFactoryDAO.createAndSaveRecipe(
+                createRecipeIdeaSO,
                 userID,
                 userInput,
-                createRecipeIdeaFC.getCuisineType(),
+                createRecipeIdeaSO.getCuisineType(),
                 expandIngredientsMagnitude
         );
 
-        return recipeWithIngredients;
+        return recipeWithIngredientsAndDirections;
     }
 
     public static void finalizeSaveRecipe(Integer recipeID, String additionalInput) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException {
@@ -214,24 +186,14 @@ public class PantryPro {
 //                .addUser(input)
 //                .build();
 
-        // Get fcResponse from FCClient serializedChatCompletion
-        OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
-                FinalizeRecipeFC.class,
-                OpenAIGPTModels.GPT_4_MINI.getName(),
-                Constants.Response_Token_Limit_Finalize_Recipe,
-                Constants.DEFAULT_TEMPERATURE,
-                new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
-                Keys.openAiAPI,
-                httpClient,
-                userMessage
-        );
-
-        // Deserialize fcResponse to FinalizeRecipeFC
-        FinalizeRecipeFC finalizeRecipeFC = JSONSchemaDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), FinalizeRecipeFC.class);
+        // Get structured output
+        FinalizeRecipeSO finalizeRecipeSO = getStructuredOutput(
+                FinalizeRecipeSO.class,
+                userMessage);
 
         // Update and save Recipe, RecipeMeasuredIngredients, and RecipeDirections in RecipeWithIngredientsAndDirections using RecipeFactoryDAO
         RecipeFactoryDAO.updateAndSaveRecipe(
-                finalizeRecipeFC,
+                finalizeRecipeSO,
                 recipeID
         );
     }
@@ -281,24 +243,15 @@ public class PantryPro {
                 userMessage
         );
 
-        // Get fcResponse from FCClient for TagRecipeFC
-        OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
-                TagRecipeFC.class,
-                OpenAIGPTModels.GPT_4_MINI.getName(),
-                Constants.Response_Token_Limit_Tag_Recipe,
-                Constants.DEFAULT_TEMPERATURE,
-                new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
-                Keys.openAiAPI,
-                httpClient,
+        // Get structured output
+        TagRecipeSO tagRecipeSO = getStructuredOutput(
+                TagRecipeSO.class,
                 messages
         );
 
-        // Deserialize fcResponse to TagRecipeFC
-        TagRecipeFC tagRecipeFC = JSONSchemaDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), TagRecipeFC.class);
-
         // Get and save RecipeTag list with RecipeFactoryDAO and return
         List<RecipeTag> recipeTags = RecipeFactoryDAO.createAndSaveRecipeTags(
-                tagRecipeFC,
+                tagRecipeSO,
                 recipeID
         );
 
@@ -340,23 +293,13 @@ public class PantryPro {
 //                .addUser(input)
 //                .build();
 
-        // Get fcResponse from FCClient serializedChatCompletion
-        OAIGPTChatCompletionResponse fcResponse = FCClient.serializedChatCompletion(
-                GenerateMeasuredIngredientsAndDirectionsFC.class,
-                OpenAIGPTModels.GPT_4_MINI.getName(),
-                Constants.Response_Token_Limit_Generate_Directions,
-                Constants.DEFAULT_TEMPERATURE,
-                new OAIChatCompletionRequestResponseFormat(ResponseFormatType.TEXT),
-                Keys.openAiAPI,
-                httpClient,
+        GenerateMeasuredIngredientsAndDirectionsSO generateMeasuredIngredientsAndDirectionsSO = getStructuredOutput(
+                GenerateMeasuredIngredientsAndDirectionsSO.class,
                 userMessage
         );
 
-        // Deserialize fcResponse to GenerateDirectionsFC
-        GenerateMeasuredIngredientsAndDirectionsFC generateMeasuredIngredientsAndDirectionsFC = JSONSchemaDeserializer.deserialize(fcResponse.getChoices()[0].getMessage().getTool_calls().get(0).getFunction().getArguments(), GenerateMeasuredIngredientsAndDirectionsFC.class);
-
         // Update and save directions and feasibility with RecipeFactoryDAO
-        RecipeFactoryDAO.updateAndSaveRecipe(generateMeasuredIngredientsAndDirectionsFC, recipeID);
+        RecipeFactoryDAO.updateAndSaveRecipe(generateMeasuredIngredientsAndDirectionsSO, recipeID);
     }
 
     public static void updateIngredientsAndMeasurements(Integer recipeID, List<String> measuredIngredients) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException {
@@ -571,6 +514,42 @@ public class PantryPro {
         System.out.println(sb.toString());
 
         return sb.toString();
+    }
+
+
+    public static <T> T getStructuredOutput(Class<T> soClass, OAIChatCompletionRequestMessage... messages) throws OAISerializerException, OpenAIGPTException, IOException, InterruptedException, JSONSchemaDeserializerException {
+        return getStructuredOutput(soClass, List.of(messages));
+    }
+    public static <T> T getStructuredOutput(Class<T> soClass, List<OAIChatCompletionRequestMessage> messages) throws OAISerializerException, OpenAIGPTException, IOException, InterruptedException, JSONSchemaDeserializerException {
+        // Objectify soClass
+        SOBase soObject = SOJSONSchemaSerializer.objectify(soClass);
+
+        // Create request
+        OAIChatCompletionRequest chatCompletionRequest = OAIChatCompletionRequest.build(
+                Constants.DEFAULT_MODEL_NAME,
+                Constants.Response_Token_Limit,
+                Constants.DEFAULT_TEMPERATURE,
+                new OAIChatCompletionRequestResponseFormat(
+                        ResponseFormatType.JSON_SCHEMA,
+                        soObject
+                ),
+                messages
+        );
+
+        // Get response
+        OAIGPTChatCompletionResponse response = OAIClient.postChatCompletion(
+                chatCompletionRequest,
+                Keys.openAiAPI,
+                httpClient
+        );
+
+        // Transform back into requested StructuredOutput class
+        try {
+            return JSONSchemaDeserializer.deserialize(response.getChoices()[0].getMessage().getContent(), soClass);
+        } catch (Exception e) {
+            System.out.println("The response: \n" + response.getChoices()[0].getMessage().getContent());
+            throw e;
+        }
     }
 
 }

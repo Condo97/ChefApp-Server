@@ -188,6 +188,18 @@ public class RecipeDAO {
         );
     }
 
+    public static void updateImageURL(Connection conn, Integer recipeID, String imageURL) throws DBSerializerException, SQLException, InterruptedException {
+        DBManager.updateWhere(
+                conn,
+                Recipe.class,
+                DBRegistry.Table.Recipe.image_url,
+                imageURL,
+                DBRegistry.Table.Recipe.recipe_id,
+                SQLOperators.EQUAL,
+                recipeID
+        );
+    }
+
     public static void updateModificationDate(Connection conn, Integer recipeID) throws DBSerializerException, SQLException, InterruptedException {
         updateModificationDate(conn, recipeID, LocalDateTime.now());
     }

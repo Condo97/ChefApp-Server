@@ -5,8 +5,8 @@ import com.oaigptconnector.model.JSONSchemaParameter;
 
 import java.util.List;
 
-@JSONSchema(name = "categorize_ingredients", functionDescription = "Categorizes ingredients for easy finding in a list.")
-public class CategorizeIngredientsFC {
+@JSONSchema(name = "categorize_ingredients", functionDescription = "Categorizes ingredients for easy finding in a list.", strict = JSONSchema.NullableBool.TRUE)
+public class CategorizeIngredientsSO {
 
     public static class IngredientsWithCategories {
 
@@ -38,11 +38,11 @@ public class CategorizeIngredientsFC {
     @JSONSchemaParameter(description = "A list of ingredients each mapped to a category")
     List<IngredientsWithCategories> ingredientsWithCategories;
 
-    public CategorizeIngredientsFC() {
+    public CategorizeIngredientsSO() {
 
     }
 
-    public CategorizeIngredientsFC(List<IngredientsWithCategories> ingredientsWithCategories) {
+    public CategorizeIngredientsSO(List<IngredientsWithCategories> ingredientsWithCategories) {
         this.ingredientsWithCategories = ingredientsWithCategories;
     }
 

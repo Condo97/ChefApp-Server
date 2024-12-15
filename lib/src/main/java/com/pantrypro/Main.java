@@ -7,13 +7,9 @@ import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
 import com.pantrypro.core.Server;
 import com.pantrypro.exceptions.ResponseStatusException;
 import com.pantrypro.keys.Keys;
-import com.pantrypro.networking.endpoints.APNSRegistrationEndpoint;
-import com.pantrypro.networking.endpoints.AddOrRemoveLikeOrDislikeEndpoint;
-import com.pantrypro.networking.endpoints.TikTokSearchEndpoint;
+import com.pantrypro.networking.endpoints.*;
 import com.pantrypro.networking.server.ResponseStatus;
-import com.pantrypro.networking.server.request.APNSRegistrationRequest;
-import com.pantrypro.networking.server.request.AddOrRemoveLikeOrDislikeRequest;
-import com.pantrypro.networking.server.request.TikTokSearchRequest;
+import com.pantrypro.networking.server.request.*;
 import com.pantrypro.networking.server.response.BodyResponse;
 import com.pantrypro.networking.server.response.GetCreatePanelsResponse;
 import com.pantrypro.networking.server.response.GetIAPStuffResponse;
@@ -128,8 +124,11 @@ public class Main {
     private static void configureHttpEndpoints(boolean dev) {
         // POST Functions
         post(Constants.URIs.ADD_OR_REMOVE_LIKE_OR_DISLIKE, (req, res) -> Server.respond(req, AddOrRemoveLikeOrDislikeRequest.class, new AddOrRemoveLikeOrDislikeEndpoint()));
+        post(Constants.URIs.GET_AND_DUPLICATE_RECIPE, (req, res) -> Server.respond(req, GetAndDuplicateRecipeRequest.class, new GetAndDuplicateRecipeEndpoint()));
         post(Constants.URIs.REGISTER_APNS, (req, res) -> Server.respond(req, APNSRegistrationRequest.class, new APNSRegistrationEndpoint()));
+        post(Constants.URIs.SEND_PUSH_NOTIFICATION, (req, res) -> Server.respond(req, SendPushNotificationRequest.class, new SendPushNotificationEndpoint()));
         post(Constants.URIs.TIK_TOK_SEARCH, (req, res) -> Server.respond(req, TikTokSearchRequest.class, new TikTokSearchEndpoint()));
+        post(Constants.URIs.UPDATE_RECIPE_IMAGE_URL, (req, res) -> Server.respond(req, UpdateRecipeImageURLRequest.class, new UpdateRecipeImageURLEndpoint()));
 
         post(Constants.URIs.CATEGORIZE_INGREDIENTS, Server.Func::categorizeIngredients);
         post(Constants.URIs.CREATE_RECIPE_IDEA, Server.Func::createRecipeIdea);

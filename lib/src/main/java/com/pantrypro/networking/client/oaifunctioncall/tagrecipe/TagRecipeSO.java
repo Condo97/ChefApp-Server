@@ -5,13 +5,13 @@ import com.oaigptconnector.model.JSONSchema;
 
 import java.util.List;
 
-@JSONSchema(name = "tag_recipe", functionDescription = "Gets tags that represent the recipe")
-public class TagRecipeFC {
+@JSONSchema(name = "tag_recipe", functionDescription = "Gets tags that represent the recipe", strict = JSONSchema.NullableBool.TRUE)
+public class TagRecipeSO {
 
     @JSONSchemaParameter(description = "2-5 relevant tags that apply to the recipe from the included list")
     private List<String> tags;
 
-    public TagRecipeFC() {
+    public TagRecipeSO() {
 
     }
 
