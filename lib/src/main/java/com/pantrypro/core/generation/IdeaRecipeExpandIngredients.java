@@ -1,9 +1,9 @@
 package com.pantrypro.core.generation;
 
-import com.pantrypro.networking.client.oaifunctioncall.createrecipeidea.CreateRecipeIdeaEM0SO;
-import com.pantrypro.networking.client.oaifunctioncall.createrecipeidea.CreateRecipeIdeaEM1SO;
-import com.pantrypro.networking.client.oaifunctioncall.createrecipeidea.CreateRecipeIdeaEM2SO;
-import com.pantrypro.networking.client.oaifunctioncall.createrecipeidea.CreateRecipeIdeaSO;
+import com.pantrypro.openai.structuredoutput.createrecipeidea.CreateRecipeIdeaEM0SO;
+import com.pantrypro.openai.structuredoutput.createrecipeidea.CreateRecipeIdeaEM1SO;
+import com.pantrypro.openai.structuredoutput.createrecipeidea.CreateRecipeIdeaEM2SO;
+import com.pantrypro.openai.structuredoutput.createrecipeidea.CreateRecipeIdeaSO;
 
 public enum IdeaRecipeExpandIngredients {
 

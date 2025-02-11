@@ -1,4 +1,4 @@
-package com.pantrypro.networking.client.oaifunctioncall.createrecipeidea;
+package com.pantrypro.openai.structuredoutput.createrecipeidea;
 
 import com.oaigptconnector.model.JSONSchema;
 import com.oaigptconnector.model.JSONSchemaParameter;
@@ -6,7 +6,7 @@ import com.oaigptconnector.model.JSONSchemaParameter;
 import java.util.List;
 
 @JSONSchema(name = "create_recipe_idea", functionDescription = "Creates a recipe from ingredients, adding as necessary", strict = JSONSchema.NullableBool.TRUE)
-public class CreateRecipeIdeaEM2SO implements CreateRecipeIdeaSO {
+public class CreateRecipeIdeaEM1SO implements CreateRecipeIdeaSO {
 
     @JSONSchemaParameter(description = "All of the ingredients needed, no measurements, adding as necessary")
     private List<String> ingredients;
@@ -20,7 +20,7 @@ public class CreateRecipeIdeaEM2SO implements CreateRecipeIdeaSO {
     @JSONSchemaParameter(description = "A 1-5 word cuisine type for the recipe")
     private String cuisineType;
 
-    public CreateRecipeIdeaEM2SO() {
+    public CreateRecipeIdeaEM1SO() {
 
     }
 

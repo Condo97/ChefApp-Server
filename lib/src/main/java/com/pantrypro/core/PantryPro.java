@@ -24,11 +24,11 @@ import com.pantrypro.exceptions.InvalidAssociatedIdentifierException;
 import com.pantrypro.exceptions.PreparedStatementMissingArgumentException;
 import com.pantrypro.keys.Keys;
 import com.pantrypro.networking.client.apple.itunes.exception.AppleItunesResponseException;
-import com.pantrypro.networking.client.oaifunctioncall.categorizeingredients.CategorizeIngredientsSO;
-import com.pantrypro.networking.client.oaifunctioncall.createrecipeidea.CreateRecipeIdeaSO;
-import com.pantrypro.networking.client.oaifunctioncall.finalizerecipe.FinalizeRecipeSO;
-import com.pantrypro.networking.client.oaifunctioncall.generatedirections.GenerateMeasuredIngredientsAndDirectionsSO;
-import com.pantrypro.networking.client.oaifunctioncall.tagrecipe.TagRecipeSO;
+import com.pantrypro.openai.structuredoutput.CategorizeIngredientsSO;
+import com.pantrypro.openai.structuredoutput.createrecipeidea.CreateRecipeIdeaSO;
+import com.pantrypro.openai.structuredoutput.FinalizeRecipeSO;
+import com.pantrypro.openai.structuredoutput.GenerateMeasuredIngredientsAndDirectionsSO;
+import com.pantrypro.openai.structuredoutput.TagRecipeSO;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 

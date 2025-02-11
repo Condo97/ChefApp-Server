@@ -1,4 +1,4 @@
-package com.pantrypro.networking.client.oaifunctioncall.createrecipeidea;
+package com.pantrypro.openai.structuredoutput.createrecipeidea;
 
 import java.util.List;
 

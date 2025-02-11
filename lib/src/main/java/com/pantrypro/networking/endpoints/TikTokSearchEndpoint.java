@@ -1,15 +1,13 @@
 package com.pantrypro.networking.endpoints;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pantrypro.core.Endpoint;
-import com.pantrypro.core.tikapi.TikAPIClient;
+import com.pantrypro.tikapi.TikAPISearchClient;
 import com.pantrypro.database.dao.pooled.User_AuthTokenDAOPooled;
 import com.pantrypro.database.objects.User_AuthToken;
 import com.pantrypro.keys.Keys;
-import com.pantrypro.networking.responsefactories.BodyResponseFactory;
 import com.pantrypro.networking.server.request.TikTokSearchRequest;
-import com.pantrypro.networking.server.response.TikTokSearchResponse;
+import com.pantrypro.networking.server.response.GenericTikAPIResponse;
 
 public class TikTokSearchEndpoint implements Endpoint<TikTokSearchRequest> {
 
@@ -19,15 +17,15 @@ public class TikTokSearchEndpoint implements Endpoint<TikTokSearchRequest> {
         User_AuthToken u_aT = User_AuthTokenDAOPooled.get(request.getAuthToken());
 
         // Adapt category
-        TikAPIClient.Category tikAPIClientCategory = switch (request.getCategory()) {
-            case USERS -> TikAPIClient.Category.USERS;
-            case VIDEOS -> TikAPIClient.Category.VIDEOS;
-            case GENERAL -> TikAPIClient.Category.GENERAL;
-            case AUTOCOMPLETE -> TikAPIClient.Category.AUTOCOMPLETE;
+        TikAPISearchClient.Category tikAPIClientCategory = switch (request.getCategory()) {
+            case USERS -> TikAPISearchClient.Category.USERS;
+            case VIDEOS -> TikAPISearchClient.Category.VIDEOS;
+            case GENERAL -> TikAPISearchClient.Category.GENERAL;
+            case AUTOCOMPLETE -> TikAPISearchClient.Category.AUTOCOMPLETE;
         };
 
         // Get response from TikAPI
-        JsonNode tikAPISearchResponse = TikAPIClient.searchTikAPI(
+        JsonNode tikAPISearchResponse = TikAPISearchClient.search(
                 tikAPIClientCategory,
                 request.getQuery(),
                 request.getNextCursor(),
@@ -35,7 +33,7 @@ public class TikTokSearchEndpoint implements Endpoint<TikTokSearchRequest> {
         );
 
         // Return in TikTokSearchResponse
-        return new TikTokSearchResponse(tikAPISearchResponse);
+        return new GenericTikAPIResponse(tikAPISearchResponse);
     }
 
 }

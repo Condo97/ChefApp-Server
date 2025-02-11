@@ -1,4 +1,4 @@
-package com.pantrypro.core.tikapi;
+package com.pantrypro.tikapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.pantrypro.Constants;
@@ -11,7 +11,7 @@ import java.net.http.HttpRequest;
 import java.time.Duration;
 import java.util.function.Consumer;
 
-public class TikAPIClient {
+public class TikAPISearchClient {
 
     private static final HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).connectTimeout(Duration.ofMinutes(Constants.AI_TIMEOUT_MINUTES)).build();
 
@@ -33,7 +33,7 @@ public class TikAPIClient {
 
     }
 
-    public static JsonNode searchTikAPI(Category category, String query, String nextCursor, String apiKey) throws IOException, InterruptedException {
+    public static JsonNode search(Category category, String query, String nextCursor, String apiKey) throws IOException, InterruptedException {
         // Add accessToken to HttpRequest with builder
         Consumer<HttpRequest.Builder> httpRequestBuilder = (r) -> {
             r.setHeader("X-API-KEY", apiKey);
@@ -41,7 +41,6 @@ public class TikAPIClient {
         };
 
         // Create URI
-//        URI tikAPISearchURI = .create(Constants.TIK_API_SEARCH_URI);
         URLBuilder urlBuilder = new URLBuilder(Constants.TIK_API_SEARCH_URI)
                 .addPathParameter(category.getParameterString())
                 .addQueryParameter("query", query);

@@ -59,7 +59,9 @@ public final class Constants {
         public static final String REGISTER_TRANSACTION_URI = "/registerTransaction";
         public static final String REGISTER_USER_URI = "/registerUser";
         public static final String SEND_PUSH_NOTIFICATION = "/sendPushNotification";
+        public static final String TIK_API_GET_VIDEO_INFO = "/tikApiGetVideoInfo";
         public static final String TIK_TOK_SEARCH = "/tikTokSearch";
+        public static final String TRANSCRIBE_SPEECH = "/transcribeSpeech";
         public static final String UPDATE_RECIPE_IMAGE_URL = "/updateRecipeImageURL";
         public static final String VALIDATE_AUTH_TOKEN_URI = "/validateAuthToken";
     }
@@ -118,6 +120,7 @@ public final class Constants {
     public static long PINTEREST_TIMEOUT_MINUTES = 4;
 
     /* TikAPI Constants */
+    public static String TIK_API_GET_USER_INFO_URI = "https://api.tikapi.io/public/video";
     public static String TIK_API_SEARCH_URI = "https://api.tikapi.io/public/search";
 
 }

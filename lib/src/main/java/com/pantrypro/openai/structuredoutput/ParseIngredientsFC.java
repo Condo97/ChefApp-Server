@@ -1,4 +1,4 @@
-package com.pantrypro.networking.client.oaifunctioncall.parseingredientnames;
+package com.pantrypro.openai.structuredoutput;
 
 import com.oaigptconnector.model.JSONSchema;
 import com.oaigptconnector.model.JSONSchemaParameter;

@@ -11,7 +11,7 @@ import com.pantrypro.core.PantryPro;
 import com.pantrypro.core.UserAuthenticator;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.exceptions.MissingRequiredRequestObjectException;
-import com.pantrypro.networking.client.oaifunctioncall.parsepantryitems.ParsePantryItemsSO;
+import com.pantrypro.openai.structuredoutput.ParsePantryItemsSO;
 import com.pantrypro.networking.server.request.ParsePantryItemsRequest;
 import com.pantrypro.networking.server.response.ParsePantryItemsResponse;
 import sqlcomponentizer.dbserializer.DBSerializerException;
@@ -45,7 +45,7 @@ public class ParsePantryItemsEndpoint {
             userMessageBuilder.addText(request.getInput());
 
         if (request.getImageDataInput() != null && !request.getImageDataInput().isEmpty())
-            userMessageBuilder.addImage("data:image/png;base64,\n" + request.getImageDataInput(), InputImageDetail.AUTO);
+            userMessageBuilder.addImage("data:image/png;base64,\n" + request.getImageDataInput(), null);
 
         OAIChatCompletionRequestMessage userMessage = userMessageBuilder.build();
 

@@ -127,8 +127,25 @@ public class Main {
         post(Constants.URIs.GET_AND_DUPLICATE_RECIPE, (req, res) -> Server.respond(req, GetAndDuplicateRecipeRequest.class, new GetAndDuplicateRecipeEndpoint()));
         post(Constants.URIs.REGISTER_APNS, (req, res) -> Server.respond(req, APNSRegistrationRequest.class, new APNSRegistrationEndpoint()));
         post(Constants.URIs.SEND_PUSH_NOTIFICATION, (req, res) -> Server.respond(req, SendPushNotificationRequest.class, new SendPushNotificationEndpoint()));
-        post(Constants.URIs.TIK_TOK_SEARCH, (req, res) -> Server.respond(req, TikTokSearchRequest.class, new TikTokSearchEndpoint()));
         post(Constants.URIs.UPDATE_RECIPE_IMAGE_URL, (req, res) -> Server.respond(req, UpdateRecipeImageURLRequest.class, new UpdateRecipeImageURLEndpoint()));
+
+        post(Constants.URIs.TIK_API_GET_VIDEO_INFO, (req, res) -> Server.respond(
+                req,
+                TikAPIGetVideoInfoRequest.class,
+                new TikAPIGetVideoInfoEndpoint()
+        ));
+
+        post(Constants.URIs.TIK_TOK_SEARCH, (req, res) -> Server.respond(
+                req,
+                TikTokSearchRequest.class,
+                new TikTokSearchEndpoint()
+        ));
+
+        post(Constants.URIs.TRANSCRIBE_SPEECH, (req, res) -> Server.respond(
+                req,
+                TranscribeSpeechRequest.class,
+                new TranscribeSpeechEndpoint()
+        ));
 
         post(Constants.URIs.CATEGORIZE_INGREDIENTS, Server.Func::categorizeIngredients);
         post(Constants.URIs.CREATE_RECIPE_IDEA, Server.Func::createRecipeIdea);

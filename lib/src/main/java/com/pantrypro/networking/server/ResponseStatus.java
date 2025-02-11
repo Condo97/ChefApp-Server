@@ -5,6 +5,7 @@ public enum ResponseStatus {
 
     JSON_ERROR(4),
     MISSING_REQUIRED_REQUEST_OBJECT(5),
+    INVALID_FILE_TYPE(10),      // Invalid file type attached
     CAP_REACHED_ERROR(51),
 
     // Errors with services
