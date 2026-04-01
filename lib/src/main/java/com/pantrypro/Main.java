@@ -26,8 +26,6 @@ public class Main {
     private static final int MIN_THREADS = 1;
     private static final int TIMEOUT_MS = -1; //30000;
 
-    private static final int DEFAULT_PORT = 800;
-
     public static void main(String... args) throws SQLException {
         // Set up MySQL Driver
         try {
@@ -44,13 +42,14 @@ public class Main {
 
         // Set up Spark thread pool and port
 //        threadPool(MAX_THREADS, MIN_THREADS, TIMEOUT_MS);
-        port(DEFAULT_PORT);
+        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "9055"));
+        port(port);
 
         // Set up Policy static file location
         staticFiles.location("/policies");
 
-        // Set up SSL
-        secure("chitchatserver.com.jks", Keys.sslPassword, null, null);
+        // SSL disabled: Cloudflare Tunnel handles TLS termination
+        // secure("chitchatserver.com.jks", Keys.sslPassword, null, null);
 
         // Set up https v1 path
         path("/v1", () -> configureHttpEndpoints());

@@ -104,8 +104,9 @@ public final class Constants {
 
     /* OpenAI Constants */
     public static URI OPENAI_URI = URI.create("https://api.openai.com/v1/chat/completions");
+    public static final URI OPENROUTER_URL = URI.create("https://openrouter.ai/api/v1/chat/completions");
     public static long AI_TIMEOUT_MINUTES = 4;
-    public static String DEFAULT_MODEL_NAME = "gpt-4o-mini";
+    public static String DEFAULT_MODEL_NAME = "openai/gpt-4o-mini";
     public static String PAID_MODEL_NAME = "gpt-4o";
     public static String DEFAULT_BEHAVIOR = null;
     public static CompletionRole LEGACY_DEFAULT_ROLE = CompletionRole.USER;

@@ -30,6 +30,43 @@ repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
     mavenLocal()
+
+    // GitHub Packages for custom dependencies
+    maven {
+        url = uri("https://maven.pkg.github.com/Condo97/SQLComponentizer")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME")
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+    maven {
+        url = uri("https://maven.pkg.github.com/Condo97/DBClient")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME")
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+    maven {
+        url = uri("https://maven.pkg.github.com/Condo97/Java-GPT-Client-OAIGPTConnector")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME")
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+    maven {
+        url = uri("https://maven.pkg.github.com/Condo97/HttpsHandler")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME")
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+    maven {
+        url = uri("https://maven.pkg.github.com/Condo97/AppleTransactionClient")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME")
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 dependencies {
@@ -39,12 +76,11 @@ dependencies {
     // Apache HttpClient for new HTTP requests
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.3.1'
 
-    // SQLComponentizer for SQL handling
-//    implementation 'com.github.Condo97:SQLComponentizer:-SNAPSHOT'
-    implementation 'com.github.condo97:SQLComponentizer:1.0.0'
+    // SQLComponentizer for SQL handling (GitHub Packages)
+    implementation 'io.github.condo97:sqlcomponentizer:+'
 
-    // OIAGPTConnector for OpenAI GPT handling
-    implementation 'com.github.condo97:OAIGPTConnector:1.0.0'
+    // OAIGPTConnector for OpenAI GPT handling (GitHub Packages)
+    implementation 'io.github.condo97:oaigptconnector:+'
 
     // Use JUnit Jupiter for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
@@ -68,14 +104,14 @@ dependencies {
     // java-jwt for JWT
     implementation 'com.auth0:java-jwt:4.4.0'
 
-    // Httpson for HTTPS handling with Jackson and JsonNode
-    implementation 'com.github.condo97:Httpson:1.0.0'
+    // Httpson for HTTPS handling with Jackson and JsonNode (GitHub Packages)
+    implementation 'io.github.condo97:httpson:+'
 
-    // AppleTransactionClient for handling Apple transactions
-    implementation 'com.github.condo97:AppleTransactionClient:1.1.0'
+    // AppleTransactionClient for handling Apple transactions (GitHub Packages)
+    implementation 'io.github.condo97:apple-transaction-client:+'
 
-    // MySQLDBClient for handling MySQL database interaction
-    implementation 'com.github.condo97:MySQLDBClient:1.0.0'
+    // DBClient for handling database interaction (GitHub Packages)
+    implementation 'io.github.condo97:dbclient:+'
 
 }
 

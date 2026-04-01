@@ -528,7 +528,8 @@ public class PantryPro {
         OAIChatCompletionRequest chatCompletionRequest = OAIChatCompletionRequest.build(
                 Constants.DEFAULT_MODEL_NAME,
                 Constants.Response_Token_Limit,
-                Constants.DEFAULT_TEMPERATURE,
+                (double) Constants.DEFAULT_TEMPERATURE,
+                "",
                 new OAIChatCompletionRequestResponseFormat(
                         ResponseFormatType.JSON_SCHEMA,
                         soObject
@@ -540,7 +541,8 @@ public class PantryPro {
         OAIGPTChatCompletionResponse response = OAIClient.postChatCompletion(
                 chatCompletionRequest,
                 Keys.openAiAPI,
-                httpClient
+                httpClient,
+                Constants.OPENROUTER_URL
         );
 
         // Transform back into requested StructuredOutput class

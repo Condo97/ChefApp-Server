@@ -6,7 +6,6 @@ import com.oaigptconnector.model.OAISerializerException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.oaigptconnector.model.request.chat.completion.CompletionRole;
 import com.oaigptconnector.model.request.chat.completion.OAIChatCompletionRequestMessage;
-import com.oaigptconnector.model.request.chat.completion.content.InputImageDetail;
 import com.pantrypro.core.PantryPro;
 import com.pantrypro.core.UserAuthenticator;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
@@ -45,7 +44,7 @@ public class ParsePantryItemsEndpoint {
             userMessageBuilder.addText(request.getInput());
 
         if (request.getImageDataInput() != null && !request.getImageDataInput().isEmpty())
-            userMessageBuilder.addImage("data:image/png;base64,\n" + request.getImageDataInput(), null);
+            userMessageBuilder.addImage("data:image/png;base64,\n" + request.getImageDataInput());
 
         OAIChatCompletionRequestMessage userMessage = userMessageBuilder.build();
 
