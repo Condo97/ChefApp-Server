@@ -14,7 +14,7 @@ set -euo pipefail
 # ── Configuration ────────────────────────────────────────────────────────────
 
 PROJECT_DIR="/home/defaultuser/ChefApp-Server"
-RUNTIME_DIR="/home/defaultuser/App_Servers/PantryPro"
+RUNTIME_DIR="/home/defaultuser/App_Servers/PantryPro/PantryPro"
 SERVICE_NAME="pantrypro"
 BRANCH="main"
 HEALTH_URL="http://localhost:9055/health"

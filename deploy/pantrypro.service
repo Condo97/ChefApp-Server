@@ -8,10 +8,10 @@ Type=simple
 User=defaultuser
 Group=defaultuser
 
-WorkingDirectory=/home/defaultuser/App_Servers/PantryPro
-EnvironmentFile=/home/defaultuser/App_Servers/PantryPro/.env
+WorkingDirectory=/home/defaultuser/App_Servers/PantryPro/PantryPro
+EnvironmentFile=/home/defaultuser/App_Servers/PantryPro/PantryPro/.env
 
-ExecStart=/usr/bin/java -Xms256m -Xmx512m -jar /home/defaultuser/App_Servers/PantryPro/PantryPro_Server.jar
+ExecStart=/usr/bin/java -Xms256m -Xmx512m -jar /home/defaultuser/App_Servers/PantryPro/PantryPro/PantryPro_Server.jar
 
 # Java exits with 143 on SIGTERM — treat as clean shutdown
 SuccessExitStatus=143
