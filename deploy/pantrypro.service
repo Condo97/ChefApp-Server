@@ -1,0 +1,34 @@
+[Unit]
+Description=PantryPro Server (ChefApp Recipe API)
+After=network.target mysql.service
+Wants=mysql.service
+
+[Service]
+Type=simple
+User=defaultuser
+Group=defaultuser
+
+WorkingDirectory=/home/defaultuser/App_Servers/PantryPro
+EnvironmentFile=/home/defaultuser/App_Servers/PantryPro/.env
+
+ExecStart=/usr/bin/java -Xms256m -Xmx512m -jar /home/defaultuser/App_Servers/PantryPro/PantryPro_Server.jar
+
+# Java exits with 143 on SIGTERM — treat as clean shutdown
+SuccessExitStatus=143
+
+Restart=on-failure
+RestartSec=5
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+# Graceful shutdown: send SIGTERM, wait 30s, then SIGKILL
+KillMode=mixed
+TimeoutStopSec=30
+
+# Logging goes to journald — view with: journalctl -u pantrypro -f
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pantrypro
+
+[Install]
+WantedBy=multi-user.target
