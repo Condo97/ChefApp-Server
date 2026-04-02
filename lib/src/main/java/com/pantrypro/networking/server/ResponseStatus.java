@@ -16,7 +16,9 @@ public enum ResponseStatus {
     INVALID_ASSOCIATED_ID(70),
     GENERATION_ERROR(71),
     ILLEGAL_ARGUMENT(80),
-    UNHANDLED_ERROR(99);
+    AUTH_TOKEN_EXPIRED(81),
+    UNHANDLED_ERROR(99),
+    RATE_LIMITED(429);
 
     public final int Success;
 

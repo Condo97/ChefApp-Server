@@ -1,5 +1,7 @@
 package com.pantrypro.connectionpool;
 
+import com.pantrypro.util.PersistentLogger;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -39,7 +41,7 @@ public class SQLConnectionPool implements ISQLConncetionPool {
     @Override
     public synchronized Connection getConnection() throws InterruptedException, SQLException {
         if (poolConnections.size() < usedConnections.size())
-            System.out.println("SQLConnectionPool Getting Squeezed! " + poolConnections.size() + " connections left...");
+            PersistentLogger.warn(PersistentLogger.DATABASE, "SQLConnectionPool getting squeezed! " + poolConnections.size() + " connections left...");
         while (poolConnections.isEmpty())
             wait();
         Connection connection = validifyConnection(poolConnections.pop());
@@ -61,11 +63,10 @@ public class SQLConnectionPool implements ISQLConncetionPool {
                 return connection;
             }
         } catch (SQLException e) {
-            System.out.println("SQLException in getConnection in SQLConnectionPool...");
-            e.printStackTrace();
+            PersistentLogger.error(PersistentLogger.DATABASE, "SQLException validating connection in SQLConnectionPool", e);
         }
 
-        System.out.println("Creating new connection to replace invalid connection...");
+        PersistentLogger.info(PersistentLogger.DATABASE, "Creating new connection to replace invalid connection...");
 
         return createConnection();
     }

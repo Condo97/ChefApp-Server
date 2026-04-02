@@ -8,6 +8,7 @@ import com.pantrypro.Constants;
 import com.pantrypro.networking.client.apple.itunes.exception.AppleItunesResponseException;
 import com.pantrypro.networking.client.apple.itunes.response.error.AppleItunesErrorResponse;
 import com.pantrypro.networking.client.apple.itunes.response.verifyreceipt.VerifyReceiptResponse;
+import com.pantrypro.util.PersistentLogger;
 import httpson.Httpson;
 
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class AppleHttpVerifyReceipt extends Httpson {
 
             return verifyReceiptResponse;
         } catch (JsonMappingException e) {
-            e.printStackTrace();
+            PersistentLogger.error(PersistentLogger.APPLE, "Error mapping Apple verify receipt response", e);
             // Try with sandbox if error is 21007, which should be a constant, otherwise throw ItunesVerifyReceiptException
             AppleItunesErrorResponse errorResponse = new ObjectMapper().treeToValue(response, AppleItunesErrorResponse.class);
 

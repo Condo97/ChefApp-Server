@@ -3,6 +3,7 @@ package com.pantrypro.database.dao.factory;
 import com.pantrypro.connectionpool.SQLConnectionPoolInstance;
 import com.pantrypro.database.dao.User_AuthTokenDAO;
 import com.pantrypro.database.dao.helpers.AuthTokenGenerator;
+import com.pantrypro.database.dao.helpers.AuthTokenHasher;
 import com.pantrypro.database.objects.User_AuthToken;
 import com.pantrypro.exceptions.AutoIncrementingDBObjectExistsException;
 import sqlcomponentizer.dbserializer.DBSerializerException;
@@ -11,8 +12,11 @@ import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 public class User_AuthTokenFactoryDAO {
+
+    private static final int AUTH_TOKEN_EXPIRY_DAYS = 90;
 
     /***
      * Creates a User_AuthToken object with an empty userID and generated authToken, just for use when registering a new user
@@ -34,17 +38,23 @@ public class User_AuthTokenFactoryDAO {
     }
 
     public static User_AuthToken createAndSave(Integer userID, String authToken) throws DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, AutoIncrementingDBObjectExistsException, InterruptedException, InvocationTargetException, IllegalAccessException {
-        // Create User_AuthToken object
+        // Hash the token for storage
+        String hashedToken = AuthTokenHasher.hashToken(authToken);
+
+        // Create User_AuthToken object with expiry and hashed token
         User_AuthToken u_aT = new User_AuthToken(
                 userID,
-                authToken
+                authToken,
+                LocalDateTime.now().plusDays(AUTH_TOKEN_EXPIRY_DAYS),
+                hashedToken
         );
 
         Connection conn = SQLConnectionPoolInstance.getConnection();
         try {
-            // Insert User_AuthToken object and return
+            // Insert User_AuthToken object
             User_AuthTokenDAO.insert(conn, u_aT);
 
+            // Return with the raw auth token so the client receives the unhashed version
             return u_aT;
         } finally {
             SQLConnectionPoolInstance.releaseConnection(conn);

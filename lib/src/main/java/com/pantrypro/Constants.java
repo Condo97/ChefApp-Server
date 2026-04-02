@@ -1,6 +1,7 @@
 package com.pantrypro;
 
 import com.oaigptconnector.model.request.chat.completion.CompletionRole;
+import com.pantrypro.config.EnvConfig;
 
 import java.net.URI;
 
@@ -39,7 +40,7 @@ public final class Constants {
     public static final int Cap_Chat_Daily_Paid_Legacy = -1; //-1 is unlimited
 
     /* URIs for HTTPSServer */
-    class URIs {
+    public class URIs {
         public static final String ADD_OR_REMOVE_LIKE_OR_DISLIKE = "/addOrRemoveLikeOrDislike";
         public static final String CATEGORIZE_INGREDIENTS = "/categorizeIngredients";
         public static final String CREATE_RECIPE_IDEA = "/createRecipeIdea";
@@ -63,6 +64,7 @@ public final class Constants {
         public static final String TIK_TOK_SEARCH = "/tikTokSearch";
         public static final String TRANSCRIBE_SPEECH = "/transcribeSpeech";
         public static final String UPDATE_RECIPE_IMAGE_URL = "/updateRecipeImageURL";
+        public static final String SEARCH_IMAGES = "/searchImages";
         public static final String VALIDATE_AUTH_TOKEN_URI = "/validateAuthToken";
     }
 
@@ -77,7 +79,7 @@ public final class Constants {
     /* Policy Retrieval Constants */
 
     /* MySQL Constants */
-    public static final String MYSQL_URL = "jdbc:mysql://localhost:3306/pantrypro_schema?autoReconnect=true";
+    public static final String MYSQL_URL = EnvConfig.MYSQL_URL;
 
     /* Apple Server Constants */
     public static final String Apple_Bundle_ID = "com.acapplications.PantryPal";
@@ -103,10 +105,10 @@ public final class Constants {
     public static String Tag_List_Location = "recipeTags.csv";
 
     /* OpenAI Constants */
-    public static URI OPENAI_URI = URI.create("https://api.openai.com/v1/chat/completions");
+    public static URI OPENAI_URI = URI.create(EnvConfig.get("PANTRYPRO_AI_BASE_URL", "https://openrouter.ai/api") + "/v1/chat/completions");
     public static long AI_TIMEOUT_MINUTES = 4;
-    public static String DEFAULT_MODEL_NAME = "gpt-4o-mini";
-    public static String PAID_MODEL_NAME = "gpt-4o";
+    public static String DEFAULT_MODEL_NAME = EnvConfig.DEFAULT_MODEL_NAME;
+    public static String PAID_MODEL_NAME = EnvConfig.PAID_MODEL_NAME;
     public static String DEFAULT_BEHAVIOR = null;
     public static CompletionRole LEGACY_DEFAULT_ROLE = CompletionRole.USER;
     public static int DEFAULT_TEMPERATURE = 1;
@@ -118,6 +120,12 @@ public final class Constants {
     public static String PINTEREST_EVENTS_URI = "/events";
     public static String PINTEREST_TEST_URI_ARGUMENT = "test=true";
     public static long PINTEREST_TIMEOUT_MINUTES = 4;
+
+    /* Serper API Constants */
+    // Requires Keys.serperApiKey to be set in com.pantrypro.keys.Keys (gitignored)
+    public static String SERPER_IMAGES_URL = "https://google.serper.dev/images";
+    public static long SERPER_TIMEOUT_SECONDS = 30;
+    public static long IMAGE_SEARCH_CACHE_TTL_DAYS = 30;
 
     /* TikAPI Constants */
     public static String TIK_API_GET_USER_INFO_URI = "https://api.tikapi.io/public/video";

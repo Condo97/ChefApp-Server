@@ -2,6 +2,7 @@ package com.pantrypro.networking.endpoints;
 
 import com.pantrypro.core.UserAuthenticator;
 import com.pantrypro.core.conversiontracking.pinterest.PinterestConversionLogger;
+import com.pantrypro.exceptions.AuthTokenExpiredException;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.exceptions.InvalidAssociatedIdentifierException;
 import com.pantrypro.networking.client.pinterest.conversionsapi.request.PinterestSendConversionRequest;
@@ -9,13 +10,20 @@ import com.pantrypro.networking.server.request.LogPinterestConversionRequest;
 import com.pantrypro.networking.server.response.LogPinterestConversionResponse;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 
+import com.pantrypro.core.Endpoint;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
-public class LogPinterestConversionEndpoint {
+public class LogPinterestConversionEndpoint implements Endpoint<LogPinterestConversionRequest> {
 
-    public static LogPinterestConversionResponse logPinterestConversion(LogPinterestConversionRequest request) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvalidAssociatedIdentifierException, IOException {
+    @Override
+    public Object getResponse(LogPinterestConversionRequest request) throws Exception {
+        return logPinterestConversion(request);
+    }
+
+    public static LogPinterestConversionResponse logPinterestConversion(LogPinterestConversionRequest request) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvalidAssociatedIdentifierException, IOException, AuthTokenExpiredException {
         // Null or empty check for authToken
         if (request.getAuthToken() == null || request.getAuthToken().isEmpty())
             throw new InvalidAssociatedIdentifierException("Missing authToken!");

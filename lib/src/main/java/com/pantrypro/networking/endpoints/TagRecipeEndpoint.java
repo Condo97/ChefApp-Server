@@ -5,6 +5,7 @@ import com.oaigptconnector.model.OAISerializerException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.core.PantryPro;
 import com.pantrypro.database.objects.recipe.RecipeTag;
+import com.pantrypro.exceptions.AuthTokenExpiredException;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.exceptions.InvalidAssociatedIdentifierException;
 import com.pantrypro.networking.responsefactories.TagRecipeResponseFactory;
@@ -13,14 +14,21 @@ import com.pantrypro.networking.server.response.TagRecipeResponse;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 
+import com.pantrypro.core.Endpoint;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
-public class TagRecipeEndpoint {
+public class TagRecipeEndpoint implements Endpoint<TagRecipeRequest> {
 
-    public static TagRecipeResponse tagRecipe(TagRecipeRequest tagRecipeRequest) throws InvalidAssociatedIdentifierException, DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, OpenAIGPTException, DBObjectNotFoundFromQueryException, IOException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OAISerializerException, JSONSchemaDeserializerException {
+    @Override
+    public Object getResponse(TagRecipeRequest request) throws Exception {
+        return tagRecipe(request);
+    }
+
+    public static TagRecipeResponse tagRecipe(TagRecipeRequest tagRecipeRequest) throws InvalidAssociatedIdentifierException, DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, OpenAIGPTException, DBObjectNotFoundFromQueryException, IOException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OAISerializerException, JSONSchemaDeserializerException, AuthTokenExpiredException {
         // COMPATIBILITY - Get recipeID as recipeID if not null, otherwise ideaID
         Integer recipeID;
         if (tagRecipeRequest.getRecipeID() != null) {
@@ -33,7 +41,7 @@ public class TagRecipeEndpoint {
         PantryPro.validateUserRecipeAssociation(tagRecipeRequest.getAuthToken(), recipeID);
 
         // Tag recipe
-        List<RecipeTag> recipeTags = PantryPro.tagReicpe(recipeID);
+        List<RecipeTag> recipeTags = PantryPro.tagReicpe(recipeID, tagRecipeRequest.getAuthToken());
 
         // Adapt to TagRecipeResponse and return
         TagRecipeResponse tagRecipeResponse = TagRecipeResponseFactory.from(recipeTags);

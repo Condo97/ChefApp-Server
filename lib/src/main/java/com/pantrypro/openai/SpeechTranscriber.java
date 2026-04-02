@@ -14,6 +14,8 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 
+import com.pantrypro.util.PersistentLogger;
+
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.time.Duration;
@@ -102,17 +104,16 @@ public class SpeechTranscriber {
         try {
             SpeechTranscriptionResponse speechTranscriptionResponse = new ObjectMapper().treeToValue(responseJson, SpeechTranscriptionResponse.class);
 
-            System.out.println(response);
+            PersistentLogger.info(PersistentLogger.API, "Speech transcription response received: " + response);
 
             if (speechTranscriptionResponse == null) {
-                // TODO: Handle Errors
-                System.out.println("Got null response from server when requesting speech transcription in SpeechTranscriber!");
+                PersistentLogger.error(PersistentLogger.API, "Got null response from server when requesting speech transcription");
                 throw new IOException("Got null response from server when requesting speech transcription.");
             }
 
             return speechTranscriptionResponse;
         } catch (JsonProcessingException e) {
-            System.out.println("Issue Mapping SpeechTranscriptionResponse " + response);
+            PersistentLogger.error(PersistentLogger.API, "Issue mapping SpeechTranscriptionResponse: " + response, e);
 
             throw new OpenAIGPTException(e, new ObjectMapper().treeToValue(responseJson, OpenAIGPTErrorResponse.class)); // TODO: Okay to throw OpenAIGPTException here even though its using speech generator from open ai not gpt?
         }

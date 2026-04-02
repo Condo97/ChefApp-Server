@@ -6,6 +6,7 @@ import com.google.common.hash.Hashing;
 import com.pantrypro.Constants;
 import com.pantrypro.keys.Keys;
 import com.pantrypro.networking.client.pinterest.conversionsapi.request.PinterestSendConversionRequest;
+import com.pantrypro.util.PersistentLogger;
 import httpson.Httpson;
 
 import java.io.IOException;
@@ -85,8 +86,7 @@ public class PinterestConversionLogger {
                 httpRequestBuilder
         );
 
-        // Print pscResponse
-        System.out.println("Logged Pinterest Conversion: " + new ObjectMapper().writeValueAsString(pscResponse));
+        PersistentLogger.info(PersistentLogger.API, "Logged Pinterest Conversion: " + new ObjectMapper().writeValueAsString(pscResponse));
     }
 
 }

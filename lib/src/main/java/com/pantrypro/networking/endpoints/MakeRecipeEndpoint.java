@@ -7,6 +7,7 @@ import com.pantrypro.core.PantryPro;
 import com.pantrypro.database.objects.recipe.Recipe;
 import com.pantrypro.database.objects.recipe.RecipeInstruction;
 import com.pantrypro.database.objects.recipe.RecipeMeasuredIngredient;
+import com.pantrypro.exceptions.AuthTokenExpiredException;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.exceptions.InvalidAssociatedIdentifierException;
 import com.pantrypro.networking.responsefactories.MakeRecipeResponseFactory;
@@ -15,14 +16,21 @@ import com.pantrypro.networking.server.response.MakeRecipeResponse;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 
+import com.pantrypro.core.Endpoint;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
-public class MakeRecipeEndpoint {
+public class MakeRecipeEndpoint implements Endpoint<MakeRecipeRequest> {
 
-    public static MakeRecipeResponse makeRecipe(MakeRecipeRequest makeRecipeRequest) throws DBSerializerPrimaryKeyMissingException, SQLException, DBObjectNotFoundFromQueryException, IOException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, DBSerializerException, OpenAIGPTException, InstantiationException, InvalidAssociatedIdentifierException, OAISerializerException, JSONSchemaDeserializerException {
+    @Override
+    public Object getResponse(MakeRecipeRequest request) throws Exception {
+        return makeRecipe(request);
+    }
+
+    public static MakeRecipeResponse makeRecipe(MakeRecipeRequest makeRecipeRequest) throws DBSerializerPrimaryKeyMissingException, SQLException, DBObjectNotFoundFromQueryException, IOException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, DBSerializerException, OpenAIGPTException, InstantiationException, InvalidAssociatedIdentifierException, OAISerializerException, JSONSchemaDeserializerException, AuthTokenExpiredException {
         // COMPATIBILITY - Get recipeID from request recipeID or if null ideaID
         Integer recipeID;
         if (makeRecipeRequest.getRecipeID() != null) {
@@ -35,7 +43,7 @@ public class MakeRecipeEndpoint {
         PantryPro.validateUserRecipeAssociation(makeRecipeRequest.getAuthToken(), recipeID);
 
         // Finalize and save recipe
-        PantryPro.finalizeSaveRecipe(recipeID, makeRecipeRequest.getAdditionalInput());
+        PantryPro.finalizeSaveRecipe(recipeID, makeRecipeRequest.getAdditionalInput(), makeRecipeRequest.getAuthToken());
 
         // Get Recipe
         Recipe recipe = PantryPro.getRecipe(recipeID);

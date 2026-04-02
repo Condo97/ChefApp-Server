@@ -13,6 +13,11 @@ public class BodyResponse extends StatusResponse {
         this.body = body;
     }
 
+    public BodyResponse(ResponseStatus status, Object body, String errorMessage) {
+        super(status, errorMessage);
+        this.body = body;
+    }
+
     public Object getBody() {
         return body;
     }

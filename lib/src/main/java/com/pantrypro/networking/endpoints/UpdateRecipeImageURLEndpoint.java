@@ -1,9 +1,9 @@
 package com.pantrypro.networking.endpoints;
 
 import com.pantrypro.core.Endpoint;
+import com.pantrypro.core.UserAuthenticator;
 import com.pantrypro.database.dao.pooled.RecipeDAOPooled;
-import com.pantrypro.database.dao.pooled.User_AuthTokenDAOPooled;
-import com.pantrypro.database.objects.User_AuthToken;
+import com.pantrypro.exceptions.InvalidAssociatedIdentifierException;
 import com.pantrypro.exceptions.MissingRequiredRequestObjectException;
 import com.pantrypro.networking.server.request.UpdateRecipeImageURLRequest;
 
@@ -15,15 +15,17 @@ public class UpdateRecipeImageURLEndpoint implements Endpoint<UpdateRecipeImageU
         if (request.getAuthToken() == null || request.getAuthToken().isEmpty() || request.getRecipeID() == null || request.getImageURL() == null || request.getImageURL().isEmpty())
             throw new MissingRequiredRequestObjectException("Did not include authToken, recipeID, or imageURL.");
 
-        // Get u_aT
-        User_AuthToken u_aT = User_AuthTokenDAOPooled.get(request.getAuthToken());
+        // Validate auth token and get user ID
+        Integer userID = UserAuthenticator.getUserIDFromAuthToken(request.getAuthToken());
 
-        // TODO: Validate user recipe association?
+        // Validate user owns this recipe
+        if (!RecipeDAOPooled.isUserAssociatedWithRecipe(userID, request.getRecipeID()))
+            throw new InvalidAssociatedIdentifierException("User is not associated with recipe.");
 
         // Update Recipe with imageURL
         RecipeDAOPooled.updateImageURL(request.getRecipeID(), request.getImageURL());
 
-        // Return blank string TODO: Is this a fine practice to do check on this
+        // Return blank string
         return "";
     }
 

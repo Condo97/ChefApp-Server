@@ -13,6 +13,8 @@ import com.pantrypro.database.objects.transaction.AppStoreSubscriptionStatus;
 import com.pantrypro.database.objects.transaction.Transaction;
 import com.pantrypro.keys.Keys;
 
+import com.pantrypro.util.PersistentLogger;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.KeyStoreException;
@@ -54,7 +56,7 @@ public class AppleTransactionUpdater {
 
         // For logging purposes to see if there are any times there are more than one data or lastTransaction in the statusResponse
         if (statusResponse.getData().length != 1 || statusResponse.getData()[0].getLastTransactions().length != 1)
-            System.out.println("Found more than one data or lastTransaction object in statusResponse in AppleTransactionUpdater updateTransactionStatusFromApple!\t" + statusResponse.getData().length + "-data[] length");
+            PersistentLogger.warn(PersistentLogger.APPLE, "Found more than one data or lastTransaction object in statusResponse in AppleTransactionUpdater. data[] length: " + statusResponse.getData().length);
 
         // Set subscription status and check date
         transaction.setStatus(subscriptionStatus);

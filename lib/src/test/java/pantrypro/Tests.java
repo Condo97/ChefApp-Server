@@ -450,6 +450,38 @@ public class Tests {
     }
 
     @Test
+    @DisplayName("Test Search Images Endpoint")
+    void testSearchImagesEndpoint() throws Exception {
+        // Register user
+        BodyResponse registerUserBR = RegisterUserEndpoint.registerUser();
+        AuthResponse aResponse = (AuthResponse)registerUserBR.getBody();
+
+        // Get authToken
+        String authToken = aResponse.getAuthToken();
+
+        // Build SearchImagesRequest
+        SearchImagesRequest siRequest = new SearchImagesRequest(
+                authToken,
+                "chocolate cake",
+                5
+        );
+
+        // Test Search Images Endpoint
+        SearchImagesEndpoint endpoint = new SearchImagesEndpoint();
+        SearchImagesResponse siResponse = (SearchImagesResponse) endpoint.getResponse(siRequest);
+
+        // Ensure response is not null and imageURLs is not null
+        assert(siResponse != null);
+        assert(siResponse.getImageURLs() != null);
+
+        // Print results
+        System.out.println("Image search results for 'chocolate cake': " + siResponse.getImageURLs().size() + " images");
+        for (String url : siResponse.getImageURLs()) {
+            System.out.println("  " + url);
+        }
+    }
+
+    @Test
     @DisplayName("Test Get Encrypted Bing API Key")
     void testGetEncryptedBingAPIKey() {
         String encryptedBingAPIKey = EncryptionManager.getEncryptedBingAPIKey();

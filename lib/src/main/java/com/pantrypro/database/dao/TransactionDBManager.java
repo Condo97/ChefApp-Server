@@ -8,6 +8,8 @@ import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 import sqlcomponentizer.preparedstatement.component.OrderByComponent;
 import sqlcomponentizer.preparedstatement.component.condition.SQLOperators;
 
+import com.pantrypro.util.PersistentLogger;
+
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -55,16 +57,16 @@ public class TransactionDBManager {
 
         // If there is more than one transaction, it shouldn't be a functionality issue at this moment but print to console to see how widespread this is
         if (transactions.size() > 1)
-            System.out.println("More than one transaction found when getting most recent transaction, even though there is a limit of one transaction.. This should never be seen!");
+            PersistentLogger.warn(PersistentLogger.DATABASE, "More than one transaction found when getting most recent transaction, even though there is a limit of one transaction");
 
-        System.out.println("The most recent transaction status: " + transactions.get(0).getStatus());
+        PersistentLogger.info(PersistentLogger.DATABASE, "The most recent transaction status: " + transactions.get(0).getStatus());
 
         // Return first transaction
         return transactions.get(0);
     }
 
     public static void updateCheckedStatus(Connection conn, Transaction transaction) throws DBSerializerException, SQLException, InterruptedException {
-        System.out.println("AppStore Transaction ID: " + transaction.getAppstoreTransactionID());
+        PersistentLogger.info(PersistentLogger.DATABASE, "Updating checked status for AppStore Transaction ID: " + transaction.getAppstoreTransactionID());
 
         DBManager.updateWhere( // TODO: Should this be all that is updated? I think so..
                 conn,

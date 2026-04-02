@@ -1,6 +1,7 @@
 package com.pantrypro.core.generation.tagging;
 
 import com.pantrypro.database.objects.recipe.RecipeTag;
+import com.pantrypro.util.PersistentLogger;
 
 import java.util.List;
 
@@ -26,8 +27,7 @@ public class TagFilterer {
         // Remove all not valid tags
         tags.removeIf(t -> {
             if (!validTags.contains(t.getTag().toLowerCase())) {
-                // TODO: Better logging
-                System.out.println("Removed tag \"" + t.getTag() + "\"");
+                PersistentLogger.info(PersistentLogger.RECIPE, "Removed invalid tag \"" + t.getTag() + "\"");
 
                 return true;
             }

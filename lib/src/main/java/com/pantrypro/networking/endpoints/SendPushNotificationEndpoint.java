@@ -13,6 +13,8 @@ import com.pantrypro.keys.Keys;
 import com.pantrypro.networking.server.request.SendPushNotificationRequest;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 
+import com.pantrypro.util.PersistentLogger;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -105,8 +107,7 @@ public class SendPushNotificationEndpoint implements Endpoint<SendPushNotificati
                             .setHeader("apns-topic", topic)
                             .build();
                 } catch (IOException | URISyntaxException e) {
-                    System.out.println("Exception mapping apnsRequest in SendPushNotificationEndpoint");
-                    e.printStackTrace();
+                    PersistentLogger.error(PersistentLogger.APPLE, "Exception mapping apnsRequest in SendPushNotificationEndpoint", e);
                     continue;
                 }
 
@@ -124,13 +125,12 @@ public class SendPushNotificationEndpoint implements Endpoint<SendPushNotificati
                                             // If response contains reason: Unregistered, remove it from the database
                                             if (response.get("reason").asText().equals("Unregistered")) {
                                                 APNSRegistrationDAOPooled.delete(apnsRegistration.getId());
-                                                System.out.println("Deleted APNSRegistration");
+                                                PersistentLogger.info(PersistentLogger.APPLE, "Deleted unregistered APNSRegistration");
                                             } else {
-                                                System.out.println(response);
+                                                PersistentLogger.info(PersistentLogger.APPLE, "APNS response: " + response);
                                             }
                                         } catch (DBSerializerException | SQLException | InterruptedException e) {
-                                            System.out.println("Unexpected exception triggered in SendPushNotificationEndpoint");
-                                            e.printStackTrace();
+                                            PersistentLogger.error(PersistentLogger.APPLE, "Unexpected exception in SendPushNotificationEndpoint", e);
                                         }
                                     } catch (IOException e) {
                                         // This is called because APNS doesn't seem to respond with anything when a successful notification is sent and ObjectMapper gets mad when there is no object to map, just don't print anything here for now TODO: Maybe fix this or make it better?
@@ -140,8 +140,7 @@ public class SendPushNotificationEndpoint implements Endpoint<SendPushNotificati
 
             }
 
-            // Print futures size
-            System.out.println("Futures Size: " + futures.size());
+            PersistentLogger.info(PersistentLogger.APPLE, "Sending push notifications to " + futures.size() + " devices");
 
             // Do futures
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));

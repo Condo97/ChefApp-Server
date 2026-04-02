@@ -30,21 +30,57 @@ repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
     mavenLocal()
+
+    // GitHub Packages for private Condo97 libraries
+    maven {
+        url = uri("https://maven.pkg.github.com/Condo97/SQLComponentizer")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME") ?: "Condo97"
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN") ?: ""
+        }
+    }
+    maven {
+        url = uri("https://maven.pkg.github.com/Condo97/Java-GPT-Client-OAIGPTConnector")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME") ?: "Condo97"
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN") ?: ""
+        }
+    }
+    maven {
+        url = uri("https://maven.pkg.github.com/Condo97/HttpsHandler")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME") ?: "Condo97"
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN") ?: ""
+        }
+    }
+    maven {
+        url = uri("https://maven.pkg.github.com/Condo97/AppleTransactionClient")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME") ?: "Condo97"
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN") ?: ""
+        }
+    }
+    maven {
+        url = uri("https://maven.pkg.github.com/Condo97/DBClient")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME") ?: "Condo97"
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN") ?: ""
+        }
+    }
 }
 
 dependencies {
-    // Javalin for HTTPS server
+    // Spark for HTTPS server
     implementation 'com.sparkjava:spark-core:2.9.4'
 
     // Apache HttpClient for new HTTP requests
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.3.1'
 
     // SQLComponentizer for SQL handling
-//    implementation 'com.github.Condo97:SQLComponentizer:-SNAPSHOT'
-    implementation 'com.github.condo97:SQLComponentizer:1.0.0'
+    implementation 'io.github.condo97:sqlcomponentizer:+'
 
-    // OIAGPTConnector for OpenAI GPT handling
-    implementation 'com.github.condo97:OAIGPTConnector:1.0.0'
+    // OAIGPTConnector for OpenAI GPT handling
+    implementation 'io.github.condo97:oaigptconnector:+'
 
     // Use JUnit Jupiter for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
@@ -55,9 +91,7 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:31.1-jre'
 
-    // Logging for Spark
-    implementation 'org.apache.logging.log4j:log4j:2.20.0'
-    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.20.0'
+    // Logging: PersistentLogger (custom, no external deps)
 
     // Jackson for JSONs
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.0.1'
@@ -65,17 +99,21 @@ dependencies {
     // MySQL Connector
     implementation 'mysql:mysql-connector-java:8.0.30'
 
+    // Flyway for database migrations
+    implementation 'org.flywaydb:flyway-core:9.22.3'
+    implementation 'org.flywaydb:flyway-mysql:9.22.3'
+
     // java-jwt for JWT
     implementation 'com.auth0:java-jwt:4.4.0'
 
     // Httpson for HTTPS handling with Jackson and JsonNode
-    implementation 'com.github.condo97:Httpson:1.0.0'
+    implementation 'io.github.condo97:httpson:+'
 
     // AppleTransactionClient for handling Apple transactions
-    implementation 'com.github.condo97:AppleTransactionClient:1.1.0'
+    implementation 'io.github.condo97:apple-transaction-client:+'
 
-    // MySQLDBClient for handling MySQL database interaction
-    implementation 'com.github.condo97:MySQLDBClient:1.0.0'
+    // DBClient for handling MySQL database interaction
+    implementation 'io.github.condo97:dbclient:+'
 
 }
 

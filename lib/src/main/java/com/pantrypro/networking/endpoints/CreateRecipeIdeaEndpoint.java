@@ -7,6 +7,7 @@ import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.pantrypro.core.PantryPro;
 import com.pantrypro.database.calculators.RecipeRemainingCalculator;
 import com.pantrypro.database.compoundobjects.RecipeWithIngredientsAndDirections;
+import com.pantrypro.exceptions.AuthTokenExpiredException;
 import com.pantrypro.exceptions.CapReachedException;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.exceptions.PreparedStatementMissingArgumentException;
@@ -16,6 +17,8 @@ import com.pantrypro.networking.server.request.CreateIdeaRecipeRequest;
 import com.pantrypro.networking.server.response.CreateIdeaRecipeResponse;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
+
+import com.pantrypro.core.Endpoint;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -27,9 +30,14 @@ import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 
-public class CreateRecipeIdeaEndpoint {
+public class CreateRecipeIdeaEndpoint implements Endpoint<CreateIdeaRecipeRequest> {
 
-    public static CreateIdeaRecipeResponse createRecipeIdea(CreateIdeaRecipeRequest createIdeaRecipeRequest) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, UnrecoverableKeyException, CapReachedException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, OAISerializerException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException, DBSerializerException, AppStoreErrorResponseException {
+    @Override
+    public Object getResponse(CreateIdeaRecipeRequest request) throws Exception {
+        return createRecipeIdea(request);
+    }
+
+    public static CreateIdeaRecipeResponse createRecipeIdea(CreateIdeaRecipeRequest createIdeaRecipeRequest) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, UnrecoverableKeyException, CapReachedException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, OAISerializerException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException, DBSerializerException, AppStoreErrorResponseException, AuthTokenExpiredException {
         // Create save recipe idea
         RecipeWithIngredientsAndDirections recipeWithIngredientsAndDirections = PantryPro.createSaveRecipeIdea(
                 createIdeaRecipeRequest.getAuthToken(),

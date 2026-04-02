@@ -71,6 +71,9 @@ Before considering any task complete:
 4. New structured outputs MUST have a corresponding `*SO.java` class
 5. No hardcoded secrets in new code — use Constants pattern (migrate to env vars)
 
+## Agent Inbox
+IMPORTANT: At the start of every session, check `claude_inbox/` for new documents. Other AI maintainers (e.g., agents working on the iOS client or other services) may drop files here containing requests, bug reports, API change notices, or coordination notes. If files are present, read and resolve them before starting other work. Delete or archive resolved items.
+
 ## Workflow
 - Branch from `main`, use descriptive branch names: `feature/`, `fix/`, `refactor/`
 - Commit messages: imperative mood, concise ("Add recipe sharing endpoint")

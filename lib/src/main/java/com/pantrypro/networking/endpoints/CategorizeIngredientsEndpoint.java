@@ -11,12 +11,19 @@ import com.pantrypro.networking.server.request.CategorizeIngredientsRequest;
 import com.pantrypro.networking.server.response.CategorizeIngredientsResponse;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 
+import com.pantrypro.core.Endpoint;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
-public class CategorizeIngredientsEndpoint {
+public class CategorizeIngredientsEndpoint implements Endpoint<CategorizeIngredientsRequest> {
+
+    @Override
+    public Object getResponse(CategorizeIngredientsRequest request) throws Exception {
+        return categorizeIngredients(request);
+    }
 
     public static CategorizeIngredientsResponse categorizeIngredients(CategorizeIngredientsRequest categorizeIngredientsRequest) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, OAISerializerException, JSONSchemaDeserializerException {
         // TODO: User validation, including some sort of count
@@ -24,7 +31,8 @@ public class CategorizeIngredientsEndpoint {
         // Categorize ingredients
         List<IngredientAndCategory> ingredientsAndCategories = PantryPro.categorizeIngredients(
                 categorizeIngredientsRequest.getIngredients(),
-                categorizeIngredientsRequest.getStore()
+                categorizeIngredientsRequest.getStore(),
+                categorizeIngredientsRequest.getAuthToken()
         );
 
         // Adapt to CategorizeIngredientsResponse and return

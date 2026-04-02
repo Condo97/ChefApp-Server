@@ -8,6 +8,7 @@ import com.pantrypro.database.dao.pooled.RecipeDAOPooled;
 import com.pantrypro.database.objects.recipe.Recipe;
 import com.pantrypro.database.objects.recipe.RecipeInstruction;
 import com.pantrypro.database.objects.recipe.RecipeMeasuredIngredient;
+import com.pantrypro.exceptions.AuthTokenExpiredException;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.exceptions.InvalidAssociatedIdentifierException;
 import com.pantrypro.networking.responsefactories.RegenerateRecipeDirectionsAndIdeaRecipeIngredientsResponseFactory;
@@ -16,15 +17,22 @@ import com.pantrypro.networking.server.response.RegenerateRecipeDirectionsAndUpd
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
 
+import com.pantrypro.core.Endpoint;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
-public class RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsEndpoint {
+public class RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsEndpoint implements Endpoint<RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest> {
+
+    @Override
+    public Object getResponse(RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest request) throws Exception {
+        return regenerateRecipeDirectionsAndUpdateMeasuredIngredients(request);
+    }
 
     // The big difference between this and MakeRecipeEndpoint is that this one has a more extensive request object that includes the name, summary, and ingredients and updates them before generating the recipe.. It should be able to be simplified to one class
-    public static RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse regenerateRecipeDirectionsAndUpdateMeasuredIngredients(RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest request) throws InvalidAssociatedIdentifierException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, DBSerializerPrimaryKeyMissingException, OAISerializerException, OpenAIGPTException, JSONSchemaDeserializerException, IOException {
+    public static RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsResponse regenerateRecipeDirectionsAndUpdateMeasuredIngredients(RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest request) throws InvalidAssociatedIdentifierException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, DBSerializerPrimaryKeyMissingException, OAISerializerException, OpenAIGPTException, JSONSchemaDeserializerException, IOException, AuthTokenExpiredException {
         // Ensure request getIngredientsAndMeasurements is not null, otherwise return null TODO: Also ensure name and summary, also make this better maybe throw an exception or something
         if (request.getMeasuredIngredients() == null)
             return null;
@@ -56,7 +64,7 @@ public class RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsEndpoint {
         }
 
         // Regenerate directions
-        PantryPro.regenerateMeasuredIngredientsAndDirections(request.getRecipeID(), prevServings, request.getAdditionalInput());
+        PantryPro.regenerateMeasuredIngredientsAndDirections(request.getRecipeID(), prevServings, request.getAdditionalInput(), request.getAuthToken());
 
         // Get Recipe
         Recipe recipe = PantryPro.getRecipe(request.getRecipeID());

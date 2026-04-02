@@ -2,6 +2,7 @@ package com.pantrypro.networking.endpoints;
 
 import appletransactionclient.exception.AppStoreErrorResponseException;
 import com.pantrypro.database.calculators.RecipeRemainingCalculator;
+import com.pantrypro.exceptions.AuthTokenExpiredException;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.exceptions.PreparedStatementMissingArgumentException;
 import com.pantrypro.networking.client.apple.itunes.exception.AppleItunesResponseException;
@@ -24,7 +25,7 @@ import java.sql.SQLException;
 
 public class GetRemainingIdeaRecipesEndpoint {
 
-    public static BodyResponse getRemaining(AuthRequest authRequest) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, DBSerializerPrimaryKeyMissingException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, AppStoreErrorResponseException {
+    public static BodyResponse getRemaining(AuthRequest authRequest) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, DBSerializerPrimaryKeyMissingException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, AppStoreErrorResponseException, AuthTokenExpiredException {
         // Get remaining
         Long remaining = new RecipeRemainingCalculator().calculateRemaining(authRequest.getAuthToken());
 

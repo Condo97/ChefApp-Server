@@ -14,4 +14,8 @@ public class BodyResponseFactory {
         return new BodyResponse(status, object);
     }
 
+    public static BodyResponse createErrorResponse(ResponseStatus status, String errorMessage) {
+        return new BodyResponse(status, null, errorMessage);
+    }
+
 }

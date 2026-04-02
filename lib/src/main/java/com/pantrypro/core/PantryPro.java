@@ -8,6 +8,7 @@ import com.oaigptconnector.model.request.chat.completion.*;
 import com.oaigptconnector.model.response.chat.completion.http.OAIGPTChatCompletionResponse;
 import com.pantrypro.Constants;
 import com.pantrypro.core.generation.IdeaRecipeExpandIngredients;
+import com.pantrypro.core.PPPremiumValidator;
 import com.pantrypro.core.generation.tagging.TagFetcher;
 import com.pantrypro.database.calculators.RecipeRemainingCalculator;
 import com.pantrypro.database.compoundobjects.IngredientAndCategory;
@@ -18,6 +19,7 @@ import com.pantrypro.database.objects.recipe.Recipe;
 import com.pantrypro.database.objects.recipe.RecipeInstruction;
 import com.pantrypro.database.objects.recipe.RecipeMeasuredIngredient;
 import com.pantrypro.database.objects.recipe.RecipeTag;
+import com.pantrypro.exceptions.AuthTokenExpiredException;
 import com.pantrypro.exceptions.CapReachedException;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.exceptions.InvalidAssociatedIdentifierException;
@@ -31,6 +33,9 @@ import com.pantrypro.openai.structuredoutput.GenerateMeasuredIngredientsAndDirec
 import com.pantrypro.openai.structuredoutput.TagRecipeSO;
 import sqlcomponentizer.dbserializer.DBSerializerException;
 import sqlcomponentizer.dbserializer.DBSerializerPrimaryKeyMissingException;
+
+import com.pantrypro.util.PersistentLogger;
+import com.pantrypro.util.OpenRouterRequestLogger;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -51,7 +56,7 @@ public class PantryPro {
     // Create HttpClient
     private static final HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).connectTimeout(Duration.ofMinutes(com.oaigptconnector.Constants.AI_TIMEOUT_MINUTES)).build();
 
-    public static List<IngredientAndCategory> categorizeIngredients(List<String> ingredients, String store) throws OAISerializerException, OpenAIGPTException, IOException, InterruptedException, JSONSchemaDeserializerException {
+    public static List<IngredientAndCategory> categorizeIngredients(List<String> ingredients, String store, String authToken) throws OAISerializerException, OpenAIGPTException, IOException, InterruptedException, JSONSchemaDeserializerException {
         // Create input from ingredients
         String input = parseCategorizeIngredientsGPTInput(ingredients, store);
 
@@ -60,9 +65,13 @@ public class PantryPro {
                 .addText(input)
                 .build();
 
+        // Get model name based on premium status
+        String modelName = authToken != null ? getModelForUser(authToken) : Constants.DEFAULT_MODEL_NAME;
+
         // Get structured output
         CategorizeIngredientsSO categorizeIngredientsSO = getStructuredOutput(
                 CategorizeIngredientsSO.class,
+                modelName,
                 userMessage);
 
         // Adapt to IngredientAndCategory list and return
@@ -98,7 +107,7 @@ public class PantryPro {
 //        return BodyResponseFactory.createSuccessBodyResponse(ciResponse);
 //    }
 
-    public static Long countTodaysRecipes(String authToken) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+    public static Long countTodaysRecipes(String authToken) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, AuthTokenExpiredException {
         // Get userID from authToken with UserAuthenticator
         Integer userID = UserAuthenticator.getUserIDFromAuthToken(authToken);
 
@@ -108,7 +117,7 @@ public class PantryPro {
 
     /* Recipe Creation */
 
-    public static RecipeWithIngredientsAndDirections createSaveRecipeIdea(String authToken, String ingredientsString, String modifiersString, Integer expandIngredientsMagnitude) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, CapReachedException, OAISerializerException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException, DBSerializerException, AppStoreErrorResponseException {
+    public static RecipeWithIngredientsAndDirections createSaveRecipeIdea(String authToken, String ingredientsString, String modifiersString, Integer expandIngredientsMagnitude) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, IOException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, CapReachedException, OAISerializerException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException, DBSerializerException, AppStoreErrorResponseException, AuthTokenExpiredException {
         /* Validation */
 
         // Get userID from authToken using UserAuthenticator
@@ -124,8 +133,8 @@ public class PantryPro {
         // Get IdeaRecipeExpandIngredients, an enum that stores the system message, function description (unused/deprecated), and Funtion Call class for the expand ingredients magnitude integer provided in the request
         IdeaRecipeExpandIngredients ideaRecipeExpandIngredients = IdeaRecipeExpandIngredients.from(expandIngredientsMagnitude);
 
-        // Create userInput from ingredientsString and modifiersString
-        String userInput = "Ingredients: " + ingredientsString + "\n" + "Modifiers: " + modifiersString;
+        // Sanitize and create userInput from ingredientsString and modifiersString
+        String userInput = "Ingredients: " + PromptSanitizer.sanitize(ingredientsString) + "\n" + "Modifiers: " + PromptSanitizer.sanitize(modifiersString);
 
         // Create system and user messages
         OAIChatCompletionRequestMessage systemMessage = new OAIChatCompletionRequestMessageBuilder(CompletionRole.SYSTEM)
@@ -142,9 +151,13 @@ public class PantryPro {
 //                .addUser(userInput)
 //                .build();
 
+        // Get model name based on premium status
+        String modelName = getModelForUser(authToken);
+
         // Get structured output
         CreateRecipeIdeaSO createRecipeIdeaSO = getStructuredOutput(
                 ideaRecipeExpandIngredients.getFcClass(),
+                modelName,
                 systemMessage,
                 userMessage);
 
@@ -160,7 +173,7 @@ public class PantryPro {
         return recipeWithIngredientsAndDirections;
     }
 
-    public static void finalizeSaveRecipe(Integer recipeID, String additionalInput) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException {
+    public static void finalizeSaveRecipe(Integer recipeID, String additionalInput, String authToken) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException {
         /* Generation */
 
         // Get Recipe
@@ -172,9 +185,9 @@ public class PantryPro {
         // Create input from recipe and measuredIngredients
         String input = parseFinalizeRecipeGPTInput(recipe, recipeMeasuredIngredients);
 
-        // Append additionalInput to input
+        // Sanitize and append additionalInput to input
         if (additionalInput != null && !additionalInput.isEmpty())
-            input += "\n\n" + additionalInput;
+            input += "\n\n" + PromptSanitizer.sanitize(additionalInput);
 
         // Create user message
         OAIChatCompletionRequestMessage userMessage = new OAIChatCompletionRequestMessageBuilder(CompletionRole.USER)
@@ -186,9 +199,13 @@ public class PantryPro {
 //                .addUser(input)
 //                .build();
 
+        // Get model name based on premium status
+        String modelName = authToken != null ? getModelForUser(authToken) : Constants.DEFAULT_MODEL_NAME;
+
         // Get structured output
         FinalizeRecipeSO finalizeRecipeSO = getStructuredOutput(
                 FinalizeRecipeSO.class,
+                modelName,
                 userMessage);
 
         // Update and save Recipe, RecipeMeasuredIngredients, and RecipeDirections in RecipeWithIngredientsAndDirections using RecipeFactoryDAO
@@ -217,7 +234,7 @@ public class PantryPro {
 
     /* Recipe Tagging */
 
-    public static List<RecipeTag> tagReicpe(Integer recipeID) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException {
+    public static List<RecipeTag> tagReicpe(Integer recipeID, String authToken) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException {
         // Get Recipe
         Recipe recipe = RecipeDAOPooled.get(recipeID);
 
@@ -243,9 +260,13 @@ public class PantryPro {
                 userMessage
         );
 
+        // Get model name based on premium status
+        String modelName = authToken != null ? getModelForUser(authToken) : Constants.DEFAULT_MODEL_NAME;
+
         // Get structured output
         TagRecipeSO tagRecipeSO = getStructuredOutput(
                 TagRecipeSO.class,
+                modelName,
                 messages
         );
 
@@ -269,7 +290,7 @@ public class PantryPro {
      *
      * @param recipeID The Recipe's ID
      */
-    public static void regenerateMeasuredIngredientsAndDirections(Integer recipeID, Integer oldServings, String additionalInput) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException {
+    public static void regenerateMeasuredIngredientsAndDirections(Integer recipeID, Integer oldServings, String additionalInput, String authToken) throws DBSerializerException, SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, DBSerializerPrimaryKeyMissingException {
         // Get Recipe
         Recipe recipe = RecipeDAOPooled.get(recipeID);
 
@@ -279,9 +300,9 @@ public class PantryPro {
         // Create input from recipe and recipeMeasuredIngredients
         String input = parseRegenerateDirectionsInput(recipe, recipeMeasuredIngredients, oldServings);
 
-        // Append additionalInput two lines down if not null or empty
+        // Sanitize and append additionalInput two lines down if not null or empty
         if (additionalInput != null && !additionalInput.isEmpty())
-            input += "\n\n" + additionalInput;
+            input += "\n\n" + PromptSanitizer.sanitize(additionalInput);
 
         // Create user message
         OAIChatCompletionRequestMessage userMessage = new OAIChatCompletionRequestMessageBuilder(CompletionRole.USER)
@@ -293,8 +314,12 @@ public class PantryPro {
 //                .addUser(input)
 //                .build();
 
+        // Get model name based on premium status
+        String modelName = authToken != null ? getModelForUser(authToken) : Constants.DEFAULT_MODEL_NAME;
+
         GenerateMeasuredIngredientsAndDirectionsSO generateMeasuredIngredientsAndDirectionsSO = getStructuredOutput(
                 GenerateMeasuredIngredientsAndDirectionsSO.class,
+                modelName,
                 userMessage
         );
 
@@ -331,7 +356,7 @@ public class PantryPro {
         RecipeDAOPooled.updateSummary(recipeID, summary);
     }
 
-    public static void validateUserRecipeAssociation(String authToken, Integer recipeID) throws InvalidAssociatedIdentifierException, DBSerializerException, SQLException, InterruptedException, DBObjectNotFoundFromQueryException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+    public static void validateUserRecipeAssociation(String authToken, Integer recipeID) throws InvalidAssociatedIdentifierException, DBSerializerException, SQLException, InterruptedException, DBObjectNotFoundFromQueryException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, AuthTokenExpiredException {
         // Get userID
         Integer userID = UserAuthenticator.getUserIDFromAuthToken(authToken);
 
@@ -357,9 +382,9 @@ public class PantryPro {
         if (store != null && !store.equals(""))
             sb.append(INGREDIENTS_STRING + SPACE_STRING);
 
-        // Append ingredients with COMMA_SEPARATOR_STRING
+        // Append sanitized ingredients with COMMA_SEPARATOR_STRING
         for (int i = 0; i < ingredients.size(); i++) {
-            String ingredient = ingredients.get(i);
+            String ingredient = PromptSanitizer.sanitize(ingredients.get(i));
 
             // Append ingredient
             sb.append(ingredient);
@@ -370,9 +395,9 @@ public class PantryPro {
             }
         }
 
-        // If store is not null or empty, add the NEW_LINE_STRING and STORE_STRING and SPACE_STRING and store
+        // If store is not null or empty, add the NEW_LINE_STRING and STORE_STRING and SPACE_STRING and sanitized store
         if (store != null && !store.equals(""))
-            sb.append(NEW_LINE_STRING + STORE_STRING + SPACE_STRING + store);
+            sb.append(NEW_LINE_STRING + STORE_STRING + SPACE_STRING + PromptSanitizer.sanitize(store));
 
         return sb.toString();
     }
@@ -390,7 +415,7 @@ public class PantryPro {
         // Make a Peach Cobbler
         sb.append(makeString);
         sb.append(spaceString);
-        sb.append(recipe.getName());
+        sb.append(PromptSanitizer.sanitize(recipe.getName()));
 
         // TODO: Better servings
         sb.append("measure the ingredients and include their measurements for an appropriate serving size");
@@ -399,7 +424,7 @@ public class PantryPro {
         sb.append(withTheBaseIngredientsString);
         measuredIngredients.forEach(measuredIngredient -> {
             sb.append(spaceString);
-            sb.append(measuredIngredient.getMeasuredIngredient());
+            sb.append(PromptSanitizer.sanitize(measuredIngredient.getMeasuredIngredient()));
         });
 
         // with the description "description"
@@ -407,7 +432,7 @@ public class PantryPro {
         sb.append(withTheDescriptionString);
         sb.append(spaceString);
         sb.append(quoteString);
-        sb.append(recipe.getSummary());
+        sb.append(PromptSanitizer.sanitize(recipe.getSummary()));
         sb.append(quoteString);
 
         // expanding ingredients text
@@ -440,7 +465,8 @@ public class PantryPro {
         // "Make Peach Cobbler" or if title is null or empty, "Make Recipe"
         sb.append(makeString);
         sb.append(spaceString);
-        sb.append(recipe.getName().isEmpty() ? emptyTitleRecipeString : recipe.getName());
+        String sanitizedName = PromptSanitizer.sanitize(recipe.getName());
+        sb.append(sanitizedName.isEmpty() ? emptyTitleRecipeString : sanitizedName);
 
         // "Servings: 3"
         sb.append(newLineString);
@@ -465,7 +491,7 @@ public class PantryPro {
             sb.append(spaceString);
 
             measuredIngredients.forEach(ingredient -> {
-                sb.append(ingredient.getMeasuredIngredient());
+                sb.append(PromptSanitizer.sanitize(ingredient.getMeasuredIngredient()));
                 sb.append(commaSpaceDelimiterString);
             });
 
@@ -476,13 +502,14 @@ public class PantryPro {
         }
 
         // "With the description: A sweet and tangy dessert perfect for summer"
-        if (!recipe.getSummary().isEmpty()) {
+        String sanitizedSummary = PromptSanitizer.sanitize(recipe.getSummary());
+        if (!sanitizedSummary.isEmpty()) {
             sb.append(newLineString);
 
             sb.append(withTheDescriptionString);
             sb.append(spaceString);
 
-            sb.append(recipe.getSummary());
+            sb.append(sanitizedSummary);
         }
 
         return sb.toString();
@@ -500,7 +527,7 @@ public class PantryPro {
         // Generate tags for recipe named: RecipeName
         sb.append(generateTagsString);
         sb.append(spaceString);
-        sb.append(ideaRecipe.getName());
+        sb.append(PromptSanitizer.sanitize(ideaRecipe.getName()));
 
         sb.append(newLineString);
 
@@ -508,47 +535,157 @@ public class PantryPro {
         sb.append(withIngredientsString);
         measuredIngredients.forEach(measuredIngredient -> {
             sb.append(spaceString);
-            sb.append(measuredIngredient.getMeasuredIngredient());
+            sb.append(PromptSanitizer.sanitize(measuredIngredient.getMeasuredIngredient()));
         });
 
-        System.out.println(sb.toString());
+        PersistentLogger.info(PersistentLogger.RECIPE, "Tag recipe input: " + sb.toString());
 
         return sb.toString();
     }
 
 
     public static <T> T getStructuredOutput(Class<T> soClass, OAIChatCompletionRequestMessage... messages) throws OAISerializerException, OpenAIGPTException, IOException, InterruptedException, JSONSchemaDeserializerException {
-        return getStructuredOutput(soClass, List.of(messages));
+        return getStructuredOutput(soClass, Constants.DEFAULT_MODEL_NAME, List.of(messages));
     }
+
     public static <T> T getStructuredOutput(Class<T> soClass, List<OAIChatCompletionRequestMessage> messages) throws OAISerializerException, OpenAIGPTException, IOException, InterruptedException, JSONSchemaDeserializerException {
-        // Objectify soClass
-        SOBase soObject = SOJSONSchemaSerializer.objectify(soClass);
+        return getStructuredOutput(soClass, Constants.DEFAULT_MODEL_NAME, messages);
+    }
 
-        // Create request
-        OAIChatCompletionRequest chatCompletionRequest = OAIChatCompletionRequest.build(
-                Constants.DEFAULT_MODEL_NAME,
-                Constants.Response_Token_Limit,
-                Constants.DEFAULT_TEMPERATURE,
-                new OAIChatCompletionRequestResponseFormat(
-                        ResponseFormatType.JSON_SCHEMA,
-                        soObject
-                ),
-                messages
-        );
+    public static <T> T getStructuredOutput(Class<T> soClass, String modelName, OAIChatCompletionRequestMessage... messages) throws OAISerializerException, OpenAIGPTException, IOException, InterruptedException, JSONSchemaDeserializerException {
+        return getStructuredOutput(soClass, modelName, List.of(messages));
+    }
 
-        // Get response
-        OAIGPTChatCompletionResponse response = OAIClient.postChatCompletion(
-                chatCompletionRequest,
-                Keys.openAiAPI,
-                httpClient
-        );
+    public static <T> T getStructuredOutput(Class<T> soClass, String modelName, List<OAIChatCompletionRequestMessage> messages) throws OAISerializerException, OpenAIGPTException, IOException, InterruptedException, JSONSchemaDeserializerException {
+        // Retry logic with exponential backoff
+        int maxRetries = 3;
+        long[] delays = {1000, 2000, 4000}; // ms
 
-        // Transform back into requested StructuredOutput class
+        for (int attempt = 0; attempt <= maxRetries; attempt++) {
+            try {
+                return doGetStructuredOutput(soClass, modelName, messages);
+            } catch (OpenAIGPTException | IOException e) {
+                if (attempt == maxRetries || !isRetryableException(e)) {
+                    throw e;
+                }
+                PersistentLogger.warn(PersistentLogger.OPENROUTER, "OpenAI call failed (attempt " + (attempt + 1) + "/" + (maxRetries + 1) + "), retrying in " + delays[attempt] + "ms: " + e.getMessage());
+                try {
+                    Thread.sleep(delays[attempt]);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw ie;
+                }
+            }
+        }
+
+        // Should not reach here, but just in case
+        return doGetStructuredOutput(soClass, modelName, messages);
+    }
+
+    /**
+     * Determines if an exception from OpenAI is retryable (rate limit, server errors).
+     */
+    private static boolean isRetryableException(Exception e) {
+        String message = e.getMessage();
+        if (message == null) {
+            // Also check cause
+            Throwable cause = e.getCause();
+            if (cause != null) {
+                message = cause.getMessage();
+            }
+        }
+        if (message != null) {
+            // Check for HTTP status codes indicating retryable errors
+            if (message.contains("429") || message.contains("500") || message.contains("502") || message.contains("503")) {
+                return true;
+            }
+            // Check for common retryable error messages
+            if (message.toLowerCase().contains("rate limit") || message.toLowerCase().contains("server error") || message.toLowerCase().contains("bad gateway") || message.toLowerCase().contains("service unavailable")) {
+                return true;
+            }
+        }
+        // IOException (network errors) are generally retryable
+        if (e instanceof IOException) {
+            return true;
+        }
+        return false;
+    }
+
+    private static <T> T doGetStructuredOutput(Class<T> soClass, String modelName, List<OAIChatCompletionRequestMessage> messages) throws OAISerializerException, OpenAIGPTException, IOException, InterruptedException, JSONSchemaDeserializerException {
+        OpenRouterRequestLogger requestLogger = null;
         try {
-            return JSONSchemaDeserializer.deserialize(response.getChoices()[0].getMessage().getContent(), soClass);
+            requestLogger = new OpenRouterRequestLogger(0);
+        } catch (IOException ioe) {
+            PersistentLogger.warn(PersistentLogger.OPENROUTER, "Failed to create request logger: " + ioe.getMessage());
+        }
+
+        try {
+            SOBase soObject = SOJSONSchemaSerializer.objectify(soClass);
+
+            if (requestLogger != null) {
+                requestLogger.logRequestDetails(modelName, messages.size(), soClass.getSimpleName());
+            }
+
+            OAIChatCompletionRequest chatCompletionRequest = OAIChatCompletionRequest.build(
+                    modelName,
+                    Constants.Response_Token_Limit,
+                    Constants.DEFAULT_TEMPERATURE,
+                    null,
+                    new OAIChatCompletionRequestResponseFormat(
+                            ResponseFormatType.JSON_SCHEMA,
+                            soObject
+                    ),
+                    messages
+            );
+
+            if (requestLogger != null) {
+                requestLogger.logOutgoingRequest(chatCompletionRequest);
+            }
+
+            PersistentLogger.info(PersistentLogger.OPENROUTER, "Request started - Model: " + modelName + ", Schema: " + soClass.getSimpleName() +
+                (requestLogger != null ? ", Detail log: " + requestLogger.getLogFilePath() : ""));
+
+            OAIGPTChatCompletionResponse response = OAIClient.postChatCompletion(
+                    chatCompletionRequest,
+                    Keys.openAiAPI,
+                    httpClient,
+                    Constants.OPENAI_URI
+            );
+
+            String responseContent = response.getChoices()[0].getMessage().getContent();
+            if (requestLogger != null) {
+                requestLogger.logResponse(responseContent);
+                requestLogger.logCompletion(true);
+            }
+
+            try {
+                return JSONSchemaDeserializer.deserialize(responseContent, soClass);
+            } catch (Exception e) {
+                PersistentLogger.error(PersistentLogger.OPENROUTER, "Failed to deserialize structured output for " + soClass.getSimpleName() + ". Response: " + responseContent, e);
+                throw e;
+            }
         } catch (Exception e) {
-            System.out.println("The response: \n" + response.getChoices()[0].getMessage().getContent());
+            if (requestLogger != null) {
+                requestLogger.logError("Request failed: " + e.getMessage(), e);
+                requestLogger.logCompletion(false);
+            }
             throw e;
+        } finally {
+            if (requestLogger != null) requestLogger.close();
+        }
+    }
+
+    /**
+     * Returns the appropriate model name based on whether the user is premium.
+     */
+    public static String getModelForUser(String authToken) {
+        try {
+            boolean isPremium = PPPremiumValidator.getIsPremium(authToken);
+            return isPremium ? Constants.PAID_MODEL_NAME : Constants.DEFAULT_MODEL_NAME;
+        } catch (Exception e) {
+            // If premium check fails, default to free tier model
+            PersistentLogger.warn(PersistentLogger.OPENROUTER, "Failed to check premium status, defaulting to free model: " + e.getMessage());
+            return Constants.DEFAULT_MODEL_NAME;
         }
     }
 

@@ -1,6 +1,7 @@
 package com.pantrypro.database.calculators;
 
 import appletransactionclient.exception.AppStoreErrorResponseException;
+import com.pantrypro.exceptions.AuthTokenExpiredException;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.exceptions.PreparedStatementMissingArgumentException;
 import com.pantrypro.networking.client.apple.itunes.exception.AppleItunesResponseException;
@@ -21,6 +22,6 @@ public abstract class RemainingCalculator {
 
     protected abstract Integer getCapFromPremium(boolean isPremium);
 
-    public abstract Long calculateRemaining(String authToken) throws DBSerializerException, SQLException, InterruptedException, DBSerializerPrimaryKeyMissingException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, AppStoreErrorResponseException;
+    public abstract Long calculateRemaining(String authToken) throws DBSerializerException, SQLException, InterruptedException, DBSerializerPrimaryKeyMissingException, DBObjectNotFoundFromQueryException, CertificateException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, AppStoreErrorResponseException, AuthTokenExpiredException;
 
 }

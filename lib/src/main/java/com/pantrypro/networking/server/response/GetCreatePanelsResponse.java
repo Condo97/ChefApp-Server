@@ -1,6 +1,7 @@
 package com.pantrypro.networking.server.response;
 
 import com.pantrypro.Constants;
+import com.pantrypro.util.PersistentLogger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,8 +17,7 @@ public class GetCreatePanelsResponse {
         try {
             return new String(Files.readString(Paths.get(Constants.Create_Panel_Spec_Filepath))).replace("\n","");
         } catch (IOException e) {
-            // TODO: Handle errors
-            System.out.println("Could not read create panels file in getCreatePanels in GetCreatePanelsResponse()");
+            PersistentLogger.error(PersistentLogger.SERVER, "Could not read create panels file in GetCreatePanelsResponse", e);
             return "";
         }
     }

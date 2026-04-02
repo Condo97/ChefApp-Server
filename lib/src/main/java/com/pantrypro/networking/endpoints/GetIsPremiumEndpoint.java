@@ -3,6 +3,7 @@ package com.pantrypro.networking.endpoints;
 import appletransactionclient.exception.AppStoreErrorResponseException;
 import com.pantrypro.core.PPPremiumValidator;
 import com.pantrypro.core.UserAuthenticator;
+import com.pantrypro.exceptions.AuthTokenExpiredException;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.exceptions.PreparedStatementMissingArgumentException;
 import com.pantrypro.networking.client.apple.itunes.exception.AppleItunesResponseException;
@@ -25,7 +26,7 @@ import java.sql.SQLException;
 
 public class GetIsPremiumEndpoint {
 
-    public static IsPremiumResponse getIsPremium(AuthRequest request) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, DBSerializerException, DBSerializerPrimaryKeyMissingException, AppStoreErrorResponseException {
+    public static IsPremiumResponse getIsPremium(AuthRequest request) throws SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, IOException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, DBSerializerException, DBSerializerPrimaryKeyMissingException, AppStoreErrorResponseException, AuthTokenExpiredException {
         // Get userID from authRequest
         Integer userID = UserAuthenticator.getUserIDFromAuthToken(request.getAuthToken());
 

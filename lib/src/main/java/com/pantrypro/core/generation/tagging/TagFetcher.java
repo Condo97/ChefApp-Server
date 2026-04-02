@@ -1,6 +1,7 @@
 package com.pantrypro.core.generation.tagging;
 
 import com.pantrypro.Constants;
+import com.pantrypro.util.PersistentLogger;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -45,8 +46,7 @@ public class TagFetcher {
 
             return tags;
         } catch (Exception e) {
-            System.out.println("Couldn't locate tags!");
-            e.printStackTrace();
+            PersistentLogger.error(PersistentLogger.RECIPE, "Couldn't locate tags!", e);
 
             return null;
         }

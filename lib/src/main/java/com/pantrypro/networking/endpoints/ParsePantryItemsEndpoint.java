@@ -6,15 +6,17 @@ import com.oaigptconnector.model.OAISerializerException;
 import com.oaigptconnector.model.exception.OpenAIGPTException;
 import com.oaigptconnector.model.request.chat.completion.CompletionRole;
 import com.oaigptconnector.model.request.chat.completion.OAIChatCompletionRequestMessage;
-import com.oaigptconnector.model.request.chat.completion.content.InputImageDetail;
 import com.pantrypro.core.PantryPro;
 import com.pantrypro.core.UserAuthenticator;
+import com.pantrypro.exceptions.AuthTokenExpiredException;
 import com.pantrypro.exceptions.DBObjectNotFoundFromQueryException;
 import com.pantrypro.exceptions.MissingRequiredRequestObjectException;
 import com.pantrypro.openai.structuredoutput.ParsePantryItemsSO;
 import com.pantrypro.networking.server.request.ParsePantryItemsRequest;
 import com.pantrypro.networking.server.response.ParsePantryItemsResponse;
 import sqlcomponentizer.dbserializer.DBSerializerException;
+
+import com.pantrypro.core.Endpoint;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -24,11 +26,16 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ParsePantryItemsEndpoint {
+public class ParsePantryItemsEndpoint implements Endpoint<ParsePantryItemsRequest> {
+
+    @Override
+    public Object getResponse(ParsePantryItemsRequest request) throws Exception {
+        return parsePantryItems(request);
+    }
 
     private static final HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).connectTimeout(Duration.ofMinutes(com.oaigptconnector.Constants.AI_TIMEOUT_MINUTES)).build();
 
-    public static ParsePantryItemsResponse parsePantryItems(ParsePantryItemsRequest request) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MissingRequiredRequestObjectException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException {
+    public static ParsePantryItemsResponse parsePantryItems(ParsePantryItemsRequest request) throws DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MissingRequiredRequestObjectException, OAISerializerException, OpenAIGPTException, IOException, JSONSchemaDeserializerException, AuthTokenExpiredException {
         // If either request authToken or input are null or input is empty, throw MissingRequiredRequestObjectException
         if (request.getAuthToken() == null || ((request.getInput() == null || request.getInput().isEmpty()) && (request.getImageDataInput() == null || request.getImageDataInput().isEmpty())))
             throw new MissingRequiredRequestObjectException("Please make sure authToken and input are included and not null or empty.");
@@ -45,7 +52,7 @@ public class ParsePantryItemsEndpoint {
             userMessageBuilder.addText(request.getInput());
 
         if (request.getImageDataInput() != null && !request.getImageDataInput().isEmpty())
-            userMessageBuilder.addImage("data:image/png;base64,\n" + request.getImageDataInput(), null);
+            userMessageBuilder.addImage("data:image/png;base64,\n" + request.getImageDataInput());
 
         OAIChatCompletionRequestMessage userMessage = userMessageBuilder.build();
 
@@ -54,9 +61,13 @@ public class ParsePantryItemsEndpoint {
                 userMessage
         );
 
+        // Get model name based on premium status
+        String modelName = PantryPro.getModelForUser(request.getAuthToken());
+
         // Deserialize soResponse to ParsePantryItemsSO
         ParsePantryItemsSO parsePantryItemsSO = PantryPro.getStructuredOutput(
                     ParsePantryItemsSO.class,
+                    modelName,
                     messages
             );
 
@@ -72,4 +83,3 @@ public class ParsePantryItemsEndpoint {
     }
 
 }
-

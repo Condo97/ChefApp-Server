@@ -14,6 +14,7 @@ import com.pantrypro.networking.responsefactories.BodyResponseFactory;
 import com.pantrypro.networking.server.ResponseStatus;
 import com.pantrypro.networking.server.request.*;
 import com.pantrypro.networking.server.response.*;
+import com.pantrypro.util.PersistentLogger;
 import spark.Request;
 import spark.Response;
 import sqlcomponentizer.dbserializer.DBSerializerException;
@@ -28,11 +29,83 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Set;
 
 public class Server {
 
+    /** URI paths for AI-powered endpoints that should have stricter rate limits */
+    private static final Set<String> AI_ENDPOINT_URIS = Set.of(
+            com.pantrypro.Constants.URIs.CREATE_RECIPE_IDEA,
+            com.pantrypro.Constants.URIs.MAKE_RECIPE_FROM_IDEA,
+            com.pantrypro.Constants.URIs.CATEGORIZE_INGREDIENTS,
+            com.pantrypro.Constants.URIs.REGENERATE_RECIPE_DIRECTIONS_AND_UPDATE_MEASURED_INGREDIENTS,
+            com.pantrypro.Constants.URIs.TAG_RECIPE_IDEA,
+            com.pantrypro.Constants.URIs.PARSE_PANTRY_ITEMS_URI
+    );
+
+    /**
+     * Checks IP and user-level rate limits. Throws RateLimitedException if exceeded.
+     * For AI endpoints, applies the stricter AI rate limit.
+     */
+    public static void checkRateLimits(Request request) throws RateLimitedException {
+        // Check IP rate limit
+        String ip = request.ip();
+        if (RateLimiter.isIPRateLimited(ip)) {
+            throw new RateLimitedException("Too many requests from this IP. Please slow down.");
+        }
+
+        // Try to extract userID from authToken in the request body for user-level rate limiting
+        try {
+            String body = request.body();
+            if (body != null && body.contains("authToken")) {
+                com.fasterxml.jackson.databind.JsonNode node = new com.fasterxml.jackson.databind.ObjectMapper().readTree(body);
+                if (node.has("authToken") && !node.get("authToken").isNull()) {
+                    String authToken = node.get("authToken").asText();
+                    Integer userID = UserAuthenticator.getUserIDFromAuthToken(authToken);
+
+                    // Check general user rate limit
+                    if (RateLimiter.isUserRateLimited(userID)) {
+                        throw new RateLimitedException("Too many requests. Please slow down.");
+                    }
+
+                    // Check stricter AI rate limit for AI endpoints
+                    String uri = request.pathInfo();
+                    if (uri != null && isAIEndpoint(uri)) {
+                        if (RateLimiter.isUserAIRateLimited(userID)) {
+                            throw new RateLimitedException("Too many AI generation requests. Please wait before trying again.");
+                        }
+                    }
+                }
+            }
+        } catch (RateLimitedException e) {
+            throw e;
+        } catch (Exception e) {
+            // If we can't extract auth info, skip user-level rate limiting
+            // IP-level rate limiting still applies
+        }
+    }
+
+    /**
+     * Checks if the given URI path corresponds to an AI-powered endpoint.
+     * Strips version prefixes (/v1, /dev) before matching.
+     */
+    private static boolean isAIEndpoint(String uri) {
+        // Strip version prefix if present
+        if (uri.startsWith("/v1")) {
+            uri = uri.substring(3);
+        } else if (uri.startsWith("/dev")) {
+            uri = uri.substring(4);
+        }
+        return AI_ENDPOINT_URIS.contains(uri);
+    }
+
+    /**
+     * @deprecated Use individual Endpoint&lt;R&gt; classes with Server.respond() instead.
+     * These static methods are kept for backward compatibility. See each endpoint class
+     * (e.g., CategorizeIngredientsEndpoint, CreateRecipeIdeaEndpoint, etc.) for the
+     * unified pattern.
+     */
+    @Deprecated
     public class Func {
 
         /***
@@ -62,7 +135,10 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String categorizeIngredients(Request request, Response response) throws MalformedJSONException, IOException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, OAISerializerException, JSONSchemaDeserializerException {
+        public static String categorizeIngredients(Request request, Response response) throws MalformedJSONException, IOException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, OpenAIGPTException, OAISerializerException, JSONSchemaDeserializerException, RateLimitedException {
+            // Check rate limits
+            checkRateLimits(request);
+
             // Try to parse CategorizeIngredientsRequest
             CategorizeIngredientsRequest ciRequest;
 
@@ -74,8 +150,7 @@ public class Server {
                 return new ObjectMapper().writeValueAsString(br);
 
             } catch (JsonMappingException | JsonParseException e) {
-                System.out.println("Error when Categorizing Ingredients.. The request: " + request.body());
-                e.printStackTrace();
+                PersistentLogger.error(PersistentLogger.SERVER, "Error when categorizing ingredients: " + e.getMessage(), e);
                 throw new MalformedJSONException("Malformed JSON - " + e.getMessage());
             }
         }
@@ -110,7 +185,10 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String createRecipeIdea(Request request, Response response) throws IOException, MalformedJSONException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, OAISerializerException, JSONSchemaDeserializerException, AppStoreErrorResponseException {
+        public static String createRecipeIdea(Request request, Response response) throws IOException, MalformedJSONException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, OAISerializerException, JSONSchemaDeserializerException, AppStoreErrorResponseException, AuthTokenExpiredException, RateLimitedException {
+            // Check rate limits
+            checkRateLimits(request);
+
             // Try to parse GetRecipeIdeaRequest
             CreateIdeaRecipeRequest criRequest;
 
@@ -119,13 +197,12 @@ public class Server {
                 CreateIdeaRecipeResponse cirr = CreateRecipeIdeaEndpoint.createRecipeIdea(criRequest);
                 BodyResponse br = BodyResponseFactory.createSuccessBodyResponse(cirr);
 
-                printTimestamped("User with AuthToken " + criRequest.getAuthToken().substring(0, Math.min(criRequest.getAuthToken().length(), 7)) + " generated Recipe Idea for Ingredients - " + criRequest.getIngredients().substring(0, Math.min(criRequest.getIngredients().length(), 39)));
+                PersistentLogger.info(PersistentLogger.SERVER, "User with AuthToken " + criRequest.getAuthToken().substring(0, Math.min(criRequest.getAuthToken().length(), 7)) + "... generated Recipe Idea for Ingredients - " + criRequest.getIngredients().substring(0, Math.min(criRequest.getIngredients().length(), 39)));
 
                 return new ObjectMapper().writeValueAsString(br);
 
             } catch (JsonMappingException | JsonParseException e) {
-                System.out.println("Error when Getting Recipe Idea.. The request: " + request.body());
-                e.printStackTrace();
+                PersistentLogger.error(PersistentLogger.SERVER, "Error when creating recipe idea: " + e.getMessage(), e);
                 throw new MalformedJSONException("Malformed JSON - " + e.getMessage());
             }
         }
@@ -162,7 +239,10 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String finalizeRecipe(Request request, Response response) throws MalformedJSONException, IOException, DBSerializerPrimaryKeyMissingException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, DBSerializerException, OpenAIGPTException, InstantiationException, InvalidAssociatedIdentifierException, OAISerializerException, JSONSchemaDeserializerException {
+        public static String finalizeRecipe(Request request, Response response) throws MalformedJSONException, IOException, DBSerializerPrimaryKeyMissingException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, DBSerializerException, OpenAIGPTException, InstantiationException, InvalidAssociatedIdentifierException, OAISerializerException, JSONSchemaDeserializerException, AuthTokenExpiredException, RateLimitedException {
+            // Check rate limits
+            checkRateLimits(request);
+
             // Try to parse MakeRecipeRequest
             MakeRecipeRequest mrRequest;
 
@@ -174,8 +254,7 @@ public class Server {
                 return new ObjectMapper().writeValueAsString(br);
 
             } catch (JsonMappingException | JsonParseException e) {
-                System.out.println("Error when Making Recipe.. The request: " + request.body());
-                e.printStackTrace();
+                PersistentLogger.error(PersistentLogger.SERVER, "Error when finalizing recipe: " + e.getMessage(), e);
                 throw new MalformedJSONException("Malformed JSON - " + e.getMessage());
             }
         }
@@ -205,7 +284,10 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String parsePantryItems(Request request, Response response) throws IOException, MissingRequiredRequestObjectException, DBSerializerException, SQLException, OAISerializerException, OpenAIGPTException, JSONSchemaDeserializerException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MalformedJSONException {
+        public static String parsePantryItems(Request request, Response response) throws IOException, MissingRequiredRequestObjectException, DBSerializerException, SQLException, OAISerializerException, OpenAIGPTException, JSONSchemaDeserializerException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MalformedJSONException, AuthTokenExpiredException, RateLimitedException {
+            // Check rate limits
+            checkRateLimits(request);
+
             // Try to parse ParsePantryItemsRequest
             ParsePantryItemsRequest ppiRequest;
 
@@ -217,8 +299,7 @@ public class Server {
                 return new ObjectMapper().writeValueAsString(br);
 
             } catch (JsonMappingException | JsonParseException e) {
-                System.out.println("Error when Making Recipe.. The request: " + request.body());
-                e.printStackTrace();
+                PersistentLogger.error(PersistentLogger.SERVER, "Error when parsing pantry items: " + e.getMessage(), e);
                 throw new MalformedJSONException("Malformed JSON - " + e.getMessage());
             }
         }
@@ -254,7 +335,10 @@ public class Server {
          *
          *
          */
-        public static String regenerateRecipeDirectionsAndUpdateMeasuredIngredients(Request request, Response response) throws IOException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, InvalidRequestJSONException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, MalformedJSONException, GenerationException, InvalidAssociatedIdentifierException, OAISerializerException, JSONSchemaDeserializerException {
+        public static String regenerateRecipeDirectionsAndUpdateMeasuredIngredients(Request request, Response response) throws IOException, DBSerializerPrimaryKeyMissingException, SQLException, CapReachedException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, InvalidRequestJSONException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, OpenAIGPTException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, MalformedJSONException, GenerationException, InvalidAssociatedIdentifierException, OAISerializerException, JSONSchemaDeserializerException, AuthTokenExpiredException, RateLimitedException {
+            // Check rate limits
+            checkRateLimits(request);
+
             // Try to parse RegenerateRecipeDirectionsAndIdeaRecipeIngredientsRequest
             RegenerateRecipeDirectionsAndUpdateMeasuredIngredientsRequest rrdairiRequest;
 
@@ -265,8 +349,7 @@ public class Server {
 
                 return new ObjectMapper().writeValueAsString(br);
             } catch (JsonMappingException | JsonParseException e) {
-                System.out.println("Error when regenerating recipe directions and idea recipe ingredients.. The request: " + request.body());
-                e.printStackTrace();
+                PersistentLogger.error(PersistentLogger.SERVER, "Error when regenerating recipe directions: " + e.getMessage(), e);
                 throw new MalformedJSONException("Malformed JSON - " + e.getMessage());
             }
         }
@@ -293,7 +376,10 @@ public class Server {
          * @param response Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static String tagRecipeIdea(Request request, Response response) throws IOException, InvalidAssociatedIdentifierException, DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, OpenAIGPTException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MalformedJSONException, OAISerializerException, JSONSchemaDeserializerException {
+        public static String tagRecipeIdea(Request request, Response response) throws IOException, InvalidAssociatedIdentifierException, DBSerializerPrimaryKeyMissingException, DBSerializerException, SQLException, OpenAIGPTException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MalformedJSONException, OAISerializerException, JSONSchemaDeserializerException, AuthTokenExpiredException, RateLimitedException {
+            // Check rate limits
+            checkRateLimits(request);
+
             // Try to parse TagRecipeRequest
             TagRecipeRequest triRequest;
 
@@ -304,14 +390,17 @@ public class Server {
 
                 return new ObjectMapper().writeValueAsString(br);
             } catch (JsonMappingException | JsonParseException e) {
-                System.out.println("Error when Tagging Recipe.. The request: " + request.body());
-                e.printStackTrace();
+                PersistentLogger.error(PersistentLogger.SERVER, "Error when tagging recipe: " + e.getMessage(), e);
                 throw new MalformedJSONException("Malformed JSON - " + e.getMessage());
             }
         }
 
     }
 
+    /**
+     * @deprecated Use LogPinterestConversionEndpoint with Server.respond() instead.
+     */
+    @Deprecated
     public class Pinterest {
 
         /***
@@ -336,7 +425,7 @@ public class Server {
          * @param res Response object given by Spark
          * @return Value of JSON response as String
          */
-        public static Object logPinterestConversion(Request req, Response res) throws IOException, InvalidAssociatedIdentifierException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MalformedJSONException {
+        public static Object logPinterestConversion(Request req, Response res) throws IOException, InvalidAssociatedIdentifierException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, MalformedJSONException, AuthTokenExpiredException {
             // Try to parse LogPinterestConversionRequest
             LogPinterestConversionRequest lpcRequest;
 
@@ -348,8 +437,7 @@ public class Server {
                 return new ObjectMapper().writeValueAsString(br);
 
             } catch (JsonMappingException | JsonParseException e) {
-                System.out.println("Error when Making Recipe.. The request: " + req.body());
-                e.printStackTrace();
+                PersistentLogger.error(PersistentLogger.SERVER, "Error when logging Pinterest conversion: " + e.getMessage(), e);
                 throw new MalformedJSONException("Malformed JSON - " + e.getMessage());
             }
         }
@@ -360,13 +448,15 @@ public class Server {
      * Generic respond lol
      */
     public static <RQ> Object respond(Request request, Class<RQ> requestClass, Endpoint<RQ> endpoint) throws Exception {
+        // Check rate limits before processing
+        checkRateLimits(request);
+
         RQ requestObject;
 
         try {
             requestObject = new ObjectMapper().readValue(request.body(), requestClass);
         } catch (JsonMappingException | JsonParseException e) {
-            System.out.println("Exception when getting response... The request: " + request.body());
-            e.printStackTrace();
+            PersistentLogger.error(PersistentLogger.SERVER, "Exception when getting response: " + e.getMessage(), e);
             throw new MalformedJSONException("Malformed JSON - " + e.getMessage());
         }
 
@@ -378,6 +468,9 @@ public class Server {
     }
 
     public static Object respond(Request request, Endpoint<?> endpoint) throws Exception {
+        // Check rate limits before processing
+        checkRateLimits(request);
+
         Object responseObject = endpoint.getResponse(null);
 
         BodyResponse bodyResponse = BodyResponseFactory.createSuccessBodyResponse(responseObject);
@@ -435,7 +528,7 @@ public class Server {
      * @param response Response object given by Spark
      * @return Value of JSON represented as String
      */
-    public static Object getIsPremium(Request request, Response response) throws IOException, DBSerializerPrimaryKeyMissingException, SQLException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, AppStoreErrorResponseException {
+    public static Object getIsPremium(Request request, Response response) throws IOException, DBSerializerPrimaryKeyMissingException, SQLException, DBObjectNotFoundFromQueryException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, UnrecoverableKeyException, DBSerializerException, PreparedStatementMissingArgumentException, AppleItunesResponseException, InvalidKeySpecException, InstantiationException, AppStoreErrorResponseException, AuthTokenExpiredException {
         // Process the request
         AuthRequest authRequest = new ObjectMapper().readValue(request.body(), AuthRequest.class);
 
@@ -446,7 +539,7 @@ public class Server {
         return new ObjectMapper().writeValueAsString(br);
     }
 
-    public static Object registerTransaction(Request request, Response response) throws IOException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, UnrecoverableKeyException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, DBSerializerPrimaryKeyMissingException, AppStoreErrorResponseException {
+    public static Object registerTransaction(Request request, Response response) throws IOException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, UnrecoverableKeyException, CertificateException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, DBSerializerPrimaryKeyMissingException, AppStoreErrorResponseException, AuthTokenExpiredException {
         // Parse the request
         RegisterTransactionRequest rtr = new ObjectMapper().readValue(request.body(), RegisterTransactionRequest.class);
 
@@ -479,12 +572,12 @@ public class Server {
     public static String registerUser(Request request, Response response) throws SQLException, SQLGeneratedKeyException, PreparedStatementMissingArgumentException, IOException, DBSerializerPrimaryKeyMissingException, DBSerializerException, AutoIncrementingDBObjectExistsException, IllegalAccessException, InterruptedException, InvocationTargetException {
         BodyResponse bodyResponse = RegisterUserEndpoint.registerUser();
 
-        printTimestamped("Registered new user!");
+        PersistentLogger.info(PersistentLogger.SERVER, "Registered new user!");
 
         return new ObjectMapper().writeValueAsString(bodyResponse);
     }
 
-    public static String validateAuthToken(Request request, Response response) throws IOException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+    public static String validateAuthToken(Request request, Response response) throws IOException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, AuthTokenExpiredException {
         AuthRequest authRequest = new ObjectMapper().readValue(request.body(), AuthRequest.class);
 
         ValidateAuthTokenResponse vatr = ValidateAuthTokenEndpoint.validateAuthToken(authRequest);
@@ -514,7 +607,7 @@ public class Server {
      * @param response Response object given by Spark
      * @return Value of JSON represented as String
      */
-    public static Object getRemainingIdeaRecipes(Request request, Response response) throws IOException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException, DBSerializerPrimaryKeyMissingException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, AppStoreErrorResponseException {
+    public static Object getRemainingIdeaRecipes(Request request, Response response) throws IOException, DBSerializerException, SQLException, DBObjectNotFoundFromQueryException, InterruptedException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException, DBSerializerPrimaryKeyMissingException, UnrecoverableKeyException, CertificateException, PreparedStatementMissingArgumentException, AppleItunesResponseException, URISyntaxException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, AppStoreErrorResponseException, AuthTokenExpiredException {
         // Process the request
         AuthRequest authRequest = new ObjectMapper().readValue(request.body(), AuthRequest.class);
 
@@ -528,26 +621,25 @@ public class Server {
     // --------------- //
 
     public static String getSimpleExceptionHandlerResponseStatusJSON(ResponseStatus status, String description) {
-        // Create error response
+        // Create error response with errorMessage in StatusResponse and description in Body
         ErrorResponse errorResponse = new ErrorResponse(description);
-        BodyResponse bodyResponse = BodyResponseFactory.createBodyResponse(status, errorResponse);
+        BodyResponse bodyResponse = new BodyResponse(status, errorResponse, description);
 
         try {
             return new ObjectMapper().writeValueAsString(bodyResponse);
         } catch (IOException e) {
             return null;
         }
-//        return "{\"Success\":" + ResponseStatus.EXCEPTION_MAP_ERROR.Success + "}";
     }
 
     // -------------- //
 
+    /**
+     * @deprecated Use PersistentLogger instead. This method is kept for backward compatibility.
+     */
+    @Deprecated
     public static void printTimestamped(String string) {
-        // TODO: Better logging
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        Date date = new Date();
-
-        System.out.println(sdf.format(date) + " - " + string);
+        PersistentLogger.info(PersistentLogger.SERVER, string);
     }
 
 }
